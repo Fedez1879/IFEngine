@@ -240,7 +240,7 @@ class IFEngine{
 		let choose;
 
 		do {
-			await this.CRT.printTyping(question+"? ",{cr:false});
+			await this.CRT.printTyping(question+i18n.IFEngine.questionMark+" ",{cr:false});
 			choose = await this.CRT.input(false);
 			
 			if(options[choose] === undefined){

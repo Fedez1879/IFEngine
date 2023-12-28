@@ -1,10 +1,10 @@
 :root{
-  --yellowF: #fc0;
-  --yellowB: #110900;
-  --yellowS: #fc0;
-  --yellowRevF: #430;
+  --yellowF: #fa0;
+  --yellowB: #110700;
+  --yellowS: #fa0;
+  --yellowRevF: #420;
   --yellowRevBs: #fa0;
-  --yellowRevS: #a20;
+  --yellowRevS: #a00;
 
   --greenF: #6f6;
   --greenB: #000c00;
@@ -13,12 +13,12 @@
   --greenRevBs: #0c0;
   --greenRevS: #0c0;
 
-  --cyanF: #3ef;
-  --cyanB: #000c0d;
-  --cyanS: #3ef;
-  --cyanRevF: #034;
-  --cyanRevBs: #0cd;
-  --cyanRevS: #0cd;
+  --cyanF: #6ff;
+  --cyanB: #000c0c;
+  --cyanS: #6ff;
+  --cyanRevF: #033;
+  --cyanRevBs: #0cc;
+  --cyanRevS: #0cc;
 
   --whiteF: #fff;
   --whiteB: #0c0c0c;
