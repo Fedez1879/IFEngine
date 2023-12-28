@@ -12,19 +12,22 @@ class Parser{
 	}
 
 	parse(input){
-		input = this._prepare(input);
-		//console.log(input);
-
 		// O è un comando imperativo
 		// O è un verbo
 		
-		let c = this._parse(input, this.commands, (this.override.commands === undefined ? {} : this.override.commands));
+		let c = this._parse(input, this.commands, true);
 		return c === false ? 
-			this._parse(input, this.verbs, (this.override.verbs === undefined ? {} : this.override.verbs)) : 
+			this._parse(input, this.verbs, false) : 
 			c;
 	}
 
-	_parse(input, sorgente, override){
+	_parse(input, sorgente, patternEsatto){
+		
+		let override = patternEsatto ? 
+			(this.override.commands === undefined ? {} : this.override.commands) :
+			(this.override.verbs === undefined ? {} : this.override.verbs);
+		
+
 		for (let chiave in sorgente){
 			let obj = { ...sorgente[chiave]};
 			
@@ -37,10 +40,20 @@ class Parser{
 					obj = { ...sorgente[chiave], ...overrideObj};
 			}
 			
+			if (typeof obj.pattern);
 
-			let pattern = obj.pattern === undefined ? 
-				"("+chiave+")" :  
-				obj.pattern;
+			let pattern = 
+				obj.pattern === undefined ? 
+				"("+chiave+")" : 
+				(
+					typeof obj.pattern == 'function' ? 
+					obj.pattern() : 
+					(
+						obj.pattern.substr(0,1) != "(" ? 
+						`(${obj.pattern})` :
+						obj.pattern
+					)
+				);
 			
 			if(
 				sorgente != this.commands && 
@@ -53,7 +66,7 @@ class Parser{
 					return input;
 			}
 
-			if(sorgente == this.verbs){
+			if(patternEsatto == false){
 				if(
 					(obj.movimento === undefined || obj.movimento == false) && 
 					(obj.complex === undefined || obj.complex == false)
@@ -66,8 +79,9 @@ class Parser{
 
 			pattern = new RegExp("^"+pattern+"$", 'i');
 			let matches = input.match(pattern);
-			//console.log(input,pattern,matches);
 			
+			// console.log(input, pattern,matches);
+
 			if(matches != null){
 
 				let subjects = [];
@@ -76,7 +90,6 @@ class Parser{
 				// Se è un movimento e lo posso usare singolarmente
 				// mappo la direzione con l'attributo "direzione" 
 				
-				//console.log(matches);
 
 				if(obj.direzione !== undefined)
 					subjects.push(obj.direzione);
@@ -89,10 +102,6 @@ class Parser{
 			
 				}	
 				
-				
-
-				// console.log(subjects)
-					
 				// Rirotno un oggetto contenente l'azione e i soggetti
 				return {
 					verb: chiave,
@@ -108,24 +117,8 @@ class Parser{
 		return false;
 	}
 
-	_prepare(input){
-		input = input.trim();
-		input = input.replace(/[\.,:;!"£\$%&\/\(\)=°\+\*]*/gmi,"");
-		input = input.replace(/à/gmi,"a");
-		input = input.replace(/(è|é)/gmi,"e");
-		input = input.replace(/ì/gmi,"i");
-		input = input.replace(/ò/gmi,"o");
-		input = input.replace(/ù/gmi,"u");
-		input = input.replace(/'/gmi," ");
-		input = input.replace(/\s+(un|uno|una|i|il|gli|le|lo|la|l)\s+/gmi," ");
-		input = input.replace(/\s+(nel|nell|nello|nella|nelle|negli|nei|dentro)\s+/gmi," in ");
-		input = input.replace(/\s+(sul|sull|sullo|sulla|sulle|sugli|sui)\s+/gmi," su ");
-		input = input.replace(/\s+(al|all|allo|agli|alle|ai)\s+/gmi," a ");
-		input = input.replace(/\s+/gmi," ");
-		return input;		
-	}
-
 	_getSource(key, source,separator){
+
 		if(separator === undefined)
 			separator = "|";
 

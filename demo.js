@@ -7,38 +7,38 @@ class Avventura extends IFEngine{
 		this.defaultInput = "\n] "
 
 		// DATI AVVENTURA
-		this.datiAvventura = {
+		this.adventureData = {
 			// stanza iniziale
-			stanzaIniziale: "ufficio",
+			startingRoom: "ufficio",
 			
 			/* STANZE */
-			stanze: {
+			rooms: {
 
 				// 01.AEREO
 				ufficio: {
 					label: "Ufficio",
-					descrizione: "Sei nel tuo ufficio. Davanti a te si estende la scrivania, piena di appunti. Sotto di essa c'è una cassettiera di ferro. Sulla parete si staglia un moderno mobile a vetri. La luce entra dalle finestre a ovest, mentre a est si trova l'unico ingresso della stanza.",
-					direzioni: {
+					description: () => "Sei nel tuo ufficio. Davanti a te si estende la scrivania, piena di appunti. Sotto di essa c'è una cassettiera di ferro. Sulla parete si staglia un moderno mobile a vetri. La luce entra dalle finestre a ovest, mentre a est si trova l'unico ingresso della stanza.",
+					directions: {
 						//e: "corridoio"
 						//defaultMessage: "Quella direzione è preclusa"
 					},
-					interattori: {
+					interactors: {
 						scrivania: {
 							label: "la scrivania",
-							descrizione: "E' una classica scrivania da ufficio in legno."
+							description: "E' una classica scrivania da ufficio in legno."
 						},
 						soggetto: {
 							label: "il soggetto",
-							descrizione: "Che tipo",
+							description: "Che tipo",
 							live: true,
-							descrizioneIniziale: () => "Un soggetto di tipo "+(this.stanzaCorrente.interattori.soggetto.live ? "A" : "B")
+							initialDescription: () => "Un soggetto di tipo "+(this.currentRoom.interactors.soggetto.live ? "A" : "B")
 						}
 						
 					},
 					onEnter: async () => {
-						if(this.datiAvventura.prologo){
-							this.datiAvventura.prologo = false;
-							await this.runSequence("prologo");
+						if(this.adventureData.prologue){
+							this.adventureData.prologue = false;
+							//await this.runSequence("prologo");
 						} 
 					},
 				},
@@ -46,22 +46,32 @@ class Avventura extends IFEngine{
 			},
 
 			/* OGGETTI */
-			oggetti: {
+			objects: {
 	
 				chiave: {
-					label: "una chiave",
-					descrizione: "E' una chiave di ottone.",
-					posizione: "ufficio",
-					initial: "C'è una chiave di ottone appoggiata sul tavolo"
+					label: [
+						"una chiave di ottone",
+						"una chiave di argento"
+					],
+					status: 0,
+					pattern: "chiave((?: di)? ottone)?",
+					description: "E' una chiave di ottone.",
+					location: "ufficio",
+					initialDescription: "C'è una chiave di ottone appoggiata sul tavolo",
+					on: {
+						take: () => { 
+							this.currentRoom.objects.chiave.status++ 
+							return null
+						}
+					}
 				},
 				occhiali: {
 					label: "un paio di occhiali",
 					pattern: "(?:paio (?:di )?)?occhiali",
-					descrizione: "Sono occhiali per astigmatici e ipermetropi.",
-					posizione: "ufficio",
-					visibile:true,
+					description: "Sono occhiali per astigmatici e ipermetropi.",
+					location: "ufficio",
 					on: {
-						'lascia': "Meglio di no, potrebbero servirti in furturo."
+						drop: "Meglio di no, potrebbero servirti in furturo."
 					}
 				}
 			},
@@ -90,11 +100,12 @@ class Avventura extends IFEngine{
 					await this.CRT.println("  ___         |                ");
  					await this.CRT.println("  |_ _   _|  _  ._ o  _  _  ");
 					await this.CRT.println("  | (/_ (_| (/_ |  | (_ (_) \n");
+					await this.CRT.wait();
 					await this.CRT.println("volpini.federico79@gmail.com\n");
 					await this.CRT.println("licenza MIT\n");
 					await this.CRT.wait();
 					this.CRT.clear();
-
+					
 				},
 				prologo: async () => {
 					await this.CRT.sleep(1000);
@@ -116,7 +127,7 @@ class Avventura extends IFEngine{
 	// Override di IFEngine.run
 	async run(){
 		await this.runSequence("titolo");
-		this.displayMenu(this.menu.principale);
+		this.displayMenu(this.menu.main);
 	}
 
 }

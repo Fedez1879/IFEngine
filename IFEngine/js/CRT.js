@@ -14,8 +14,8 @@ class CRT{
 		this.spad 				= 16;
 		this.currentCol 		= 1;
 		this.capsLock 			= false;
-		this.acceptedKeyCodes 	= [188,190,13,32,222,8,219,49,173,59,220];
-		this.waitText 			= "Premere invio per continuare...";
+		//this.acceptedKeyCodes 	= [188,190,13,32,222,8,219,49,173,59,220];
+		this.waitText 			= i18n.CRT.waitText;
 		
 		this.printOptions		= {
 			printDelay: 5,
@@ -28,6 +28,7 @@ class CRT{
 
 		this.refreshScreen();
 		document.body.onresize = () => {this.refreshScreen()}
+		this.mobileInput.addEventListener("paste", this.onPasteHandler, true);
 	}
 
 	refreshScreen(){
@@ -182,6 +183,31 @@ class CRT{
 		await this.print(text+"\n",options);
 	}
 	
+	onPasteHandler(e) {
+		e.preventDefault();
+		let text = (e.clipboardData.getData('text/plain'));
+		document.getElementById("txt").innerHTML += text.toUpperCase();
+	}
+
+	specialKey(keyCode){
+		switch(keyCode){
+			case 112:
+				document.body.classList.remove(...document.body.classList);
+				break;
+			case 113:
+				document.body.classList.remove(...document.body.classList);
+				document.body.classList.add("green");
+				break;
+			case 114:
+				document.body.classList.remove(...document.body.classList);
+				document.body.classList.add("cyan");
+				break;
+			case 115:
+				document.body.classList.remove(...document.body.classList);
+				document.body.classList.add("white");
+				break;
+		}
+    }
 	async input(cr, noInput){
 		if(cr==undefined) 
 			cr = this.defaultCR;
@@ -207,7 +233,15 @@ class CRT{
 			if(noInput)
 				break;
 			keyCode = lastKeyEvent.which || lastKeyEvent.keyCode;
-			if(this.acceptedKeys(keyCode) || keyCode == 13 || keyCode == 229){
+
+			if(keyCode >= 112 && keyCode <= 115){
+				this.specialKey(keyCode);
+				continue;
+			}
+
+			if(lastKeyEvent.buttons !== undefined)
+				continue;
+			if(this.accepted(lastKeyEvent.key, keyCode)){
 				switch(keyCode){
 					case 13:
 					case 229:
@@ -261,7 +295,7 @@ class CRT{
 		span.removeAttribute('id');
 		this.fixed.append(span);
 		
-		this.fixed.innerHTML += "\n" + (cr ? "\n" : "");
+		this.fixed.innerHTML += "\n\n" + (cr ? "\n" : "");
 		this.currentCol = 1;
 		this.txt.innerHTML = "";
 		
@@ -270,7 +304,11 @@ class CRT{
 		return inputTxt.trim();
 	}
 
-	acceptedKeys(code){
+	accepted(lastKeyEventKey, keyCode){
+		return lastKeyEventKey.length == 1 || 
+			keyCode == 8 ||
+			keyCode == 13 ||
+			keyCode == 229;
 		//console.log(code);
 		if (code >= 65 && code <= 90) return true;
 		if (code >= 48 && code <= 57) return true;

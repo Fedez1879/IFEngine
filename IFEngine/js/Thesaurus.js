@@ -1,18 +1,17 @@
 class Thesaurus{
 	constructor(){
 		this.defaultMessages = {
-			FATTO: 					"Fatto!",
-			PREFERISCO_DI_NO: 		"Preferisco di no.",
-			NON_TROVATO:	 		"Ricerca infruttuosa.",
-			NON_HO_CAPITO:			"Non ho capito...",
-			NULLA_DI_PARTICOLARE:	"Non noto nulla di particolare.",
-			QUI_NON_NE_VEDO: 		"Qui non ne vedo.", 
-			NON_NE_POSSIEDI: 		"Non ne possiedi.", 
-			NON_SUCCEDE_NIENTE: 	"Non succede niente.",
-			SII_PIU_SPECIFICO: 		"Sii più specifico.",
-			NON_E_POSSIBILE: 		"Non è possibile",
-			BUIO: 					"Qui è completamente buio..",
-			AZIONE_AL_BUIO: 		"Con l'oscurità non voglio azzardarmi a fare nulla..."
+			DONE: 					i18n.Thesaurus.defaultMessages.done,
+			PREFER_NOT: 			i18n.Thesaurus.defaultMessages.preferNot,
+			NOT_FOUND:	 			i18n.Thesaurus.defaultMessages.notFound,
+			DONT_UNDERSTAND:		i18n.Thesaurus.defaultMessages.dontUnderstand,
+			NOTHING_PARTICULAR:		i18n.Thesaurus.defaultMessages.dontNoticeAnythingInParticular,
+			NOT_SEEN_HERE: 			i18n.Thesaurus.defaultMessages.notSeenHere, 
+			DONT_HAVE_ANY: 			i18n.Thesaurus.defaultMessages.dontHaveAny, 
+			NOTHING_HAPPENS: 		i18n.Thesaurus.defaultMessages.nothingHappens,
+			BE_MORE_SPECIFIC: 		i18n.Thesaurus.defaultMessages.beMoreSpecific,
+			NON_E_POSSIBILE: 		i18n.Thesaurus.defaultMessages.notPossible,
+			TOO_DARK_HERE: 			i18n.Thesaurus.defaultMessages.tooDarkHere
 		}
 
 		this.loadCommands();
@@ -22,112 +21,90 @@ class Thesaurus{
 
 	loadCommands(){
 		this.commands = {
-			nord: {
+			north: {
 				movimento: true,
-				pattern: "(vai verso |vai a |vai )?(n(ord)?)",
-				defaultMessage: "Non puoi andare a nord.",
+				pattern: i18n.Thesaurus.commands.north.pattern,
+				defaultMessage: i18n.Thesaurus.commands.north.defaultMessage,
 				direzione: "n"
 			},
-			sud: {
+			south: {
 				movimento: true,
-				pattern: "(vai verso |vai a |vai )?(s(ud|outh)?)",
-				defaultMessage: "Non puoi andare a sud.",
+				pattern: i18n.Thesaurus.commands.south.pattern,
+				defaultMessage: i18n.Thesaurus.commands.south.defaultMessage,
 				direzione: "s"
 			},
 			est: {
 				movimento: true,
-				pattern: "(vai verso |vai a |vai )?(e(st)?)",
-				defaultMessage: "Non puoi andare a est.",
+				pattern: i18n.Thesaurus.commands.east.pattern,
+				defaultMessage: i18n.Thesaurus.commands.east.defaultMessage,
 				direzione: "e"
 			},
-			ovest: {
+			west: {
 				movimento: true,
-				pattern: "(vai verso |vai a |vai )?(o(vest)?|w(est)?)",
-				defaultMessage: "Non puoi andare ad ovest.",
-				direzione: "o"
+				pattern: i18n.Thesaurus.commands.west.pattern,
+				defaultMessage: i18n.Thesaurus.commands.west.defaultMessage,
+				direzione: "w"
 			},
-			alto: {
+			up: {
 				movimento: true,
-				pattern: "(sali|(vai in |vai )?a(lto)?|u(p)?|su)",
-				defaultMessage: "Non puoi andare su.",
-				direzione: "a"
+				pattern: i18n.Thesaurus.commands.up.pattern,
+				defaultMessage: i18n.Thesaurus.commands.up.defaultMessage,
+				direzione: "u"
 			},
-			basso: {
+			down: {
 				movimento: true,
-				pattern: "(scendi|(vai in |vai )?b(asso)?|d(own)?|giu)",
-				defaultMessage: "Non puoi andare giù.",
-				direzione: "b"
+				pattern: i18n.Thesaurus.commands.down.pattern,
+				defaultMessage: i18n.Thesaurus.commands.down.defaultMessage,
+				direzione: "d"
 			}
 		}
 	}
 
 	loadVerbs(){
 		this.verbs = {
-			apri: {
-				defaultMessage: "Non si apre"
+			open: {
+				pattern: i18n.Thesaurus.verbs.open.pattern,
+				defaultMessage: i18n.Thesaurus.verbs.open.defaultMessage
 			},
-			apriCon: {
-				pattern: "apri (.+) (?:con|col|coi) (.+)",
-				complex: true,
-				defaultMessage: "Non si apre"
+			close: {
+				pattern: i18n.Thesaurus.verbs.close.pattern,
+				defaultMessage: i18n.Thesaurus.verbs.close.defaultMessage
+
 			},
-			chiudi: {
-				defaultMessage: "Non si chiude"
+			pull: {
+				pattern: i18n.Thesaurus.verbs.pull.pattern,
+				defaultMessage: this.defaultMessages.PREFER_NOT
 			},
-			tira: {
-				defaultMessage: this.defaultMessages.PREFERISCO_DI_NO
+			press: {
+				pattern: i18n.Thesaurus.verbs.press.pattern,
+				defaultMessage: this.defaultMessages.PREFER_NOT
 			},
-			premi: {
-				defaultMessage: this.defaultMessages.PREFERISCO_DI_NO
+			push: {
+				pattern: i18n.Thesaurus.verbs.push.pattern,
+				defaultMessage: i18n.Thesaurus.verbs.push.defaultMessage
 			},
-			spingi: {
-				pattern: "(spingi|sposta)",
-				defaultMessage: "Non si muove."
-			},
-			prendi: {
-				pattern: "(prendi|raccogli)",
-				defaultMessage: this.defaultMessages.PREFERISCO_DI_NO
+			take: {
+				pattern: i18n.Thesaurus.verbs.take.pattern,
+				defaultMessage: this.defaultMessages.PREFER_NOT
 			},		
-			lascia: {
-				pattern: "(lascia|posa|abbandona|metti (?:giu))",
+			drop: {
 				inventario: true,
-				defaultMessage: this.defaultMessages.PREFERISCO_DI_NO
+				pattern: i18n.Thesaurus.verbs.drop.pattern,
+				defaultMessage: this.defaultMessages.PREFER_NOT
 			},
-			metti: {
-				pattern: "(metti|infila|inserisci) (.+) (?:in|su) (.+)",
-				complex: true,
-				defaultMessage: this.defaultMessages.PREFERISCO_DI_NO
-			},
-			indossa: {
-				pattern: "(indossa|metti|infila)(?:ti)?",
-				defaultMessage: this.defaultMessages.PREFERISCO_DI_NO
-			},
-			togli: {
-				pattern: "(togli|leva|sfila)(?:ti)?",
-				defaultMessage: this.defaultMessages.PREFERISCO_DI_NO
-			},
-			dai: {
-				pattern: "(dai) (.+) a (.+)",
+			give: {
 				inventario: true,
+				pattern: i18n.Thesaurus.verbs.give.pattern,
 				complex: true,
-				defaultMessage: this.defaultMessages.PREFERISCO_DI_NO
+				defaultMessage: this.defaultMessages.PREFER_NOT
 			},
-			guarda: {
-				pattern: "(guarda|esamina)",
-				defaultMessage: this.defaultMessages.NULLA_DI_PARTICOLARE
+			lookAt: {
+				pattern: i18n.Thesaurus.verbs.lookAt.pattern,
+				defaultMessage: this.defaultMessages.NOTHING_PARTICULAR
 			},
-			leggi: {
-				defaultMessage: this.defaultMessages.NULLA_DI_PARTICOLARE
-			},
-			cerca:{
-				pattern: "(cerca|trova)",
-				defaultMessage: this.defaultMessages.NON_TROVATO,
-			},
-			sali: {
-				defaultMessage: this.defaultMessages.NON_HO_CAPITO,
-			}, 
-			scendi: {
-				defaultMessage: this.defaultMessages.NON_HO_CAPITO,
+			search:{
+				pattern: i18n.Thesaurus.verbs.search.pattern,
+				defaultMessage: this.defaultMessages.NOT_FOUND
 			}
 		};
 	}

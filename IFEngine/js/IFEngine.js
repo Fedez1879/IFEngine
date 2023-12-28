@@ -2,7 +2,7 @@ class IFEngine{
 	// Questa classe deve essere estesa
 	constructor(){
 		if(this.constructor === IFEngine)
-			throw "IFEngine deve essere esteso";
+			throw i18n.IFEngine.warnings.mustBeExtended;
 		
 		// Lo schermo
 		this.CRT = new CRT();
@@ -14,73 +14,73 @@ class IFEngine{
 
 		// Costante da modificare, è la chiave di salvataggio
 		// nel localstorage
-		this.SAVED = "Avventura";
+		this.SAVED = i18n.IFEngine.SAVEDPrefix;
 
 		this.defaultInput = "\n>";
 
 		//La  stanza corrente
-		this.stanzaCorrente = null;
+		this.currentRoom = null;
 
 		// L'inventario
-		this.inventario = {};
+		this.inventory = {};
 
 		// Dati specifici di ogni avventura da salvare
-		this.altriDati = {};
+		this.otherData = {};
 
 		// Elenco degli eventi "a tempo"
 		this.timedEvents = [];
 
 		// Menu
 		this.menu = {
-			principale: {
-				label: "Vuoi:",
-				opzioni: {
+			main: {
+				label: i18n.IFEngine.menu.choose,
+				options: {
 					1: {
-						label: "Iniziare una nuova avventura",
+						label: i18n.IFEngine.menu.new,
 						callback: async () => {
 							await this.CRT.clear();
 							this.restart();
 						}
 					},
 					2: {
-						label: "Riprendere una situazione salvata",
+						label: i18n.IFEngine.menu.load,
 						callback: async () => {
 							return await this.restore();
 						}
 					},
 					3: {
-						label: "Ripassare le istruzioni",
+						label: i18n.IFEngine.menu.readInstructions,
 						callback: async () => {
-							await this.istruzioni();
+							await this.instructions();
 							await this.CRT.clear();
 							await this.run();
 						}
 					},
 					4: {
-						label: "Uscire dal gioco",
+						label: i18n.IFEngine.menu.quit,
 						callback: () => {
 							this.byebye();
 						}
 					}
 				}
 			},
-			contestuale: {
-				label: "Vuoi:",
-				opzioni: {
+			contextual: {
+				label: i18n.IFEngine.menu.choose,
+				options: {
 					1: {
-						label: "Rincominciare dall'inizio",
+						label: i18n.IFEngine.menu.restart,
 						callback: async () => {
 							this.restart(false);
 						}
 					},
 					2: {
-						label: "Riprendere una situazione salvata",
+						label: i18n.IFEngine.menu.load,
 						callback: async () => {
 							return await this.restore();
 						}
 					},
 					3: {
-						label: "Smettere di giocare",
+						label: i18n.IFEngine.menu.stop,
 						callback: () => {
 							this.byebye();
 						}
@@ -94,62 +94,50 @@ class IFEngine{
 		this.Thesaurus.commands = { 
 			...this.Thesaurus.commands, 
 			...{
-				// Salva 
-				salva:{
+				save:{
 					callback: async () =>{
 						await this.save();
 						this.gameLoop(true,true);
 						return false;
 					},
 				},
-				
-				// Carica 
-				carica: {
+				load: {
 					callback: async () =>{
 						let res = await this.restore();
 						return !res;
 					},
 				},
-
-				// Istruzioni 
-				istruzioni: {
+				instructions: {
 					callback: async () => {
-						await this.istruzioni();
+						await this.instructions();
 						return true;
 					},
 				},
-				
-				// Inventario 
-				inventario: {
+				inventory: {
 					callback: async () => {
-						await this._inventario();
+						await this.inventory();
 						return true;
 					},
 				},
-
-				// Esci
-				basta: {
+				quit: {
 					callback: async () => {
-						let answer = await this.yesNoQuestion("Vuoi smettere di giocare");
+						let answer = await this.yesNoQuestion(i18n.IFEngine.questions.quitQuestion);
 						if(answer){
-							this.displayMenu(this.menu.contestuale);
+							this.displayMenu(this.menu.contextual);
 							return false;
 						}
 						return true;
 					}
 				},
-
-				// dove 
-				dove: {
+				where: {
 					callback: async () => {
-						await this.descriviStanzaCorrente();
+						await this.currentRoomDescription();
 						return true;
 					},
 				},
-
-				punti: {
+				points: {
 					callback: async () => {
-						await this._punti();
+						await this._points();
 						return true;
 					},	
 				}
@@ -170,20 +158,20 @@ class IFEngine{
 		this.Parser = new Parser(this.Thesaurus.verbs, this.Thesaurus.commands);
 		
 
-		if(this.datiAvventura === undefined){
-			throw "Nessuna avventura caricata";
+		if(this.adventureData === undefined){
+			throw i18n.IFEngine.warnings.notLoaded;
 		}
 
 		
 		// Setta il valore key di ogni oggetto
-		for (let o in this.datiAvventura.oggetti){
-			this.datiAvventura.oggetti[o].key = o;
-			this.datiAvventura.oggetti[o].type = "oggetto";
+		for (let o in this.adventureData.objects){
+			this.adventureData.objects[o].key = o;
+			this.adventureData.objects[o].type = "oggetto";
 		}
 
 		// Setta il valore key di ogni stanza
-		for (let s in this.datiAvventura.stanze){
-			this.datiAvventura.stanze[s].key = s;
+		for (let s in this.adventureData.rooms){
+			this.adventureData.rooms[s].key = s;
 		}
 
 		let datiIniziali = this._getTbs();
@@ -193,67 +181,76 @@ class IFEngine{
 		this.run();
 	}
 
-	async restart(prologo) {
-		if(prologo === undefined) 
-			prologo = true;
+	async restart(prologue) {
+		if(prologue === undefined) 
+			prologue = true;
 		await this.CRT.clear();
+		
 		if(this.datiIniziali != undefined)
 			this.reload(this.datiIniziali);
-		this.datiAvventura.prologo = prologo;
-		this.entra(this.datiAvventura.stanzaIniziale);
+		this.adventureData.prologue = prologue;
+		this.enterRoom(this.adventureData.startingRoom);
 	}
 
 	// Mostra il menù
 	async run(){
-		this.displayMenu(this.menu.principale);
+		this.displayMenu(this.menu.main);
 	}
 	
 	// Mostra un menu
 	async displayMenu(aMenu){
 		let menu = { ...aMenu }
 		await this.CRT.printTyping(menu.label+"\n");
-		for(let o in menu.opzioni){
-			if(menu.opzioni[o].displayIf ===undefined || menu.opzioni[o].displayIf)
-				await this.CRT.printTyping("("+o+") "+menu.opzioni[o].label+"\n");
+		for(let o in menu.options){
+			if(menu.options[o].displayIf ===undefined || menu.options[o].displayIf)
+				await this.CRT.printTyping("("+o+") "+menu.options[o].label+"\n");
 			else 
-				delete menu.opzioni[o];
+				delete menu.options[o];
 		}
 		
 		let res;
-		res = await this.scelta(menu.opzioni, undefined, true);
+		res = await this.choose(menu.options, undefined, true);
 		if(res == false)
 			this.displayMenu(aMenu);
 	}
 
 	// si o no
 	async yesNoQuestion(question, cr){
-
-		return await this.scelta({
-			si: () => {return true}, 
-			no: () => {return false}
-		},question == undefined ? "Sei sicuro" : question, cr);
+		let options = {}
+		options[i18n.IFEngine.yesOrNo.yes] = () => true;
+		options[i18n.IFEngine.yesOrNo.no] = () => false;
+		
+		return await this.choose(
+			options,
+			question == undefined ? i18n.IFEngine.questions.areYouSureQuestion : question,
+			cr)
+		;
 	}
 
 	// Parsing delle scelte
-	async scelta(opzioni, question, cr){
+	async choose(options, question, cr){
 		if(cr == undefined) 
 			cr = true;
 
-		let listaOpzioni = "("+Object.keys(opzioni).join(",")+") ";
+		let optionsList = "("+Object.keys(options).join(",")+") ";
+		
 		if(question === undefined)
 			question = "";
-		let scelta;
+		
+		let choose;
+
 		do {
 			await this.CRT.printTyping(question+"? ",{cr:false});
-			scelta = await this.CRT.input(false);
+			choose = await this.CRT.input(false);
 			
-			if(opzioni[scelta] === undefined){
-				question = listaOpzioni;
+			if(options[choose] === undefined){
+				question = optionsList;
 			}
-		} while (opzioni[scelta] === undefined);
-		let callback = typeof opzioni[scelta] === 'function' ? 
-			opzioni[scelta] :
-			opzioni[scelta].callback;
+		} while (options[choose] === undefined);
+
+		let callback = typeof options[choose] === 'function' ? 
+			options[choose] :
+			options[choose].callback;
 
 		let result = await callback();
 	
@@ -264,7 +261,7 @@ class IFEngine{
 	
 	// Esci dal gioco
 	async byebye(){
-		await this.CRT.printTyping("Grazie per aver giocato. Ciao! :)", {nlAfter:1,nlBefore:1});
+		await this.CRT.printTyping(i18n.IFEngine.messages.tanksForPlaying, {nlAfter:1,nlBefore:1});
 		await this.CRT.wait();
 		await this.CRT.clear();
 		window.close();
@@ -273,87 +270,91 @@ class IFEngine{
 	
 	
 	// Entra nella stanza
-	async entra(labelStanza){
+	async enterRoom(roomLabel){
 		if(await this._breakRoomAction("onExit"))
 			return;
 
-		this.stanzaCorrente = this.datiAvventura.stanze[labelStanza];
+		this.currentRoom = this.adventureData.rooms[roomLabel];
 
-		this.Parser.setOverride(this.stanzaCorrente.override);
+		this.Parser.setOverride(this.currentRoom.override);
 
 		if(await this._breakRoomAction("onEnter"))
 			return;
 
 		await this.printRoomLabel();
-		this.refreshOggettiInStanza();
+		this.refreshRoomObjects();
 		await this.gameLoop(true);
 	}
 
 	async printRoomLabel(){
-		if(this.stanzaCorrente.label !== undefined && !this.stanzaCorrente.dark){
-			await this.CRT.println("<strong style='text-decoration:underline'>"+this.stanzaCorrente.label+"</strong>");
+		if(this.currentRoom.label !== undefined && !this.currentRoom.dark){
+			await this.CRT.println("<strong style='text-decoration:underline'>"+this.currentRoom.label+"</strong>");
 		}
 	}
 		
 	// CONTROLLE CHE UN'AZIONE DI INGRESSO O USCITA NON SIA "definitiva...."
 	async _breakRoomAction(action){
-		if(this.stanzaCorrente && this.stanzaCorrente[action]){
-			let ret = await this.stanzaCorrente[action]();
+		if(this.currentRoom && this.currentRoom[action]){
+			let ret = await this.currentRoom[action]();
 			return ret === false;
 		}
 	}
 
 	// Aggiorna gli oggetti nella stanza in base alla loro posizione
-	refreshOggettiInStanza(){
-		this.stanzaCorrente.oggetti = this._filter(o => {
-			return o.posizione == this.stanzaCorrente.key;
-		}, this.datiAvventura.oggetti);
-		//console.log(this.stanzaCorrente.oggetti);
+	refreshRoomObjects(){
+		this.currentRoom.objects = this._filter(o => {
+			return o.location == this.currentRoom.key;
+		}, this.adventureData.objects);
+		//console.log(this.currentRoom.objects);
 	}
 
 	// Descrive la stanza corrente
-	async descriviStanzaCorrente(){
-		if(this.stanzaCorrente.dark){
-			await this.CRT.printTyping(this.stanzaCorrente.descrizioneDark ? this.stanzaCorrente.descrizioneDark : this.Thesaurus.defaultMessages.BUIO);
+	async currentRoomDescription(){
+		if(this.currentRoom.dark){
+
+			await this.CRT.printTyping(this.currentRoom.darkDescription ? this._cos(this.currentRoom.darkDescription) : this.Thesaurus.defaultMessages.TOO_DARK_HERE);
 			return;
 		}
-		let descrizione = this.stanzaCorrente.descrizione;
-		descrizione += this.arricchisciDescrizione(this.stanzaCorrente.interattori);
-		descrizione += this.arricchisciDescrizione(this.stanzaCorrente.oggetti);
+		let description = this._cos(this.currentRoom.description);
+		description += this.addInitialDescription(this.currentRoom.interactors);
+		description += this.addInitialDescription(this.currentRoom.objects);
 		
-		await this.CRT.printTyping(descrizione);
-		await this.elenca(this.stanzaCorrente.interattori);
-		await this.elenca(this.stanzaCorrente.oggetti);
+		await this.CRT.printTyping(description);
+		await this.listVisibleThings(this.currentRoom.interactors);
+		await this.listVisibleThings(this.currentRoom.objects);
 	}
 
-	arricchisciDescrizione(lista){
+	addInitialDescription(lista){
 		if(lista == null || Object.keys(lista).length == 0) return "";
 		let more = [];
 		for(let i in lista){
-			if(lista[i].visibile == undefined && lista[i].descrizioneIniziale){
-				//console.log(typeof lista[i].descrizioneIniziale)	
-				let descrizioneIniziale = typeof lista[i].descrizioneIniziale == "string" ? lista[i].descrizioneIniziale : (lista[i].descrizioneIniziale)();
-				more.push(descrizioneIniziale);
+			if(lista[i].visible == undefined && lista[i].initialDescription){
+				//console.log(typeof lista[i].initialDescription)	
+				let initialDescription = this._cos(lista[i].initialDescription);
+				more.push(initialDescription);
 			} 
 
 		}
 		return more.length == 0 ? "" : "\n"+more.join("\n\n");
-	}
+	}	
 
+	
 	// Elenca una lista "cose" visibili
-	async elenca(lista){
-		if (lista == null)
+	async listVisibleThings(list){
+		if (list == null)
 			return;
-		if( Object.keys(lista).length > 0){
-			for(let i in lista){
-				if(lista[i].visibile){
-					let cosaVedo = lista[i].label+ (lista[i].stati ? " "+lista[i].stati[lista[i].stato] : "");
-					await this.CRT.printTyping("Vedo "+cosaVedo.trim()+".");
-					continue;
-				} 
+		if( Object.keys(list).length > 0){
+			for(let i in list){
+				if(list[i].visible){
+					let whatISee = Array.isArray(list[i].label) ? 
+						list[i].label[list[i].status] : 
+						list[i].label;
+					await this.CRT.printTyping(i18n.IFEngine.ISee+" "+whatISee.trim()+".");
+				}
 			}
 		}
 	}
+
 	
 	// Avvia un evento a tempo
 	startTimedEvent(eventLabel){
@@ -367,7 +368,7 @@ class IFEngine{
 		if(resetIndex === undefined)
 			resetIndex = true;
 		
-		let timedEvent = this.datiAvventura.timedEvents[eventLabel];
+		let timedEvent = this.adventureData.timedEvents[eventLabel];
 		
 		if(timedEvent !== undefined){
 			if(resetIndex)
@@ -377,16 +378,16 @@ class IFEngine{
 	}
 	
 	// Il loop del gioco
-	async gameLoop(descriviStanzaCorrente, ignoraTimedEvents){
+	async gameLoop(describeCurrentRoom, ignoraTimedEvents){
 		
-		if(descriviStanzaCorrente){
-			await this.descriviStanzaCorrente();
+		if(describeCurrentRoom){
+			await this.currentRoomDescription();
 		}
 
 		// Esistono eventi a tempo attivi?
 		if(this.timedEvents.length > 0 && !ignoraTimedEvents){
 			for(let i in this.timedEvents){
-				let timedEvent = this.datiAvventura.timedEvents[this.timedEvents[i]];
+				let timedEvent = this.adventureData.timedEvents[this.timedEvents[i]];
 				if(timedEvent !== undefined){
 					var limit = 0;
 					
@@ -436,57 +437,57 @@ class IFEngine{
 	// Salva il gioco
 	async save() {
 		if(this._checkStorage() == false ){
-			await this.CRT.printTyping("Per poter effettuare salvataggi è necessario attivare il localstorage nel browser.");
+			await this.CRT.printTyping(i18n.IFEngine.warnings.localstorageInactive);
 			return;
 		} 
-		let etichetta;
+		let saveLabel;
 		do{
-			await this.CRT.printTyping("Etichetta salvataggio (X annulla): ",this.CRT.printDelay,false);
+			await this.CRT.printTyping(i18n.IFEngine.questions.saveLabel+" ",this.CRT.printDelay,false);
 		
-			etichetta = await this.CRT.input();
-			etichetta = etichetta.trim();
-			if(etichetta == "e"){
-				await this.CRT.printTyping("Etichetta non valida. Riprovare.\n",this.CRT.printDelay);
+			saveLabel = await this.CRT.input();
+			saveLabel = saveLabel.trim();
+			if(saveLabel == i18n.IFEngine.questions.listLetter.toLowerCase()){
+				await this.CRT.printTyping(i18n.IFEngine.warnings.labelNotValid+"\n",this.CRT.printDelay);
 			}
 
-			if(etichetta == "x"){
+			if(saveLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase()){
 				return;
 			}
-		} while (etichetta == "e")
+		} while (saveLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
 		
 		let tbs = this._getTbs();
-		this.storage.setItem(this.SAVED+"-"+etichetta, JSON.stringify(tbs, (k,v) => typeof v === 'function' ? "" + v : v));
-		await this.CRT.printTyping("Dati salvati!");
+		this.storage.setItem(this.SAVED+"-"+saveLabel, JSON.stringify(tbs, (k,v) => typeof v === 'function' ? "" + v : v));
+		await this.CRT.printTyping(i18n.IFEngine.messages.saved);
 	}
 
 	// Ritorna i dati principali da salvare
 	_getTbs(){
 		return { 
-			stanzaCorrente: this.stanzaCorrente == null ? 
-				this.datiAvventura.stanzaIniziale : 
-				this.stanzaCorrente.key, 
+			currentRoom: this.currentRoom == null ? 
+				this.adventureData.startingRoom : 
+				this.currentRoom.key, 
 			timedEvents: this.timedEvents,
-			datiAvventura: this.datiAvventura, 
-			inventario: this.inventario,
-			altriDati: this.altriDati
+			adventureData: this.adventureData, 
+			inventory: this.inventory,
+			otherData: this.otherData
 		};
 	}
 
 	// Carica il gioco
 	async restore() {
 		if(this._checkStorage() == false ){
-			await this.CRT.printTyping("Attivare il localstorage nel browser.",{nlbefore: 1});
+			await this.CRT.printTyping(i18n.IFEngine.warnings.localstorageMustBeActivated,{nlbefore: 1});
 			return
 		} 
-		let etichetta;
+		let loadLabel;
 
 		do{
-			await this.CRT.printTyping("Etichetta (X annulla, E per elenco):",{nlBefore:1});
+			await this.CRT.printTyping(i18n.IFEngine.questions.restoreLabel,{nlBefore:1});
 		
-			etichetta = await this.CRT.input();
-			etichetta = etichetta.trim();
+			loadLabel = await this.CRT.input();
+			loadLabel = loadLabel.trim();
 
-			if(etichetta == "e"){
+			if(loadLabel == i18n.IFEngine.questions.listLetter.toLowerCase()){
 				let sdk = Object.keys(this.storage).filter(key => key.startsWith(this.SAVED+"-"));
 
 				let savedGames = Object.keys(this.storage)
@@ -502,7 +503,7 @@ class IFEngine{
 				
 
 				if(Object.keys(savedGames).length == 0){
-					await this.CRT.printTyping("Nessun dato da caricare...\n");
+					await this.CRT.printTyping(i18n.IFEngine.warnings.noData+"\n");
 					return false;	
 				}
 
@@ -515,20 +516,20 @@ class IFEngine{
 
 			}
 
-			if(etichetta == "x"){
+			if(loadLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase()){
 				return false;
 			}
-		} while (etichetta == "x" || etichetta == "e")
+		} while (loadLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase() || loadLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
 		
-		let realLabel = this.SAVED+"-"+etichetta;
+		let realLabel = this.SAVED+"-"+loadLabel;
 		if(this.storage[realLabel] === undefined){
-			await this.CRT.printTyping("Salvataggio \""+etichetta.toUpperCase()+"\" non trovato.\n");
+			await this.CRT.printTyping(i18n.IFEngine.warnings.notFound(loadLabel.toUpperCase())+"\n");
 			return false;	
 		}
 		
 		let stored = this.storage.getItem(realLabel);
 		if(stored == null) {
-			await this.CRT.printTyping("Nessun dato da caricare...\n");
+			await this.CRT.printTyping(i18n.IFEngine.warnings.noData+"\n");
 			return false;	
 		}
 
@@ -536,17 +537,17 @@ class IFEngine{
 		
 		
 
-		await this.CRT.printTyping("Dati caricati...\n");
+		await this.CRT.printTyping(i18n.IFEngine.messages.loaded+"\n");
 		
-		this.entra(tbr.stanzaCorrente);
+		this.enterRoom(tbr.currentRoom);
 		return true;
 	}
 	
 	reload (stored){
 		let tbr = JSON.parse(stored, (k,v) => typeof v === "string"? (v.indexOf('=>') >=0 ? eval(v) : v): v);
 		
-		if(tbr.stanzaCorrente === undefined)
-			tbr.stanzaCorrente = this.datiAvventura.stanzaIniziale;
+		if(tbr.currentRoom === undefined)
+			tbr.currentRoom = this.adventureData.startingRoom;
 
 		for (let k in tbr)
 			this[k] = Array.isArray(tbr[k]) ? [ ...tbr[k] ] : { ...tbr[k] };
@@ -554,76 +555,77 @@ class IFEngine{
 		return tbr;
 	}
 
-	async istruzioni(){
-		await this.CRT.printTyping("Nessuna istruzione qui...\n");
+	async instructions(){
+		await this.CRT.printTyping(i18n.IFEngine.messages.noInstructions+"\n");
 		await this.CRT.wait();
 	}
 	
 	// Morte
 	async die(){
-		await this.CRT.printTyping("SEI MORTO!!!");
-		this.displayMenu(this.menu.contestuale);
+		await this.CRT.printTyping(i18n.IFEngine.messages.death);
+		this.displayMenu(this.menu.contextual);
 		return false;
 	}
 
 	// Scopri oggetto, quindi diventa visibile
-	scopri(oggetto){
-		oggetto.visibile = true;
-		this.refreshOggettiInStanza();		
+	discover(object){
+		object.visible = true;
+		this.refreshRoomObjects();		
 	}
 
 	// Abilita direzione in una stanza
-	abilitaDirezione(direzione,stanza){
-		if(stanza === undefined) stanza = this.stanzaCorrente;
-		delete stanza.direzioniBloccate[stanza.direzioniBloccate.indexOf(direzione)];
+	enableDirection(direction, room){
+		if(room === undefined) room = this.currentRoom;
+		delete room.blockedDirections[room.blockedDirections.indexOf(direction)];
 	}
 
 	// Disabilita direzione in una stanza
-	disabilitaDirezione(direzione,stanza){
-		if(stanza === undefined) stanza = this.stanzaCorrente;
-		if(stanza.direzioniBloccate === undefined)
-			stanza.direzioniBloccate = [];
-		if(stanza.direzioniBloccate.indexOf(direzione) < 0)
-			stanza.direzioniBloccate.push(direzione);
+	disableDirection(direction, room){
+		if(room === undefined) room = this.currentRoom;
+		if(room.blockedDirections === undefined)
+			room.blockedDirections = [];
+		if(room.blockedDirections.indexOf(direction) < 0)
+			room.blockedDirections.push(direction);
 	}
 
 	// Esegui una sequenza di azioni
 	async runSequence(labelSequenza, args){
-		let sequence = this.datiAvventura.sequenze[labelSequenza];
+		let sequence = this.adventureData.sequenze[labelSequenza];
 		return await sequence(args);
 	}
 	
 	// Stampa i punti del gioco
-	async _punti(){
-		if (this.datiPunti === undefined)
-			await this.CRT.printTyping("Quest'avventura non prevede un punteggio");
-		else
-			await this.CRT.printTyping("Hai conquistato "+this.altriDati.punti+" punti su "+this.datiPunti.puntiMax+".\n");
+	async _points(){
+		if (this.dataPoints.actionPoints === undefined)
+			await this.CRT.printTyping(i18n.IFEngine.messages.noPoints);
+		else{
+			await this.CRT.printTyping(i18n.IFEngine.messages.points(this.otherData.ponts, this.otherData.pontsMax)+".\n");
+		}
 		return true;
 	}
 
 	// AggiungePunti
-	async aggiungiPunti(action){
-		if (this.datiPunti.puntiAzione === undefined)
+	async addPoints(action){
+		if (this.dataPoints === undefined)
 			return 0;
-		let puntiAzione = this.datiPunti.puntiAzione;
-		if(this.altriDati.puntiAzioneGiocati == undefined)
-			this.altriDati.puntiAzioneGiocati = [];
-		if(this.altriDati.puntiAzioneGiocati.indexOf(action) == -1){
-			this.altriDati.puntiAzioneGiocati.push(action)
-			this.altriDati.punti += puntiAzione[action].i;
+		let actionPoints = this.dataPoints.actionPoints;
+		if(this.otherData.playedActionPoints == undefined)
+			this.otherData.playedActionPoints = [];
+		if(this.otherData.playedActionPoints.indexOf(action) == -1){
+			this.otherData.playedActionPoints.push(action)
+			this.otherData.points += actionPoints[action].i;
 		}
 	}
 
 	async wtf(APO, wtf){
 		/*if(wtf.indexOf(" ") >=0)
 			wtf = wtf.substring(0,wtf.indexOf(" ")); */
-		await this.CRT.printTyping("Non vedi nulla del genere.");
+		await this.CRT.printTyping(i18n.IFEngine.messages.notHere);
 		return true;
 	}
 
 	async inputNotUnderstood(){
-		await this.CRT.printTyping(this.Thesaurus.defaultMessages.NON_HO_CAPITO);
+		await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_UNDERSTAND);
 		return true;
 	}
 
@@ -639,7 +641,7 @@ class IFEngine{
 		
 		if(typeof APO == 'string'){
 			// comando = verbo, manca il resto
-			await this.CRT.printTyping(APO.charAt(0).toUpperCase() + APO.slice(1)+" che cosa? "+this.Thesaurus.defaultMessages.SII_PIU_SPECIFICO);
+			await this.CRT.printTyping(APO.charAt(0).toUpperCase() + APO.slice(1)+" "+i18n.IFEngine.questions.what+" "+this.Thesaurus.defaultMessages.BE_MORE_SPECIFIC);
 			return true;
 		}
 		
@@ -657,7 +659,7 @@ class IFEngine{
 	async _action(APO, input){
 		let actionObject = APO.actionObject;
 		if(actionObject.movimento){
-			return await this._vai(APO.subjects[0], actionObject.defaultMessage);
+			return await this._go(APO.subjects[0], actionObject.defaultMessage);
 		}
 
 		// è un'azione!
@@ -668,7 +670,7 @@ class IFEngine{
 			if(testVerb.indexOf(" ") >=0)
 				testVerb = testVerb.substring(0,testVerb.indexOf(" "));	
 			if(typeof this.Parser.parse(testVerb) == 'string'){
-				await this.CRT.printTyping(this.Thesaurus.defaultMessages.NON_HO_CAPITO);
+				await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_UNDERSTAND);
 				return true;
 			} 
 		}
@@ -678,13 +680,13 @@ class IFEngine{
 		// - oggetti nella stanza
 		// - oggetti nell'inventario
 		let mSubjects = APO.subjects.map(subject => {
-			let interattore = this._get(subject,this.stanzaCorrente.interattori);
-			let oggettoInStanza = this._get(subject, this.stanzaCorrente.oggetti);
-			let oggettoInInventario = this._get(subject, this.inventario);
+			let interactor = this._get(subject,this.currentRoom.interactors);
+			let roomObject = this._get(subject, this.currentRoom.objects);
+			let inventoryObject = this._get(subject, this.inventory);
 
-			return interattore ? interattore : 
-				(oggettoInStanza ? oggettoInStanza : 
-				(oggettoInInventario ? oggettoInInventario : null));
+			return interactor ? interactor : 
+				(roomObject ? roomObject : 
+				(inventoryObject ? inventoryObject : null));
 		}); 
 
 		//mSubjects = mSubjects.filter( i => {return i != null});
@@ -698,11 +700,10 @@ class IFEngine{
 		}
 
 		
-		if(this.stanzaCorrente.dark){
-			await this.CRT.printTyping(this.Thesaurus.defaultMessages.AZIONE_AL_BUIO);
+		if(this.currentRoom.dark){
+			await this.CRT.printTyping(this.Thesaurus.defaultMessages.TOO_DARK_HERE);
 			return
 		}
-
 
 		// Ho scritto solo il verbo
 		if(APO.subjects.length == 0 && (actionObject.singolo === true)){
@@ -722,7 +723,7 @@ class IFEngine{
 					return ret;
 			}
 			// Scrivi il messaggio di default se c'è altrimenti messaggio generico
-			await this.CRT.printTyping(actionObject.defaultMessage === undefined ? this.Thesaurus.defaultMessages.PREFERISCO_DI_NO : actionObject.defaultMessage);
+			await this.CRT.printTyping(actionObject.defaultMessage === undefined ? this.Thesaurus.defaultMessages.PREFER_NOT : actionObject.defaultMessage);
 			return true;
 			
 		}
@@ -736,7 +737,7 @@ class IFEngine{
 				return ret;
 		}
 
-		let visibile = mSubjects[0].visibile === undefined ? true : mSubjects[0].visibile;
+		let visibile = mSubjects[0].visible === undefined ? true : mSubjects[0].visible;
 
 		if(visibile){
 			// Eseguji l'azione sugli oggetti/interattori mappati
@@ -749,30 +750,30 @@ class IFEngine{
 				return actionResult;
 		}
 		
-		if(visibile == false && actionObject.inventario == undefined){
+		if(visibile == false && actionObject.inventory == undefined){
 			return this._notSeen(mSubjects[0]);
 		}
 		switch (APO.verb){
-			case "guarda":
+			case "lookAt":
 
-				let descrizione = mSubjects[0].descrizione ?  
-					(Array.isArray(mSubjects[0].descrizione) ? mSubjects[0].descrizione[mSubjects[0].stato] : mSubjects[0].descrizione) :
+				let descrizione = mSubjects[0].description ?  
+					(Array.isArray(mSubjects[0].description) ? mSubjects[0].description[mSubjects[0].stato] : mSubjects[0].description) :
 					actionObject.defaultMessage;
 				await this.CRT.printTyping(descrizione);
 				return true;	
 			
-			case "prendi":
+			case "take":
 				let ret = await this._prendi(mSubjects[0]);
 				return ret === undefined ? true : ret;
 			
-			case "lascia":
-	 			if(this.inventario[mSubjects[0].key] !== undefined){
-					this._rimuoviDaInventario(mSubjects[0]);
-					await this.CRT.printTyping(this.Thesaurus.defaultMessages.FATTO);
+			case "drop":
+	 			if(this.inventory[mSubjects[0].key] !== undefined){
+					this._removeFromInventory(mSubjects[0]);
+					await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
 					return true;
 				}
 
-				await this.CRT.printTyping(this.Thesaurus.defaultMessages.NON_NE_POSSIEDI);
+				await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
 				return true;
 		}
 
@@ -780,18 +781,18 @@ class IFEngine{
 		// non posso applicarlo al soggetto/ai soggetti
 		let errorMessage = 
 				actionObject.defaultMessage === undefined ? 
-				this.Thesaurus.defaultMessages.NON_HO_CAPITO : 
+				this.Thesaurus.defaultMessages.DONT_UNDERSTAND : 
 				actionObject.defaultMessage
 			;
 		
 		await this.CRT.printTyping(errorMessage);
 		
-		return (errorMessage == this.Thesaurus.defaultMessages.NON_HO_CAPITO) ? undefined : true;
+		return (errorMessage == this.Thesaurus.defaultMessages.DONT_UNDERSTAND) ? undefined : true;
 
 	}
 
 	async _notSeen(s){
-		await this.CRT.printTyping(this.Thesaurus.defaultMessages.QUI_NON_NE_VEDO);
+		await this.CRT.printTyping(this.Thesaurus.defaultMessages.NOT_SEEN_HERE);
 		return true;
 	}
 
@@ -801,7 +802,7 @@ class IFEngine{
 		let verb = APO.verb;
 		s = [...s];
 
-		let ai = await this._azioneInventario(APO,s);
+		let ai = await this._inventoryAction(APO,s);
 		if(ai)
 			return true;
 
@@ -834,12 +835,12 @@ class IFEngine{
 		return ret;
 	}
 
-	async _azioneInventario(APO,s){
-		if(APO.actionObject.inventario){
-			let inventarioKey = typeof APO.actionObject.inventario == 'boolean' ? [APO.actionObject.inventario] : APO.actionObject.inventario;
+	async _inventoryAction(APO,s){
+		if(APO.actionObject.inventory){
+			let inventoryKey = typeof APO.actionObject.inventory == 'boolean' ? [APO.actionObject.inventory] : APO.actionObject.inventory;
 			for(let i in s){
-				if(inventarioKey[i] && /*s[i].type == "oggetto" &&*/ this.inventario[s[i].key] === undefined){
-					await this.CRT.println(this.Thesaurus.defaultMessages.NON_NE_POSSIEDI);
+				if(inventoryKey[i] && /*s[i].type == "oggetto" &&*/ this.inventory[s[i].key] === undefined){
+					await this.CRT.println(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
 					return true;
 				}
 			}
@@ -847,17 +848,17 @@ class IFEngine{
 	}
 
 	// Movimento
-	async _vai(direzione, defaultMessage){
-		let direzioni = this.stanzaCorrente.direzioni;
-		let direzioniBloccate = this.stanzaCorrente.direzioniBloccate === undefined ? [] : this.stanzaCorrente.direzioniBloccate; 
+	async _go(direction, defaultMessage){
+		let directions = this.currentRoom.directions;
+		let blockedDirections = this.currentRoom.blockedDirections === undefined ? [] : this.currentRoom.blockedDirections; 
 		
 		//Esiste la direzione
-		if(direzioni !== undefined && direzioni[direzione] !== undefined && direzioniBloccate.includes(direzione) === false){
-			if(typeof direzioni[direzione] == 'string'){
-				this.entra(direzioni[direzione]);
+		if(directions !== undefined && directions[direction] !== undefined && blockedDirections.includes(direction) === false){
+			if(typeof directions[direction] == 'string'){
+				this.enterRoom(directions[direction]);
 				return false;
 			}
-			let ret = await direzioni[direzione]();
+			let ret = await directions[direction]();
 			if(typeof ret == 'string'){
 				await this.CRT.printTyping(ret);
 				return true;
@@ -866,58 +867,62 @@ class IFEngine{
 		}
 
 		// No way, non si può andare di là
-		await this.CRT.printTyping(direzioni.defaultMessage ? direzioni.defaultMessage : defaultMessage);
+		await this.CRT.printTyping(directions.defaultMessage ? directions.defaultMessage : defaultMessage);
 		return;
 	}
 
 	// Mostra l'inventario
-	async _inventario(action){
+	async inventory(action){
 		let output;
-		if(Object.keys(this.inventario).length == 0){
-			await this.CRT.printTyping("Non hai con te nessun oggetto.");
-			return;
-		}
-		await this.CRT.println("<strong style='text-decoration:underline'>Stai portando con te:</strong>",{cr:false});
-		for(let i in this.inventario){
-			let label = this.inventario[i].label;
-			if(this.inventario[i].stati !== undefined){
-				label += " "+this.inventario[i].stati[this.inventario[i].stato];
+		if(Object.keys(this.inventory).length == 0){
+			output = i18n.IFEngine.messages.noObjects
+		} else {
+			output = "* "+i18n.IFEngine.messages.carriedObjectsLabel+" *"+"\n"
+			for(let i in this.inventory){
+				let label = Array.isArray(this.inventory[i].label) ? 
+					this.inventory[i].label[this.inventory[i].status] : 
+					this.inventory[i].label
+				;
+				output += "\n- "+label.trim()+".";
 			}
-			await this.CRT.printTyping("-- "+label.trim()+".");
 		}
-		
+		await this.CRT.printTyping(output);
 	}
 
 	// Aggiungi oggetto nell'inventario
-	_aggiungiInInventario(oggetto){
-		this.scopri(oggetto);
-		oggetto.posizione = null;
+	_addInInventory(oggetto){
+		this.discover(oggetto);
+		oggetto.location = null;
 		//this.inventario[oggetto.key] = { ...oggetto };
-		this.inventario[oggetto.key] = oggetto;
-		this.refreshOggettiInStanza();
+		this.inventory[oggetto.key] = oggetto;
+		this.refreshRoomObjects();
 	}
 
 	// Rimuovi oggetto dall'inventario
-	_rimuoviDaInventario(oggetto,posizione){
-		oggetto.posizione = 
+	_removeFromInventory(oggetto,posizione){
+		oggetto.location = 
 			posizione === undefined ? 
-			this.stanzaCorrente.key :
+			this.currentRoom.key :
 			posizione;
-		this.datiAvventura.oggetti[oggetto.key] = oggetto
+		this.adventureData.objects[oggetto.key] = oggetto
 
-		delete this.inventario[oggetto.key];
-		this.refreshOggettiInStanza();
+		delete this.inventory[oggetto.key];
+		this.refreshRoomObjects();
 	}
 
 	// Prendi 
 	async _prendi(oggetto){
-		if(this.stanzaCorrente.oggetti[oggetto.key] !== undefined){
-			this._aggiungiInInventario(oggetto);
-			await this.CRT.printTyping(this.Thesaurus.defaultMessages.FATTO);
-		} else if(this.inventario[oggetto.key] !== undefined){
-			await this.CRT.printTyping("Ce l'hai già");
+		if(this.currentRoom.objects[oggetto.key] !== undefined){
+			this._addInInventory(oggetto);
+			await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
+		} else if(this.inventory[oggetto.key] !== undefined){
+			await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);
 		} else
 			await this.CRT.printTyping(this.Thesaurus.verbs.prendi.defaultMessage);
+	}
+
+	_cos(what){
+		return typeof what == "string" ? what : (what)()
 	}
 
 	// Filtra JSON
@@ -943,9 +948,9 @@ class IFEngine{
 			let res = this._match(needle, jsonObj);
 			
 			if(!res) {
-				if(jsonObj.oggettiCollegati){
-					for(let j in jsonObj.oggettiCollegati){
-						let linked = this.Parser._getSource(jsonObj.oggettiCollegati[j],this.datiAvventura.oggetti);
+				if(jsonObj.linkedObjects){
+					for(let j in jsonObj.linkedObjects){
+						let linked = this.Parser._getSource(jsonObj.linkedObjects[j],this.adventureData.objects);
 						if(linked){
 							if(this._match(needle, linked))
 								return linked;
