@@ -1,5 +1,7 @@
 class Thesaurus{
-	constructor(){
+	constructor(parent){
+		this.parent = parent
+
 		this.defaultMessages = {
 			DONE: 					i18n.Thesaurus.defaultMessages.done,
 			PREFER_NOT: 			i18n.Thesaurus.defaultMessages.preferNot,
@@ -10,7 +12,7 @@ class Thesaurus{
 			DONT_HAVE_ANY: 			i18n.Thesaurus.defaultMessages.dontHaveAny, 
 			NOTHING_HAPPENS: 		i18n.Thesaurus.defaultMessages.nothingHappens,
 			BE_MORE_SPECIFIC: 		i18n.Thesaurus.defaultMessages.beMoreSpecific,
-			NON_E_POSSIBILE: 		i18n.Thesaurus.defaultMessages.notPossible,
+			NOT_POSSIBLE: 			i18n.Thesaurus.defaultMessages.notPossible,
 			TOO_DARK_HERE: 			i18n.Thesaurus.defaultMessages.tooDarkHere
 		}
 
@@ -22,41 +24,89 @@ class Thesaurus{
 	loadCommands(){
 		this.commands = {
 			north: {
-				movimento: true,
+				movement: true,
 				pattern: i18n.Thesaurus.commands.north.pattern,
 				defaultMessage: i18n.Thesaurus.commands.north.defaultMessage,
-				direzione: "n"
+				direction: "n"
 			},
 			south: {
-				movimento: true,
+				movement: true,
 				pattern: i18n.Thesaurus.commands.south.pattern,
 				defaultMessage: i18n.Thesaurus.commands.south.defaultMessage,
-				direzione: "s"
+				direction: "s"
 			},
 			est: {
-				movimento: true,
+				movement: true,
 				pattern: i18n.Thesaurus.commands.east.pattern,
 				defaultMessage: i18n.Thesaurus.commands.east.defaultMessage,
-				direzione: "e"
+				direction: "e"
 			},
 			west: {
-				movimento: true,
+				movement: true,
 				pattern: i18n.Thesaurus.commands.west.pattern,
 				defaultMessage: i18n.Thesaurus.commands.west.defaultMessage,
-				direzione: "w"
+				direction: "w"
 			},
 			up: {
-				movimento: true,
+				movement: true,
 				pattern: i18n.Thesaurus.commands.up.pattern,
 				defaultMessage: i18n.Thesaurus.commands.up.defaultMessage,
-				direzione: "u"
+				direction: "u"
 			},
 			down: {
-				movimento: true,
+				movement: true,
 				pattern: i18n.Thesaurus.commands.down.pattern,
 				defaultMessage: i18n.Thesaurus.commands.down.defaultMessage,
-				direzione: "d"
+				direction: "d"
+			},
+			save:{
+				callback: async () =>{
+					await this.save();
+					this.parent.gameLoop(true,true);
+					return false;
+				},
+			},
+			load: {
+				callback: async () =>{
+					let res = await this.parent.restore();
+					return !res;
+				},
+			},
+			instructions: {
+				callback: async () => {
+					await this.parent.instructions();
+					return true;
+				},
+			},
+			inventory: {
+				callback: async () => {
+					await this.parent._inventory();
+					return true;
+				},
+			},
+			quit: {
+				callback: async () => {
+					let answer = await this.parent.yesNoQuestion(i18n.IFEngine.questions.quitQuestion);
+					if(answer){
+						this.parent.displayMenu(this.parent.menu.contextual);
+						return false;
+					}
+					return true;
+				}
+			},
+			where: {
+				callback: async () => {
+					await this.parent.currentRoomDescription();
+					return true;
+				},
+			},
+			points: {
+				callback: async () => {
+					await this.parent._points();
+					return true;
+				},	
 			}
+		
 		}
 	}
 

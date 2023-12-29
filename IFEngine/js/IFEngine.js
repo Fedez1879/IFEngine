@@ -89,61 +89,7 @@ class IFEngine{
 			}
 		}
 		
-		this.Thesaurus = new Thesaurus();
-		// Comandi particolari
-		this.Thesaurus.commands = { 
-			...this.Thesaurus.commands, 
-			...{
-				save:{
-					callback: async () =>{
-						await this.save();
-						this.gameLoop(true,true);
-						return false;
-					},
-				},
-				load: {
-					callback: async () =>{
-						let res = await this.restore();
-						return !res;
-					},
-				},
-				instructions: {
-					callback: async () => {
-						await this.instructions();
-						return true;
-					},
-				},
-				inventory: {
-					callback: async () => {
-						await this.inventory();
-						return true;
-					},
-				},
-				quit: {
-					callback: async () => {
-						let answer = await this.yesNoQuestion(i18n.IFEngine.questions.quitQuestion);
-						if(answer){
-							this.displayMenu(this.menu.contextual);
-							return false;
-						}
-						return true;
-					}
-				},
-				where: {
-					callback: async () => {
-						await this.currentRoomDescription();
-						return true;
-					},
-				},
-				points: {
-					callback: async () => {
-						await this._points();
-						return true;
-					},	
-				}
-			}
-		}
-
+		this.Thesaurus = new Thesaurus(this);
 		return this;
 
 	}
@@ -218,7 +164,9 @@ class IFEngine{
 	async yesNoQuestion(question, cr){
 		let options = {}
 		options[i18n.IFEngine.yesOrNo.yes] = () => true;
+		options[i18n.IFEngine.yesOrNo.yes.substring(0,1)] = () => true;
 		options[i18n.IFEngine.yesOrNo.no] = () => false;
+		options[i18n.IFEngine.yesOrNo.no.substring(0,1)] = () => false;
 		
 		return await this.choose(
 			options,
@@ -658,7 +606,7 @@ class IFEngine{
 
 	async _action(APO, input){
 		let actionObject = APO.actionObject;
-		if(actionObject.movimento){
+		if(actionObject.movement){
 			return await this._go(APO.subjects[0], actionObject.defaultMessage);
 		}
 
@@ -670,8 +618,7 @@ class IFEngine{
 			if(testVerb.indexOf(" ") >=0)
 				testVerb = testVerb.substring(0,testVerb.indexOf(" "));	
 			if(typeof this.Parser.parse(testVerb) == 'string'){
-				await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_UNDERSTAND);
-				return true;
+				return await this.inputNotUnderstood();
 			} 
 		}
 		
@@ -763,7 +710,8 @@ class IFEngine{
 				return true;	
 			
 			case "take":
-				let ret = await this._prendi(mSubjects[0]);
+				let ret = await this._
+				(mSubjects[0]);
 				return ret === undefined ? true : ret;
 			
 			case "drop":
@@ -872,7 +820,7 @@ class IFEngine{
 	}
 
 	// Mostra l'inventario
-	async inventory(action){
+	async _inventory(action){
 		let output;
 		if(Object.keys(this.inventory).length == 0){
 			output = i18n.IFEngine.messages.noObjects
@@ -918,7 +866,7 @@ class IFEngine{
 		} else if(this.inventory[oggetto.key] !== undefined){
 			await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);
 		} else
-			await this.CRT.printTyping(this.Thesaurus.verbs.prendi.defaultMessage);
+			await this.CRT.printTyping(this.Thesaurus.verbs.take.defaultMessage);
 	}
 
 	_cos(what){

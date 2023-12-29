@@ -2,6 +2,8 @@ class Avventura extends IFEngine{
 	constructor(){
 		super();
 		
+		document.title = i18n.htmlTitle;
+
 		this.CRT.defaultCR = false;
 
 		this.defaultInput = "\n] "
@@ -10,6 +12,7 @@ class Avventura extends IFEngine{
 		this.adventureData = {
 			// stanza iniziale
 			startingRoom: "ufficio",
+			prologue: true,
 			
 			/* STANZE */
 			rooms: {
@@ -38,7 +41,7 @@ class Avventura extends IFEngine{
 					onEnter: async () => {
 						if(this.adventureData.prologue){
 							this.adventureData.prologue = false;
-							//await this.runSequence("prologo");
+							await this.runSequence("prologo");
 						} 
 					},
 				},
@@ -100,9 +103,8 @@ class Avventura extends IFEngine{
 					await this.CRT.println("  ___         |                ");
  					await this.CRT.println("  |_ _   _|  _  ._ o  _  _  ");
 					await this.CRT.println("  | (/_ (_| (/_ |  | (_ (_) \n");
-					await this.CRT.wait();
 					await this.CRT.println("volpini.federico79@gmail.com\n");
-					await this.CRT.println("licenza MIT\n");
+					await this.CRT.println("licenza MIT");
 					await this.CRT.wait();
 					this.CRT.clear();
 					
@@ -117,7 +119,7 @@ class Avventura extends IFEngine{
 					await this.CRT.sleep(1500);
 					await this.CRT.printTyping("Uhm... ",{cr:false})
 					await this.CRT.sleep(2000);
-					await this.CRT.printTyping("E' tutto troppo silenzioso qui. Sarà meglio tornare a casa.",{nlAfter:2})
+					await this.CRT.printTyping("E' tutto troppo silenzioso qui. Sarà meglio tornare a casa.",{nlAfter:1})
 					await this.CRT.sleep(1500);
 				}
 			}
@@ -127,7 +129,7 @@ class Avventura extends IFEngine{
 	// Override di IFEngine.run
 	async run(){
 		await this.runSequence("titolo");
-		this.displayMenu(this.menu.main);
+		await this.enterRoom(this.adventureData.startingRoom)
 	}
 
 }
