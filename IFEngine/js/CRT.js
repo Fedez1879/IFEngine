@@ -295,7 +295,7 @@ class CRT{
 		span.removeAttribute('id');
 		this.fixed.append(span);
 		
-		this.fixed.innerHTML += "\n\n" + (cr ? "\n" : "");
+		this.fixed.innerHTML += "\n"+(cr ? "\n" : "");
 		this.currentCol = 1;
 		this.txt.innerHTML = "";
 		

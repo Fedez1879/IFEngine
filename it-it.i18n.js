@@ -61,7 +61,7 @@ var i18n = {
 				replaceWith: ` `
 			},
 			{
-				pattern: ` (il|la|lo|le|li|l|gli|un|uno|una) `,
+				pattern: ` (i|il|la|lo|le|li|l|gli|un|uno|una) `,
 				replaceWith: ` `
 			},
 			{
@@ -112,7 +112,9 @@ var i18n = {
 			nothingHappens: `Non succede niente.`,
 			beMoreSpecific: `Sii più specifico.`,
 			notPossible: `Non è possibile.`,
-			tooDarkHere: `E' troppo buio.`
+			tooDarkHere: `E' troppo buio.`,
+			here: `Quello che cerchi è qui!`,
+			alreadyHaveIt: `Ce l'hai già.`
 		},
 		commands: {
 			north: {
@@ -160,20 +162,30 @@ var i18n = {
 				defaultMessage: `Non si muove.`
 			},
 			take: {
-				pattern: `(prendi|raccogli)`
+				pattern: `prendi|raccogli`
 			},		
 			drop: {
-				pattern: `(lascia|posa)`
+				pattern: `lascia|posa`
 			},
 			give: {
 				pattern: `(dai) (.+) (?:a) (.+)`,
 			},
+			useWith: {
+				pattern: `(usa) (.+) (?:con) (.+)`,
+			},
 			lookAt: {
-				pattern: `(guarda|esamina|ispeziona)`
+				pattern: `guarda|esamina|ispeziona`
 			},
 			search:{
-				pattern: `(cerca|trova)`
+				pattern: `cerca|trova`
 			}
+		}
+	},
+	DemoThesaurus: {
+		commonPatterns: {
+			wall: `mur(?:o|a)|paret(?:e|i)`,
+			floor: `pavimento`,
+			ceiling: `soffitto`
 		}
 	}
 }

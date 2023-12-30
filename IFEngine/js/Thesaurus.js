@@ -13,7 +13,8 @@ class Thesaurus{
 			NOTHING_HAPPENS: 		i18n.Thesaurus.defaultMessages.nothingHappens,
 			BE_MORE_SPECIFIC: 		i18n.Thesaurus.defaultMessages.beMoreSpecific,
 			NOT_POSSIBLE: 			i18n.Thesaurus.defaultMessages.notPossible,
-			TOO_DARK_HERE: 			i18n.Thesaurus.defaultMessages.tooDarkHere
+			TOO_DARK_HERE: 			i18n.Thesaurus.defaultMessages.tooDarkHere,
+			HERE: 					i18n.Thesaurus.defaultMessages.here, 
 		}
 
 		this.loadCommands();
@@ -61,9 +62,8 @@ class Thesaurus{
 			},
 			save:{
 				callback: async () =>{
-					await this.save();
-					this.parent.gameLoop(true,true);
-					return false;
+					let res = await this.parent.save();
+					return !res;
 				},
 			},
 			load: {
@@ -147,6 +147,12 @@ class Thesaurus{
 				pattern: i18n.Thesaurus.verbs.give.pattern,
 				complex: true,
 				defaultMessage: this.defaultMessages.PREFER_NOT
+			},
+			useWith: {
+				inventario: true,
+				pattern: i18n.Thesaurus.verbs.useWith.pattern,
+				complex: true,
+				defaultMessage: this.defaultMessages.NOTHING_HAPPENS
 			},
 			lookAt: {
 				pattern: i18n.Thesaurus.verbs.lookAt.pattern,

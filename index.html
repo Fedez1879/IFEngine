@@ -6,7 +6,7 @@
 <link href="favicon.ico" rel="icon" type="image/x-icon" />
 <title>IF Engine demo</title>
 </head>
-<body>
+<body class="green">
 <div id="crt">
 	<div id="screen" style="position:relative">
 		<pre><span id="char" style="position:fixed; top:0; left:0; visibility:hidden">@</span><span id="fixed"></span><span id="txt"></span><span id="cursor"></span></pre>
@@ -21,9 +21,11 @@
 <script src="IFEngine/js/Thesaurus.js"></script>
 <script src="IFEngine/js/Parser.js"></script>
 <script src="IFEngine/js/IFEngine.js"></script>
+<script src="DemoThesaurus.js"></script>
+<script src="DemoEngine.js"></script>
 <script src="demo.js"></script>
 <script>
-new Avventura().start();
+new Adventure().start();
 </script>
 <noscript>
 <p>Per poter giocare devi abilitare Javascript</p>

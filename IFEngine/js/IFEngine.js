@@ -112,7 +112,7 @@ class IFEngine{
 		// Setta il valore key di ogni oggetto
 		for (let o in this.adventureData.objects){
 			this.adventureData.objects[o].key = o;
-			this.adventureData.objects[o].type = "oggetto";
+			this.adventureData.objects[o].type = "object";
 		}
 
 		// Setta il valore key di ogni stanza
@@ -372,7 +372,7 @@ class IFEngine{
 		// Attendo il comando
 		await this.CRT.print(this.defaultInput);
 		let input = await this.CRT.input();
-		console.log(input);
+		input = this._prepare(input);
 		// Faccio il parsing del comando. 
 		// Se la funzione mi restituisce undefined o true allora ciclo nuovament il loop
 		let repeat = await this._parse(input);
@@ -392,14 +392,14 @@ class IFEngine{
 		do{
 			await this.CRT.printTyping(i18n.IFEngine.questions.saveLabel+" ",this.CRT.printDelay,false);
 		
-			saveLabel = await this.CRT.input();
+			saveLabel = await this.CRT.input(false);
 			saveLabel = saveLabel.trim();
 			if(saveLabel == i18n.IFEngine.questions.listLetter.toLowerCase()){
 				await this.CRT.printTyping(i18n.IFEngine.warnings.labelNotValid+"\n",this.CRT.printDelay);
 			}
 
 			if(saveLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase()){
-				return;
+				return false;
 			}
 		} while (saveLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
 		
@@ -424,16 +424,20 @@ class IFEngine{
 	// Carica il gioco
 	async restore() {
 		if(this._checkStorage() == false ){
-			await this.CRT.printTyping(i18n.IFEngine.warnings.localstorageMustBeActivated,{nlbefore: 1});
+			await this.CRT.printTyping(i18n.IFEngine.warnings.localstorageMustBeActivated);
 			return
 		} 
 		let loadLabel;
 
 		do{
-			await this.CRT.printTyping(i18n.IFEngine.questions.restoreLabel,{nlBefore:1});
+			await this.CRT.printTyping(i18n.IFEngine.questions.restoreLabel);
 		
-			loadLabel = await this.CRT.input();
+			loadLabel = await this.CRT.input(false);
 			loadLabel = loadLabel.trim();
+
+			if(loadLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase()){
+				return false;
+			}
 
 			if(loadLabel == i18n.IFEngine.questions.listLetter.toLowerCase()){
 				let sdk = Object.keys(this.storage).filter(key => key.startsWith(this.SAVED+"-"));
@@ -464,9 +468,6 @@ class IFEngine{
 
 			}
 
-			if(loadLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase()){
-				return false;
-			}
 		} while (loadLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase() || loadLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
 		
 		let realLabel = this.SAVED+"-"+loadLabel;
@@ -516,8 +517,11 @@ class IFEngine{
 	}
 
 	// Scopri oggetto, quindi diventa visibile
-	discover(object){
-		object.visible = true;
+	discover(object, justRemove){
+		if(justRemove)
+			delete object.visible
+		else
+			object.visible = true;
 		this.refreshRoomObjects();		
 	}
 
@@ -704,25 +708,33 @@ class IFEngine{
 			case "lookAt":
 
 				let descrizione = mSubjects[0].description ?  
-					(Array.isArray(mSubjects[0].description) ? mSubjects[0].description[mSubjects[0].stato] : mSubjects[0].description) :
+					(Array.isArray(mSubjects[0].description) ? mSubjects[0].description[mSubjects[0].stato] : this._cos(mSubjects[0].description)) :
 					actionObject.defaultMessage;
-				await this.CRT.printTyping(descrizione);
-				return true;	
+				return await this.CRT.printTyping(descrizione);
 			
 			case "take":
-				let ret = await this._
-				(mSubjects[0]);
+				let ret = await this._take(mSubjects[0]);
 				return ret === undefined ? true : ret;
 			
 			case "drop":
 	 			if(this.inventory[mSubjects[0].key] !== undefined){
 					this._removeFromInventory(mSubjects[0]);
-					await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
-					return true;
+					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
 				}
 
-				await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
-				return true;
+				return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
+
+			case "search":
+				if(this.currentRoom.interactors[mSubjects[0].key] !== undefined){
+					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.HERE);
+				}
+				if(this.inventory[mSubjects[0].key] !== undefined){
+					return await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);
+				}
+				if(this.currentRoom.objects[mSubjects[0].key] !== undefined && this.currentRoom.objects[mSubjects[0].key].visible){
+					return 	await this.listVisibleThings(this.currentRoom.objects);
+				}
+				return this.Thesaurus.defaultMessages.notFound;
 		}
 
 
@@ -736,6 +748,7 @@ class IFEngine{
 		await this.CRT.printTyping(errorMessage);
 		
 		return (errorMessage == this.Thesaurus.defaultMessages.DONT_UNDERSTAND) ? undefined : true;
+				
 
 	}
 
@@ -838,35 +851,53 @@ class IFEngine{
 	}
 
 	// Aggiungi oggetto nell'inventario
-	_addInInventory(oggetto){
-		this.discover(oggetto);
-		oggetto.location = null;
-		//this.inventario[oggetto.key] = { ...oggetto };
-		this.inventory[oggetto.key] = oggetto;
+	_addInInventory(object){
+		this.discover(object);
+		object.location = null;
+		//this.inventario[object.key] = { ...object };
+		this.inventory[object.key] = object;
 		this.refreshRoomObjects();
 	}
 
 	// Rimuovi oggetto dall'inventario
-	_removeFromInventory(oggetto,posizione){
-		oggetto.location = 
-			posizione === undefined ? 
+	_removeFromInventory(object,blocation){
+		object.location = 
+			location === undefined ? 
 			this.currentRoom.key :
-			posizione;
-		this.adventureData.objects[oggetto.key] = oggetto
+			location;
+		this.adventureData.objects[object.key] = object
 
-		delete this.inventory[oggetto.key];
+		delete this.inventory[object.key];
 		this.refreshRoomObjects();
 	}
 
 	// Prendi 
-	async _prendi(oggetto){
-		if(this.currentRoom.objects[oggetto.key] !== undefined){
-			this._addInInventory(oggetto);
+	async _take(object){
+		if(this.currentRoom.objects[object.key] !== undefined){
+			this._addInInventory(object);
 			await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
-		} else if(this.inventory[oggetto.key] !== undefined){
+		} else if(this.inventory[object.key] !== undefined){
 			await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);
 		} else
 			await this.CRT.printTyping(this.Thesaurus.verbs.take.defaultMessage);
+	}
+
+	_prepare(input){
+		input = input.trim().toLowerCase()
+		// tolgo gli accenti alle parole
+		input = input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+		
+		for (let step of i18n.IFEngine.prepareInputSteps){
+			let pattern = RegExp(step.pattern,"g");
+			input = input.replace(pattern,step.replaceWith);
+		}
+		
+		console.log(input)
+		return input;
+		/*
+		input = input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+		return input;
+		*/
 	}
 
 	_cos(what){
