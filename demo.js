@@ -23,12 +23,16 @@ class Adventure extends DemoEngine{
 					pareti: {
 						...this.commonInteractors.wall,
 						...{
-							description: () => "Le pareti sono spoglie, a parte "+(this.playerHas(this.adventureData.objects.occhiali) ? "": "(credo) ")+ "un calendario appeso di fianco alla scrivania.\nNella parete a est c'è la porta di ingresso alla stanza, in quella ad ovest c'è una finestra."
+							description: () => "Le pareti sono spoglie, a parte "+(this.playerHas(this.adventureData.objects.occhiali) ? "": "(credo) ")+ "un calendario appeso di fianco alla scrivania.\nNella parete a est c'è la porta di ingresso, a fianco della quale c'è l'attaccapanni. Nella parete di fronte alla porta c'è l'unica finestra della stanza."
 						}
 					},
 					calendario: {
 						pattern: "calendario",
 						description: () => this.playerHas(this.adventureData.objects.occhiali) ? "E' un calendario vecchio, del 1979. Attualmente mostra il mese di ottobre. Il giorno 18 è cerchiato in rosso." : this.Thesaurus.defaultMessages.NOTHING_PARTICULAR
+					},
+					attaccapanni: {
+						pattern: "attaccapanni|appendiabiti",
+						description: () => "E' di metallo nero, alto, con 4 braccia." + (this.currentRoom.jacket && this.currentRoom.jacket.visible ? "\nIn uno di essi è appeso il mio piumino nero." : "")
 					},
 					scrivania: {
 						pattern: "scrivania",
@@ -184,7 +188,20 @@ class Adventure extends DemoEngine{
 					},
 					drop: "Meglio di no, potrebbero servirti in furturo."
 				}
-			}
+			},
+			piumino: {
+				label: "un piumino nero",
+				pattern: "(piumino|giacc(?:a|etto))(?: ner(?:o|a))?",
+				description: "E' un piumino leggero, primaverile. E' molto semplice. Ha quattro tasche, due interne e due esterne.",
+				location: "ufficio",
+				linkedObjects: ["taschePiumino"],
+			},
+			taschePiumino: {
+				label:"tasche",	
+				pattern: "tasc(?:a|he)",
+			},
+
+
 		},
 
 		/* SEQUENZE */
