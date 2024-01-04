@@ -7,7 +7,7 @@ class DemoEngine extends IFEngine{
 
 		this.CRT.defaultCR = "\n";
 		this.defaultInput = "\n] "
-		this.startingRoom = "quasiFuori";
+		this.startingRoom = "ufficio";
 
 		this.Thesaurus = new DemoThesaurus(this)
 

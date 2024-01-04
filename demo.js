@@ -298,7 +298,7 @@ class Adventure extends DemoEngine{
 								if(!this.playerHas(this.adventureData.objects.occhiali))
 									return "Non riesco a leggerlo, senza occhiali!"
 
-								if(await this.yesNoQuestion("Chieda un codice di sicurezza per uscire... vuoi provare a digitarlo") == false)
+								if(await this.yesNoQuestion("Chiede un codice di sicurezza per uscire... vuoi provare a digitarlo") == false)
 									return true;
 
 								let pin = await this.ask("PIN:",true)
