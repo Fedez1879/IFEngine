@@ -5,6 +5,15 @@ class DemoThesaurus extends Thesaurus{
 		ceiling: i18n.DemoThesaurus.commonPatterns.ceiling,
 	}
 
+	constructor(parent){
+		super(parent),
+		this.defaultMessages.BE_SERIOUS = "Sii serio!"
+
+		this.loadCommands();
+		this.loadVerbs();
+		
+	}
+	
 	loadVerbs(){
 		super.loadVerbs()
 		this.verbs = {
@@ -17,6 +26,20 @@ class DemoThesaurus extends Thesaurus{
 				lift:{
 					pattern: `alza|solleva`,
 					defaultMessage: `Non si muove.`
+				},
+				read:{
+					pattern: `leggi`,
+					defaultMessage: this.defaultMessages.PREFER_NOT
+				},
+				putInto: {
+					inventory: true,
+					pattern: "(infila|inserisci) (.+) in (.+)",
+					complex: true,
+					defaultMessage: this.defaultMessages.BE_SERIOUS
+				},
+				break: {
+					pattern: "rompi|distruggi|spacca",
+					defaultMessage: this.defaultMessages.BE_SERIOUS
 				}
 			}
 		};

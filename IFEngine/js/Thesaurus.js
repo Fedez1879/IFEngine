@@ -138,18 +138,18 @@ class Thesaurus{
 				defaultMessage: this.defaultMessages.PREFER_NOT
 			},		
 			drop: {
-				inventario: true,
+				inventory: true,
 				pattern: i18n.Thesaurus.verbs.drop.pattern,
 				defaultMessage: this.defaultMessages.PREFER_NOT
 			},
 			give: {
-				inventario: true,
+				inventory: true,
 				pattern: i18n.Thesaurus.verbs.give.pattern,
 				complex: true,
 				defaultMessage: this.defaultMessages.PREFER_NOT
 			},
 			useWith: {
-				inventario: true,
+				inventory: true,
 				pattern: i18n.Thesaurus.verbs.useWith.pattern,
 				complex: true,
 				defaultMessage: this.defaultMessages.NOTHING_HAPPENS

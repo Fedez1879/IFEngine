@@ -188,8 +188,7 @@ class IFEngine{
 		let choose;
 
 		do {
-			await this.CRT.printTyping(question+i18n.IFEngine.questionMark+" ",{cr:false});
-			choose = await this.CRT.input(false);
+			choose = await this.ask(question);
 			
 			if(options[choose] === undefined){
 				question = optionsList;
@@ -200,6 +199,8 @@ class IFEngine{
 			options[choose] :
 			options[choose].callback;
 
+		if(cr) this.CRT.println()
+			
 		let result = await callback();
 	
 		this.CRT.currentCol = 1;
@@ -207,6 +208,10 @@ class IFEngine{
 		return result;
 	}
 	
+	async ask(question, noQuestionMark){
+		await this.CRT.printTyping(question+(noQuestionMark ? "" : i18n.IFEngine.questionMark)+" ",{cr:false});
+		return await this.CRT.input(false);
+	}
 	// Esci dal gioco
 	async byebye(){
 		await this.CRT.printTyping(i18n.IFEngine.messages.tanksForPlaying, {nlAfter:1,nlBefore:1});
@@ -294,6 +299,7 @@ class IFEngine{
 		if( Object.keys(list).length > 0){
 			for(let i in list){
 				if(list[i].visible){
+					console.log(list[i]);
 					let whatISee = Array.isArray(list[i].label) ? 
 						list[i].label[list[i].status] : 
 						list[i].label;
@@ -522,7 +528,8 @@ class IFEngine{
 			delete object.visible
 		else
 			object.visible = true;
-		this.refreshRoomObjects();		
+		this.refreshRoomObjects();
+		return null		
 	}
 
 	// Abilita direzione in una stanza
@@ -546,6 +553,11 @@ class IFEngine{
 		return await sequence(args);
 	}
 	
+	// Controlla se il giocatore ha un oggetto nell'inventario
+	playerHas(object){
+		return this._get(object.key, this.inventory);
+	}
+
 	// Stampa i punti del gioco
 	async _points(){
 		if (this.dataPoints.actionPoints === undefined)
@@ -704,6 +716,14 @@ class IFEngine{
 		if(visibile == false && actionObject.inventory == undefined){
 			return this._notSeen(mSubjects[0]);
 		}
+		if(actionObject.inventory){
+			if(Array.isArray(actionObject.inventory)){
+
+			} else {
+				if (!this.playerHas(mSubjects[0]))
+					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
+			}
+		}
 		switch (APO.verb){
 			case "lookAt":
 
@@ -736,6 +756,7 @@ class IFEngine{
 				}
 				return this.Thesaurus.defaultMessages.notFound;
 		}
+
 
 
 		// non posso applicarlo al soggetto/ai soggetti
@@ -860,14 +881,17 @@ class IFEngine{
 	}
 
 	// Rimuovi oggetto dall'inventario
-	_removeFromInventory(object,blocation){
+	_removeFromInventory(object,location){
 		object.location = 
 			location === undefined ? 
 			this.currentRoom.key :
 			location;
 		this.adventureData.objects[object.key] = object
 
+		console.log(object)
+
 		delete this.inventory[object.key];
+		console.log(object)
 		this.refreshRoomObjects();
 	}
 

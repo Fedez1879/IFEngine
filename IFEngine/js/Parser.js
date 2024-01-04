@@ -59,7 +59,7 @@ class Parser{
 				sorgente != this.commands && 
 				override != this.override.commands && 
 				input.indexOf(" ") == -1 && 
-				(obj.singolo === undefined || obj.singolo == false) 
+				(obj.single === undefined || obj.single == false) 
 			){
 				let matches = input.match(new RegExp("^"+pattern+"$", 'i'));
 				if( matches != null)
@@ -68,10 +68,10 @@ class Parser{
 
 			if(patternEsatto == false){
 				if(
-					(obj.movimento === undefined || obj.movimento == false) && 
+					(obj.movement === undefined || obj.movement == false) && 
 					(obj.complex === undefined || obj.complex == false)
 				){
-					pattern += obj.singolo ? 
+					pattern += obj.single ? 
 					"(?:\\s+(.+))?" : 
 					"\\s+(.+)"; 
 			 	}
@@ -87,12 +87,12 @@ class Parser{
 				let subjects = [];
 				let i = 2;
 
-				// Se è un movimento e lo posso usare singolarmente
-				// mappo la direzione con l'attributo "direzione" 
+				// Se è un movement e lo posso usare singolarmente
+				// mappo la direction con l'attributo "direction" 
 				
 
-				if(obj.direzione !== undefined)
-					subjects.push(obj.direzione);
+				if(obj.direction !== undefined)
+					subjects.push(obj.direction);
 				else {
 					// mappo i "soggetti" della mia azione
 					while(i < matches.length && matches[i] != undefined){

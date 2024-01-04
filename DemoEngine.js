@@ -11,10 +11,12 @@ class DemoEngine extends IFEngine{
 
 		this.Thesaurus = new DemoThesaurus(this)
 
-		this.Thesaurus.commands.save.pattern = "(save|salva)";
-		this.Thesaurus.commands.load.pattern = "(load|carica)";
-		this.Thesaurus.commands.inventory.pattern = "(i(?:nv)?|inventario)";
-
+		this.Thesaurus.commands.save.pattern = "save|salva";
+		this.Thesaurus.commands.load.pattern = "load|carica";
+		this.Thesaurus.commands.inventory.pattern = "i(?:nv)?|inventario";
+		this.Thesaurus.commands.where.pattern = "dove(?:sono|mi trovo)?";
+		this.Thesaurus.commands.instructions.pattern = "istruzioni";
+		
 		this.CRT.sleep = (ms) => true; // for speed test
 
 		this.commonInteractors = {
@@ -35,11 +37,20 @@ class DemoEngine extends IFEngine{
 	// Override di IFEngine.run
 	async run(){
 		await this.runSequence("titolo");
+		this.CRT.clear();
+		let a = await this.yesNoQuestion("Vuoi leggere le istruzioni")
+		if (a) {
+			await this.instructions()
+			this.CRT.println()
+			await this.CRT.wait();
+		}
+		this.CRT.clear();
 		await this.enterRoom(this.startingRoom)
 	}
 
-	playerHas(object){
-		return this._get(object.key, this.inventory);
+	async instructions(){
+		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo COMANDO (es: salta) oppure dal VERBO + OGGETTO (es: prendi la chiave). frasi più complesse vanno al di là della mia comprensione.\n\nBuona fortuna e soprattutto buon divertimento!");
 	}
+
 
 }

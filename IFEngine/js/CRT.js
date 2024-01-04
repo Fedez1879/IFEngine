@@ -180,6 +180,7 @@ class CRT{
 	}
 
 	async println(text, options){
+		if(text == undefined) text = ``
 		await this.print(text+"\n",options);
 	}
 	
