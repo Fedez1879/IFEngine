@@ -32,14 +32,24 @@ class DemoThesaurus extends Thesaurus{
 					defaultMessage: this.defaultMessages.PREFER_NOT
 				},
 				putInto: {
-					inventory: true,
 					pattern: "(infila|inserisci) (.+) in (.+)",
-					complex: true,
-					defaultMessage: this.defaultMessages.BE_SERIOUS
+					defaultMessage: this.defaultMessages.BE_SERIOUS,
+					inventory: true,
+					complex: true
 				},
 				break: {
 					pattern: "rompi|distruggi|spacca",
 					defaultMessage: this.defaultMessages.BE_SERIOUS
+				},
+				wear: {
+					pattern: `indossa`,
+					defaultMessage: this.defaultMessages.BE_SERIOUS
+				},
+				bringCloser: {
+					pattern: `avvicina (.+)? a (.+)`,
+					defaultMessage: this.defaultMessages.NOTHING_HAPPENS,
+					inventory: true,
+					complex: true
 				}
 			}
 		};

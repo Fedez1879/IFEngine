@@ -12,7 +12,7 @@ class Adventure extends DemoEngine{
 					return "Sei nel tuo ufficio. La scrivania è come sempre piena di appunti. Di fronte a te, il moderno mobile a vetri riflette il tuo viso pallido. Dalla finestra a ovest entra una fioca luce arancione."
 				},
 				directions: {
-					e: () => this.currentRoom.interactors.porta.aperta ? this.enterRoom("corridoio") : `La porta dell'ufficio è chiusa.`
+					e: () => this.currentRoom.interactors.porta.open ? this.enterRoom("quasiFuori") : `La porta dell'ufficio è chiusa.`
 				},
 				interactors: {
 					ufficio: {
@@ -26,45 +26,51 @@ class Adventure extends DemoEngine{
 					pareti: {
 						...this.commonInteractors.wall,
 						...{
-							description: () => "Nella parete di fronte, c'è il modile a vetri, in quella a est c'è la porta di ingresso. Nella parete opposta alla porta c'è l'unica finestra della stanza.\nLa parete dietro di te è completamente spoglia, a parte "+(this.playerHas(this.adventureData.objects.occhiali) ? "": "(credo) ")+ "un calendario appeso."
+							description: async () => {
+								await this.CRT.printTyping("Nella parete di fronte, c'è il modile a vetri, in quella a est c'è la porta di ingresso. Nella parete opposta alla porta c'è l'unica finestra della stanza.\nLa parete dietro di te è completamente spoglia, a parte "+(this.playerHas(this.adventureData.objects.occhiali) ? "": "(credo) ")+ "un calendario appeso.");
+								if( this.currentRoom.interactors.attaccapanni.visible == false){
+									await this.CRT.sleep(1500);
+									await this.CRT.printTyping(`Di fianco al mobile c'è un attaccapanni, mica l'avevo notato prima!`)
+									await this.discover(this.currentRoom.interactors.attaccapanni)
+								}
+							},
+							on: {
+								lookAt: () => this.currentRoom.interactors.pareti.description()
+							}
 						}
 					},
 					mobile: {
 						pattern: "mobile",
-						aperto:false,
-						description: async () => {
-							await this.CRT.printTyping(`Ha le ante di vetro che lasciano intravedere dei libri al suo interno.`);
-							if( this.currentRoom.interactors.attaccapanni.visible == false){
-								await this.CRT.sleep(1500);
-								await this.CRT.printTyping(`Di fianco al mobile c'è un attaccapanni, mica l'avevo notato prima!`)
-								this.discover(this.currentRoom.interactors.attaccapanni)
-							}
-						},
+						open:false,
+						description: () => `E' un massicico mobile di legno con le ante di vetro scuro.` + (this.currentRoom.interactors.mobile.open ? `All'interno il mobile è ricolmo di libri` : `\nRiesco ad intravedere qualcosa al suo interno...`),
 						on: {
-							lookAt: () => {
-								this.discover(this.currentRoom.interactors.libri)
-								return this.currentRoom.interactors.mobile.description()
-							},
-							open: () => {
-								this.currentRoom.interactors.mobile.aperto = true;
-								return this.Thesaurus.defaultMessages.DONE
-							},
-							close: () => {
-								this.currentRoom.interactors.mobile.aperto = false;
-								return this.Thesaurus.defaultMessages.DONE
-							}
+							lookAt: () => this.currentRoom.interactors.mobile.description(),
+							open: () => this.currentRoom.interactors.ante.on.open(),
+							close: () => this.currentRoom.interactors.ante.on.close()
 						}
+					},
+					riflesso: {
+						pattern: `riflesso`,
+						description: `Non hai una bella cera...`
 					},
 					ante: {
 						pattern: `ant(?:a|e)`,
-						description: "Le ante del mobile sono in vetro scuro e spesso. sono discretamente riflettenti.",
+						description: "Le ante del mobile sono in vetro scuro e spesso. Sono pure discretamente riflettenti.",
 						on: {
 							open: () => {
-								this.currentRoom.interactors.mobile.aperto = true;
+								if(this.currentRoom.interactors.mobile.open)
+									return `Le ante sono già aperte.`
+								this.currentRoom.interactors.mobile.open = true;
+								if(this.currentRoom.interactors.libri.visible == false){
+									this.discover(this.currentRoom.interactors.libri,true)
+									return `Il mobile è pieno zeppo di libri.`
+								}
 								return this.Thesaurus.defaultMessages.DONE
 							},
 							close: () => {
-								this.currentRoom.interactors.mobile.aperto = false;
+								if(this.currentRoom.interactors.mobile.open == false)
+									return `Le ante sono già chiuse.`
+								this.currentRoom.interactors.mobile.open = false;
 								return this.Thesaurus.defaultMessages.DONE
 							}
 						}
@@ -73,21 +79,21 @@ class Adventure extends DemoEngine{
 						label: 'alcuni libri',
 						pattern: `libri`,
 						visible: false,
-						description: () => this.currentRoom.interactors.mobile.aperto ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (!this.adventureData.objects.libro.visible ? `C'è nè uno diverso dagli altri...` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri...`) : `Forse dovrei aprire le ante per esaminarli meglio`,
+						description: () => this.currentRoom.interactors.mobile.open ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (this.adventureData.objects.libro.visible ? `C'è nè uno diverso dagli altri...` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri...`) : `Forse dovrei aprire le ante per esaminarli meglio`,
 						on: {
-							lookAt: () => this.discover(this.adventureData.objects.libro)
+							'lookAt|read|open': () => this.discover(this.adventureData.objects.libro, !this.playerHas(this.adventureData.objects.occhiali))
 						}
 					},
 					calendario: {
 						pattern: "calendario",
-						analizzato: false,
+						read: false,
 						description: () => "E' un calendario vecchio, del 1979." + (this.playerHas(this.adventureData.objects.occhiali) ? " Attualmente mostra il mese di ottobre. Il giorno 18 è cerchiato in rosso." : "")
 					},
 					attaccapanni: {
 						label: "un attaccapanni",
 						pattern: "attaccapanni|appendiabiti",
 						visible: false,
-						description: () => "E' di metallo nero, alto, con 4 braccia." + (this.currentRoom.objects.piumino && this.currentRoom.objects.piumino.visible ? "\nIn uno di essi è appeso il mio piumino nero." : ""),
+						description: () => "E' di metallo nero, alto, con 4 braccia." + (this.currentRoom.objects.piumino && this.currentRoom.objects.piumino.visible ? "\nIn uno di essi è appeso un piumino nero." : ""),
 						on: {
 							lookAt: () => this.discover(this.adventureData.objects.piumino)
 						}
@@ -105,19 +111,18 @@ class Adventure extends DemoEngine{
 					},
 					cassettiera: {
 						pattern: "cassettiera((?: di)? ferro)?",
-						spostabile: false,
-						spostata: false,
+						status: 0,
 						description: () => "E’ una cassettiera di ferro di colore grigio scuro, con la serratura nel primo cassetto e le ruote.",
 						on: {
 							'close|open': `Dovresti agire sui cassetti...`,
 							"push|pull|move": async () => {
 								let cassettiera = this.currentRoom.interactors.cassettiera;
 
-								if(!cassettiera.spostabile)
-									return "Non si muove, sembra incollata al pavimento!"
-								if(cassettiera.spostata)
+								if(cassettiera.status == 0)
+									return "Non si muove, sembra incollata a terra!"
+								if(cassettiera.status == 2)
 									return "Non voglio muoverla più!"
-								cassettiera.spostata = true;
+								cassettiera.status = 2;
 								this.discover(this.adventureData.objects.chiaveCassettiera)
 								await this.CRT.printTyping("Con un rumoroso cigolio la cassettiera finalmente si è spostata...",{cr: false});
 								await this.CRT.sleep(1500)
@@ -132,29 +137,40 @@ class Adventure extends DemoEngine{
 					},
 					cassetti: {
 						pattern: "cassett(?:o|i)",
-						chiusiAChiave: true,
-						aperti: false,
+						locked: true,
+						attempt: 0,
+						open: false,
 						on: {
 							open: () => {
 								let cassetti = this.currentRoom.interactors.cassetti;
-								if(cassetti.chiusiAChiave)
+								if(cassetti.locked){
+									if(cassetti.attempt == 0) cassetti.attempt += 1;
 									return "Niente da fare, i cassetti sono chiusi a chiave."
-								if(cassetti.aperti)
+								}
+								if(cassetti.open)
 									return "I cassetti sono già aperti"
+								
+								cassetti.open = true;
+								let finalmente = (cassetti.attempt > 3 ? "finalmente ":"")
+
+								let occhiali = this.adventureData.objects.occhiali.visible == false ? `\nIn uno di essi noti un paio di occhiali, quindi li tiri fuori e li appoggi sulla scrivania...` : ``
+								
 								this.discover(this.adventureData.objects.occhiali, true);
-								cassetti.aperti = true;
-								delete this.currentRoom.interactors.cianfrusaglie.visible
-								return "Finalmente riesci ad aprire i cassetti. Da uno di essi tiri fuori un paio di occhiali e li appoggi sulla scrivania."
+								this.discover(this.currentRoom.interactors.cianfrusaglie, true);
+								
+								cassetti.attempt = -1
+								
+								return `Hai ${finalmente}aperto i cassetti.${occhiali}`
 							},
 							close: () => {
-								if(this.currentRoom.interactors.cassetti.chiusiAChiave || this.currentRoom.interactors.cassetti.aperti == false)
+								if(this.currentRoom.interactors.cassetti.locked || this.currentRoom.interactors.cassetti.open == false)
 									return "Più di così non posso!"
 								
-								this.currentRoom.interactors.cassetti.aperti = false
+								this.currentRoom.interactors.cassetti.open = false
 								this.currentRoom.interactors.cianfrusaglie.visible = false
 								return "Richiudi delicatamente i cassetti."
 							},
-							lookAt: () => this.currentRoom.interactors.cassetti.aperti ? "Sono pieni di cianfrusaglie." : this.Thesaurus.defaultMessages.NOTHING_PARTICULAR,
+							lookAt: () => this.currentRoom.interactors.cassetti.open ? "Sono pieni di cianfrusaglie." : this.Thesaurus.defaultMessages.NOTHING_PARTICULAR,
 							move: () => this.Thesaurus.defaultMessages.NOT_POSSIBLE
 						}
 					},
@@ -165,9 +181,12 @@ class Adventure extends DemoEngine{
 							'push|pull|move|lift': () => this.Thesaurus.defaultMessages.PREFER_NOT 
 						}
 					},
+					cestino: {
+						pattern: `cestino|spazzatura`,
+						description: `E' un cestino di plastica nera, completamente vuoto.`
+					},
 					cavi:{
-						sistemabili: false,
-						sistemati: false,
+						status: 0,
 						pattern: "cav(?:o|i)",
 						description: () => this.playerHas(this.adventureData.objects.occhiali) ? "Sono cavi della corrente e cavi Ethernet..." : "Sono cavi bianchi e grigi...",
 						on: {
@@ -175,16 +194,16 @@ class Adventure extends DemoEngine{
 
 								let cavi = this.currentRoom.interactors.cavi;
 
-								if(cavi.sistemabili == false)
+								if(cavi.status == 0)
 									return "Perché dovrei?"
-								if(cavi.sistemati)
+								if(cavi.status == 2)
 									return "Meglio lasciarli in ordine!"
-								cavi.sistemati = true;
-								this.currentRoom.interactors.cassettiera.spostabile = true;
+								cavi.status = 2;
+								this.currentRoom.interactors.cassettiera.status = 1;
 								return "Adesso si che si ragiona! Li ho sistemati in modo che non intralcino più!"
 							},
 							lift: () => {
-								if(this.currentRoom.interactors.cavi.sistemabili == false)
+								if(this.currentRoom.interactors.cavi.status == 0)
 									return "Perché dovrei?"
 								return "Li sollevi per un po'... poi ti stanchi e li lasci ricadere ancora più in disordine di prima!"
 							},
@@ -194,8 +213,9 @@ class Adventure extends DemoEngine{
 						...this.commonInteractors.floor,
 						...{
 							description: () => {
-								this.currentRoom.interactors.cavi.sistemabili = true
-								return "E' il classico pavimento flottante presente in quasi tutte le stanze del posto dove lavori... è grigio chiaro con striature più scure." + (this.currentRoom.interactors.cavi.sistemati == false ? "\nAccipicchia! vicino alla scrivania è tutto un groviglio di cavi!" : "");
+								if(this.currentRoom.interactors.cavi.status == 0)
+									this.currentRoom.interactors.cavi.status = 1
+								return "E' il classico pavimento flottante presente in quasi tutte le stanze del posto dove lavori... è grigio chiaro con striature più scure." + (this.currentRoom.interactors.cavi.status == 1 ? "\nAccipicchia! vicino alla scrivania è tutto un groviglio di cavi!" : "");
 							}
 						}
 					},
@@ -206,17 +226,44 @@ class Adventure extends DemoEngine{
 					},
 					porta: {
 						pattern: `porta`,
-						aperta:false,
+						locked:true,
+						open:false,
 						description: "E' la porta del tuo ufficio. Non ha serrature, solo un pomolo. Accanto ad essa c'è un lettore badge con una pulsantiera.",
 						on: {
+							lookAt: () => this.discover(this.currentRoom.interactors.lettoreBadge),
 							open: () => {
-								return "Provi a tirare il pomolo della porta, ma è bloccata..."
+								let porta = this.currentRoom.interactors.porta;
+
+								if(porta.locked) 
+									return "Provi a tirare il pomolo della porta, ma è bloccata..."
+								if(porta.open)
+									return `La porta è già aperta`
+								porta.open = true
+								return `La porta è aperta adesso.`
+
+							},
+							close: () => {
+								let porta = this.currentRoom.interactors.porta;
+
+								if(porta.locked || porta.open == false) {
+									return "La porta è già chiusa"
+								}
+								porta.locked = true;
+								porta.open = false
+								return `La porta è chiusa adesso.`
 							}
+						}
+					},
+					pomolo: {
+						pattern:`pom(?:olo|ello)`,
+						on:{
+							pull: () => this.currentRoom.interactors.porta.on.open(),
+							push: () => this.currentRoom.interactors.porta.on.close()
 						}
 					},
 					lettoreBadge: {
 						pattern: `lettore(?: badge)?`,
-						description: `E' un lettore rfid, credo serva per aprire la porta col badge personale.`
+						description: () => this.currentRoom.interactors.lettoreBadge.visible ? `E' un lettore rfid, credo serva per aprire la porta col badge personale.` : `Mi sembrava di averne visto uno... ma dove?`
 					},
 					pulsantiera: {
 						pattern: `pulsanti(?:era)?`,
@@ -225,7 +272,6 @@ class Adventure extends DemoEngine{
 							'press|push': `Non saprei davvero cosa digitare...`
 						},
 					}
-
 				},
 				onEnter: async () => {
 					if(this.adventureData.prologue){
@@ -233,7 +279,42 @@ class Adventure extends DemoEngine{
 						await this.runSequence("prologo");
 					} 
 				},
+				onExit: async () => {
+					await this.runSequence("crollo");
+				}
 			},
+			quasiFuori: {
+				label: "Quasi fuori",
+				description: `Sei al piano terra dell'edificio, in una stanza quadrata. Le scale che ti hanno portato qui sono crollate. Davanti a te c'è il grosso portone a vetri dal quale riesci a vedere l'esterno!`,
+				interactors: {
+					portone: {
+						pattern: `port(?:a|one)`,
+						description: `E' un portone a vetri, probabilmente blindato. Accanto ad esso c'è un display con una pulsantiera sotto.`
+					},
+					display: {
+						pattern: `display|schermo`,
+						on: {
+							'lookAt|read': async () => {
+								if(!this.playerHas(this.adventureData.objects.occhiali))
+									return "Non riesco a leggerlo, senza occhiali!"
+
+								if(await this.yesNoQuestion("Chieda un codice di sicurezza per uscire... vuoi provare a digitarlo") == false)
+									return true;
+
+								let pin = await this.ask("PIN:",true)
+
+							}
+						}
+					},
+					pulsantiera: {
+						pattern: `pulsanti(?:era)?`,
+						description: `Nella pulsantiera ci sono solo numeri da 0 a 9.`,
+						on: {
+							'press|push': `Non saprei davvero cosa digitare...`
+						},
+					}
+				}
+			}
 
 		},
 
@@ -246,21 +327,18 @@ class Adventure extends DemoEngine{
 				location: "ufficio",
 				visible: false,
 				on: {
-					useWith: (targets)=> {
+					'useWith|putInto': async (targets) => {
 						let i = this.currentRoom.interactors;
-						if(targets[1] == i.cassettiera || targets[1] == i.cassetti || targets[1] == i.serratura){
-
-							i.cassetti.chiusiAChiave = ! i.cassetti.chiusiAChiave
-							return "-Click!-";
+						if(targets[1] == i.cassettiera){
+							return this.Thesaurus.defaultMessages.BE_MORE_SPECIFIC
 						}
-						return null
-					},
-					putInto: (targets)=> {
-						let i = this.currentRoom.interactors;
-						if(targets[1] == i.serratura){
-
-							i.cassetti.chiusiAChiave = ! i.cassetti.chiusiAChiave
-							return "-Click!-";
+						if(targets[1] == i.cassetti || targets[1] == i.serratura){
+							if(i.cassetti.open){
+								await this.CRT.printTyping("Prima chiudo i cassetti...");
+								await this.CRT.sleep(1000)
+							}
+							i.cassetti.locked = ! i.cassetti.locked
+							return "La serratura della cassettiera ha fatto -Click!-";
 						}
 						return null
 					}
@@ -274,9 +352,9 @@ class Adventure extends DemoEngine{
 				location: "ufficio",
 				visible:false,
 				on: {
-					take: () => {
+					'take|wear': () => {
 						this._addInInventory(this.adventureData.objects.occhiali);
-						return "Guardandoli da vicino ti accorgi che sono i tuoi occhiali da vista. Quindi gli indossi....\nOra è tutto MOLTO più chiaro e definito!"
+						return "Guardandoli da vicino ti accorgi che sono i tuoi occhiali da vista. Quindi li indossi....\nOra è tutto MOLTO più chiaro e definito!"
 					},
 					drop: "Meglio di no, potrebbero servirti in furturo."
 				}
@@ -285,12 +363,21 @@ class Adventure extends DemoEngine{
 				label: "un piumino nero",
 				visible: false,
 				pattern: "(piumino|giacc(?:a|etto))(?: ner(?:o|a))?",
-				description: "E' un piumino leggero, primaverile. E' molto semplice. Ha quattro tasche, due interne e due esterne.",
+				description: () => "E' un piumino nero"+ (this.playerHas(this.adventureData.objects.occhiali) == false ? ". Sembra":"")+" leggero, primaverile."+ ((this.adventureData.objects.taschePiumino.visible === undefined) ? "\nHa quattro tasche, due interne e due esterne.":""),
 				location: "ufficio",
 				linkedObjects: ["taschePiumino"],
 				on: {
-					lookAt: () => this.discover(this.adventureData.objects.taschePiumino, true),
-					drop: () => this.currentRoom == this.adventureData.rooms.ufficio ? `Lo rimetto nell'atttaccapanni.` : null
+					lookAt: () => {
+						if (this.playerHas(this.adventureData.objects.piumino)) 
+							this.discover(this.adventureData.objects.taschePiumino, true)
+						return null
+					},
+					wear: async (targets) => await this._take(targets[0]),
+					drop: async () => {
+						if (this.currentRoom == this.adventureData.rooms.ufficio) 
+							await this.CRT.printTyping(`Lo rimetto nell'attaccapanni...`, {cr: false})
+						return null
+					}
 				}
 			},
 
@@ -299,11 +386,16 @@ class Adventure extends DemoEngine{
 				pattern: "tasc(?:a|he)",
 				on: {
 					'open|lookAt': () => {
-						if(this.adventureData.objects.badge.visible)
+						let objects = this.adventureData.objects;
+						if(objects.badge.visible)
 							return "Dopo un'attenta ispezione concludi che sono tutte e quattro vuote."
-						this.adventureData.objects.badge.location = this.currentRoom.key
-						this.discover(this.adventureData.objects.badge)
-						return "Da una di esse tiri fuori un oggetto rigido... E' il tuo badge personale!";
+						objects.badge.location = this.currentRoom.key
+						if(this.playerHas(objects.piumino)){
+							this._addInInventory(objects.badge)
+						} else {
+							this.discover(objects.badge)
+						}
+						return "Da una di esse estrai un oggetto rigido... E' il tuo badge personale!";
 					}
 				}
 			},
@@ -311,22 +403,43 @@ class Adventure extends DemoEngine{
 				label: "un badge",
 				visible: false,
 				pattern: "badge",
-				description: () =>  "Sopra c'è la tua foto e " + (this.playerHas(this.adventureData.objects.occhiali) ? "il numero del badge: 098074" : "un numero poco distinguibile...")
+				description: () =>  "Sopra c'è la tua foto e " + (this.playerHas(this.adventureData.objects.occhiali) ? "il numero del badge: 098074" : "un numero poco distinguibile..."),
+				on: {
+					'useWith|bringCloser': async (mSubjects) => {
+						let i = this.currentRoom.interactors
+						let o = this.currentRoom.objects
+						if(mSubjects[1] == i.lettoreBadge){
+							if (i.lettoreBadge.visible == false)
+								return i.lettoreBadge.description()
+
+							i.porta.locked = false;
+							await this.CRT.printTyping("Avvicini il badge al lettore e...",{printDelay: 75, cr: false});
+							await this.CRT.sleep(1000);
+							await this.CRT.printTyping("Bzzzzzzz...");
+							await this.CRT.sleep(1500);
+							return `La porta ha vibrato per qualche secondo...`
+						}
+						return null
+					}
+				}
 			},
 			libro: {
 				label: `un libro`,
 				pattern: `libro`,
-				visible: false,
+				location: `ufficio`,
 				read: false,
-				descriprion: () => `Ha una copertina grigia e un segnalibro all'interno.`,
+				visible: false,
+				description: () => this.adventureData.objects.libro.visible ? `Ha una copertina grigia e un segnalibro all'interno.` : `Non saprei quale scegliere.`,
 				on: {
 					'open|read': () => {
+
 						if (this.playerHas(this.adventureData.objects.libro)){
-							this.inventory.objects.libro.read = true;
+							this.inventory.libro.read = true;
 							return "E' un libro di lettura, di Stephen King, dal titolo INSOMNIA. Apri il libro al segnalibro. E' una pagina bianca, si legge solo il titolo in alto e il numero di pagina in basso (1037)"
 						}
-						return "Dovrei prenderlo prima..." 
-					}
+						return this.adventureData.objects.libro.visible ? "Dovrei prenderlo prima..." : this.adventureData.objects.libro.description()
+					},
+					take: () => this.adventureData.objects.libro.visible ? null : this.adventureData.objects.libro.description()
 				}
 			}
 
@@ -357,6 +470,26 @@ class Adventure extends DemoEngine{
 				await this.CRT.sleep(1500);
 				await this.CRT.printTyping("Sarà meglio tornare a casa.",{nlAfter:1})
 				await this.CRT.sleep(2000);
+			},
+			crollo: async () => {
+				await this.CRT.printTyping("Appena esci dall'ufficio la porta dietro di te si richiude pesantamente!")
+				await this.CRT.sleep(1500);
+				await this.CRT.printTyping("Non vedi l'ora di tornare a casa. Il tuo ufficio è così claustrofobico e opprimente... Per fortuna adesso sei fuori da lì.")
+				await this.CRT.sleep(2000);
+				await this.CRT.printTyping("Percorri con passo svelto il corridoio che ti porta alle scale. Quindi inizi a scenderle, d'apprima piano, poi sempre più rapidamente...")
+				await this.CRT.sleep(2500);
+				await this.CRT.printTyping("Finalmente sei in fondo alle scale!",{cr:false})
+				await this.CRT.sleep(1500);
+				await this.CRT.printTyping(" Improvvisamente però... ",{printTyping:75, cr:false});
+				await this.CRT.sleep(1500);
+				await this.CRT.printTyping("BOOM!")
+				await this.CRT.sleep(2000);
+				await this.CRT.printTyping("Prima senti un'esplosione...",{printTyping:75, cr:false})
+				await this.CRT.sleep(1000);
+				await this.CRT.printTyping(" poi la terra inizia a tremare!", {printTyping:75})
+				await this.CRT.sleep(2000);
+				await this.CRT.printTyping("Cerchi riparo invano mentre le scale dietro di te crollano...",{nlAfter: 1})
+				await this.CRT.sleep(3000);
 			}
 		}
 

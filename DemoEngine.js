@@ -7,7 +7,7 @@ class DemoEngine extends IFEngine{
 
 		this.CRT.defaultCR = "\n";
 		this.defaultInput = "\n] "
-		this.startingRoom = "ufficio";
+		this.startingRoom = "quasiFuori";
 
 		this.Thesaurus = new DemoThesaurus(this)
 
@@ -49,7 +49,7 @@ class DemoEngine extends IFEngine{
 	}
 
 	async instructions(){
-		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo COMANDO (es: salta) oppure dal VERBO + OGGETTO (es: prendi la chiave). frasi più complesse vanno al di là della mia comprensione.\n\nBuona fortuna e soprattutto buon divertimento!");
+		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo COMANDO (es: salta) oppure dal VERBO + OGGETTO (es: prendi la chiave); frasi più complesse vanno al di là della mia comprensione.\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che chiudi il browser!\n\nBuona fortuna e soprattutto buon divertimento!");
 	}
 
 
