@@ -8,10 +8,15 @@ class DemoThesaurus extends Thesaurus{
 	constructor(parent){
 		super(parent),
 		this.defaultMessages.BE_SERIOUS = "Sii serio!"
-
+		this.defaultMessages.DONE = "Ok."
+			
 		this.loadCommands();
 		this.loadVerbs();
 		
+		this.commands.exit = {
+			pattern: `esci|scappa|fuggi`,
+			callback: `Vorrei, ma sono bloccato qui.`
+		}
 	}
 	
 	loadVerbs(){

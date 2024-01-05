@@ -86,7 +86,7 @@ class CRT{
 		}
 
 		if(options.waitBefore){
-			await this.sleep(waitBefore);
+			await this.sleep(options.waitBefore);
 		}
 			
 		for(let i=0; i<text.length;i++){

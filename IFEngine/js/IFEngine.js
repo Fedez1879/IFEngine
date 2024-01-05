@@ -135,7 +135,7 @@ class IFEngine{
 		if(this.datiIniziali != undefined)
 			this.reload(this.datiIniziali);
 		this.adventureData.prologue = prologue;
-		this.enterRoom(this.adventureData.startingRoom);
+		this.enterRoom(this.startingRoom);
 	}
 
 	// Mostra il menù
@@ -549,7 +549,7 @@ class IFEngine{
 
 	// Esegui una sequenza di azioni
 	async runSequence(labelSequenza, args){
-		let sequence = this.adventureData.sequenze[labelSequenza];
+		let sequence = this.adventureData.sequences[labelSequenza];
 		return await sequence(args);
 	}
 	
@@ -815,6 +815,10 @@ class IFEngine{
 
 		// console.log(ret);
 		return ret;
+	}
+
+	stringOrFalse(callback){
+		return typeof callback == 'string' ? callback: false;
 	}
 
 	async _inventoryAction(APO,s){

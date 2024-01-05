@@ -49,7 +49,14 @@ class DemoEngine extends IFEngine{
 	}
 
 	async instructions(){
-		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo COMANDO (es: salta) oppure dal VERBO + OGGETTO (es: prendi la chiave); frasi più complesse vanno al di là della mia comprensione.\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che chiudi il browser!\n\nBuona fortuna e soprattutto buon divertimento!");
+		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo comando (es: SALTA) oppure dal verbo + oggetto (es: PRENDI LA CHIAVE); frasi più complesse vanno al di là della mia comprensione.\nPer rileggere la descrizione del luogo dove sei usa il comando DOVE.\n\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che lo chiudi!\n\nBuona fortuna e soprattutto buon divertimento!");
+	}
+
+	// Override
+	async die(){
+		await this.CRT.printTyping(i18n.IFEngine.messages.death, {nlAfter: 1});
+		this.displayMenu(this.menu.contextual); 
+		return false;
 	}
 
 
