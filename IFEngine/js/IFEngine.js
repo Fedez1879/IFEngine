@@ -299,7 +299,7 @@ class IFEngine{
 		if( Object.keys(list).length > 0){
 			for(let i in list){
 				if(list[i].visible){
-					console.log(list[i]);
+					//console.log(list[i]);
 					let whatISee = Array.isArray(list[i].label) ? 
 						list[i].label[list[i].status] : 
 						list[i].label;
@@ -332,14 +332,14 @@ class IFEngine{
 	}
 	
 	// Il loop del gioco
-	async gameLoop(describeCurrentRoom, ignoraTimedEvents){
+	async gameLoop(describeCurrentRoom, ignoreTimedEvents){
 		
 		if(describeCurrentRoom){
 			await this.currentRoomDescription();
 		}
 
 		// Esistono eventi a tempo attivi?
-		if(this.timedEvents.length > 0 && !ignoraTimedEvents){
+		if(this.timedEvents.length > 0 && !ignoreTimedEvents){
 			for(let i in this.timedEvents){
 				let timedEvent = this.adventureData.timedEvents[this.timedEvents[i]];
 				if(timedEvent !== undefined){
@@ -418,7 +418,7 @@ class IFEngine{
 	_getTbs(){
 		return { 
 			currentRoom: this.currentRoom == null ? 
-				this.adventureData.startingRoom : 
+				this.startingRoom : 
 				this.currentRoom.key, 
 			timedEvents: this.timedEvents,
 			adventureData: this.adventureData, 
@@ -526,8 +526,10 @@ class IFEngine{
 	discover(object, justRemove){
 		if(justRemove)
 			delete object.visible
-		else
-			object.visible = true;
+		else{
+			object.visible = true
+			delete object.initialDescription
+		}
 		this.refreshRoomObjects();
 		return null		
 	}
@@ -558,6 +560,10 @@ class IFEngine{
 		return this._get(object.key, this.inventory);
 	}
 
+	getObject(key){
+		let o = this._get(key,this.inventory) 
+		return o ? o : this._get(key,this.adventureData.objects)
+	}
 	// Stampa i punti del gioco
 	async _points(){
 		if (this.dataPoints.actionPoints === undefined)
@@ -892,10 +898,10 @@ class IFEngine{
 			location;
 		this.adventureData.objects[object.key] = object
 
-		console.log(object)
+		//console.log(object)
 
 		delete this.inventory[object.key];
-		console.log(object)
+		//console.log(object)
 		this.refreshRoomObjects();
 	}
 
@@ -920,7 +926,7 @@ class IFEngine{
 			input = input.replace(pattern,step.replaceWith);
 		}
 		
-		console.log(input)
+		//console.log(input)
 		return input;
 		/*
 		input = input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');

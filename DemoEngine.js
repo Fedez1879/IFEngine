@@ -59,5 +59,18 @@ class DemoEngine extends IFEngine{
 		return false;
 	}
 
+	almostOneCode(){
+		return this.adventureData.rooms.ufficio.interactors.calendario.read || 
+			this.getObject("badge").read ||
+			this.getObject("libro").read
+
+	}
+
+	async gameLoop(describeCurrentRoom, ignoreTimedEvents){
+		console.log(this.almostOneCode())
+		super.gameLoop(describeCurrentRoom, ignoreTimedEvents);
+	}
+	
+
 
 }

@@ -92,7 +92,15 @@ class Adventure extends DemoEngine{
 					calendario: {
 						pattern: `calendario`,
 						read: false,
-						description: () => `E' un calendario a parete, di quelli con le figure in alto e le caselle con i numeri in basso.` + (this.playerHas(this.adventureData.objects.occhiali) ? ` E' un calendario vecchio, del 1979. Mostra il mse di ottobre e c'è un giorno cerchiato in rosso: il 18.` : ``)
+						description: () => `E' un calendario a parete, di quelli con le figure in alto e le caselle con i numeri in basso.` + (this.playerHas(this.adventureData.objects.occhiali) ? ` E' del 1979. Mostra il mese di ottobre e c'è un giorno cerchiato in rosso: il 18.` : ``),
+						on: {
+							lookAt: () => {
+								if (this.playerHas(this.adventureData.objects.occhiali))
+									this.currentRoom.interactors.calendario.read = true
+								return null
+							}
+						}
+
 					},
 					attaccapanni: {
 						label: `un attaccapanni`,
@@ -105,7 +113,7 @@ class Adventure extends DemoEngine{
 					},
 					scrivania: {
 						pattern: `scrivania`,
-						description: `E’ una scrivania rettangolare in legno chiaro. Sotto di essa c’è una cassettiera in ferro e il piccolo cestino dell’immondizia. Sopra di essa un'accozzaglia di appunti scritti su fogli e foglietti.`
+						description: () => `E’ una scrivania rettangolare in legno chiaro. Sotto di essa c’è una cassettiera in ferro e il piccolo cestino dell’immondizia. Sopra di essa un'accozzaglia di appunti scritti su fogli e foglietti.` + (this.adventureData.objects.occhiali.visible && playerHas(this.adventureData.objects.occhiali) == false ? this.adventureData.objects.occhiali.initialDescription : ``)
 					},
 					appunti: {
 						pattern: `appunt(?:o|i)|fogli(?:o|i|etti)?`,
@@ -289,7 +297,7 @@ class Adventure extends DemoEngine{
 					await this.runSequence(`crollo`);
 					if(this.playerHas(this.adventureData.objects.occhiali)){
 						this._removeFromInventory(this.adventureData.objects.occhiali,`quasiFuori`)
-						delete this.adventureData.objects.occhiali.visible
+						this.discover(this.adventureData.objects.occhiali, true)
 					}
 				}
 			},
@@ -323,13 +331,15 @@ class Adventure extends DemoEngine{
 								if(!this.playerHas(this.adventureData.objects.occhiali))
 									return `Non riesco a leggerlo, senza occhiali!`
 
+								if(this.almostOneCode() == false)
+									return `Chiede un codice di sicurezza per uscire... Ma tu non hai idea di quale possa essere!!!`
 								if(await this.yesNoQuestion(`Chiede un codice di sicurezza per uscire... vuoi provare a digitarlo`) == false)
 									return true;
 
 								let pin = await this.ask(`PIN:`,true)
 								await this.CRT.sleep(1500)
 								if(pin != `791810`){
-									await this.println(`CODICE ERRATO.`)
+									await this.CRT.println(`CODICE ERRATO.`)
 									return true
 								}
 								this.currentRoom.interactors.portone.locked = false 
@@ -363,8 +373,8 @@ class Adventure extends DemoEngine{
 						}
 					},
 
-				}
-				
+				},
+
 			}
 
 		},
@@ -466,8 +476,14 @@ class Adventure extends DemoEngine{
 				label: `un badge`,
 				visible: false,
 				pattern: `badge`,
+				read: false,
 				description: () =>  `Sopra c'è la tua foto e ` + (this.playerHas(this.adventureData.objects.occhiali) ? `il numero del badge: 098074` : `un numero poco distinguibile...`),
 				on: {
+					'lookAt|read': () => {
+						if(this.playerHas(this.adventureData.objects.occhiali))
+							this.getObject("badge").read = true
+						return null
+					},
 					'useWith|bringCloser': async (mSubjects) => {
 						let i = this.currentRoom.interactors
 						let o = this.currentRoom.objects
@@ -535,9 +551,9 @@ class Adventure extends DemoEngine{
 				await this.CRT.printTyping(`BOOM!`, {waitAfter: 2000})
 				await this.CRT.printTyping(`Prima senti un'esplosione...`,{printDelay: 75, cr:false, waitAfter: 1000})
 				await this.CRT.printTyping(` poi la terra inizia a tremare fortissimo!`, {printDelay: 75, waitAfter: 2000})
-				await this.CRT.printTyping(`Cerchi riparo invano mentre le scale dietro di te crollano...`,{nlAfter: 1, waitAfter: 3000})
-				if(this.datiAvventura.timedEvents.earthquake.currentStep > 6)
-					this.datiAvventura.timedEvents.earthquake.currentStep = 6
+				await this.CRT.printTyping(`Cerchi riparo mentre le scale dietro di te crollano...`,{nlAfter: 1, waitAfter: 3000})
+				if(this.adventureData.timedEvents.earthquake.currentStep > 6)
+					this.adventureData.timedEvents.earthquake.currentStep = 6
 			}
 		},
 		timedEvents: {
