@@ -14,7 +14,7 @@
   --greenRevS: #0c0;
 
   --cyanF: #6ff;
-  --cyanB: #00000c;
+  --cyanB: #000c17;
   --cyanS: #6ff;
   --cyanRevF: #033;
   --cyanRevBs: #0cc;
@@ -154,7 +154,7 @@ body.green {
 }
 
 .green pre{
-  text-shadow: 0px 0px 6px var(--greenRevS);
+  text-shadow: 0px 0px 6px var(--greenS);
 }
 
 .green #mobileInput{
@@ -201,7 +201,7 @@ body.cyan {
 }
 
 .cyan pre{
-  text-shadow: 0px 0px 6px var(--cyanRevS);
+  text-shadow: 0px 0px 6px var(--cyanS);
 }
 
 .cyan #mobileInput{
@@ -248,7 +248,7 @@ body.white {
 }
 
 .white pre{
-  text-shadow: 0px 0px 6px var(--whiteRevS);
+  text-shadow: 0px 0px 6px var(--whiteS);
 }
 
 .white #mobileInput{

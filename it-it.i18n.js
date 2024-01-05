@@ -1,5 +1,5 @@
 var i18n = {
-	htmlTitle: `Demo`,
+	htmlTitle: `L'ufficio - IFDemo`,
 	title: ` _     _        __  __ _      _       
 | |   ( )      / _|/ _(_)    (_)      
 | |   |/ _   _| |_| |_ _  ___ _  ___  
@@ -127,7 +127,7 @@ var i18n = {
 			dontUnderstand: `Non ho capito...`,
 			dontNoticeAnythingInParticular: `Non noto nulla di particolare.`,
 			notSeenHere: `Qui non ne vedo.`, 
-			dontHaveAny: `Non ne possiedi.`, 
+			dontHaveAny: `Non hai niente del genere con te.`, 
 			nothingHappens: `Non succede niente.`,
 			beMoreSpecific: `Sii più specifico.`,
 			notPossible: `Non è possibile.`,

@@ -19,20 +19,24 @@ class Adventure extends DemoEngine{
 						exit: async() => this.stringOrFalse(this.currentRoom.directions.e())
 					}
 				},
+				scenic: {
+					pattern: [`chiodo`, `ruot(?:a|e)`, `viso`, `riflesso`, `ganci(?:o)`],
+					defaultMessage: `Lascia perdere, concentrati su trovare il modo di uscire di qui..`
+				},
 				interactors: {
 					ufficio: {
 						pattern: `ufficio`,
 						description: () => this.currentRoom.description()
 					},
 					luce: {
-						pattern: `luce`,
+						pattern: `(?:fioca|debole|flebile )?luce`,
 						description: `E' la flebile luce del tramonto.`
 					},
 					pareti: {
 						...this.commonInteractors.wall,
 						...{
 							description: async () => {
-								await this.CRT.printTyping(`Nella parete di fronte, c'è il modile a vetri, in quella a est c'è la porta di ingresso. Nella parete opposta alla porta c'è l'unica finestra della stanza.\nLa parete dietro di te è completamente spoglia, a parte `+(this.playerHas(this.adventureData.objects.occhiali) ? ``: `(credo) `)+ `un calendario appeso.`);
+								await this.CRT.printTyping(`Nella parete di fronte, c'è il modile a vetri, in quella a est c'è la porta di ingresso. Nella parete opposta alla porta c'è l'unica finestra della stanza.\nLa parete dietro di te è completamente spoglia, a parte `+(this.playerHas(this.adventureData.objects.occhiali) ? ``: `(credo) `)+ `un calendario appeso a un chiodo.`);
 								if( this.currentRoom.interactors.attaccapanni.visible == false){
 									await this.CRT.sleep(1500);
 									await this.CRT.printTyping(`Di fianco al mobile c'è un attaccapanni, mica l'avevo notato prima!`)
@@ -44,8 +48,12 @@ class Adventure extends DemoEngine{
 							}
 						}
 					},
+					sedia: {
+						pattern: `sedia`,
+						description: `E' la classica sedia da ufficio con ruote, regolabile in altezza e girevole. Ha sicuramente visto giorni migliori.`
+					},
 					mobile: {
-						pattern: `mobile`,
+						pattern: `(?:moderno )?mobile`,
 						open:false,
 						description: () => `E' un massicico mobile di legno con le ante di vetro scuro.` + (this.currentRoom.interactors.mobile.open ? `All'interno il mobile è ricolmo di libri` : `\nRiesco ad intravedere qualcosa al suo interno...`),
 						on: {
@@ -92,7 +100,7 @@ class Adventure extends DemoEngine{
 					calendario: {
 						pattern: `calendario`,
 						read: false,
-						description: () => `E' un calendario a parete, di quelli con le figure in alto e le caselle con i numeri in basso.` + (this.playerHas(this.adventureData.objects.occhiali) ? ` E' del 1979. Mostra il mese di ottobre e c'è un giorno cerchiato in rosso: il 18.` : ``),
+						description: () => `E' un calendario a parete, di quelli con le figure in alto e le caselle con i numeri in basso.` + (this.playerHas(this.adventureData.objects.occhiali) ? ` E' del 1979. E' aperto al mese di ottobre e c'è un giorno cerchiato in rosso: il 18.` : ``),
 						on: {
 							lookAt: () => {
 								if (this.playerHas(this.adventureData.objects.occhiali))
@@ -106,7 +114,7 @@ class Adventure extends DemoEngine{
 						label: `un attaccapanni`,
 						pattern: `attaccapanni|appendiabiti`,
 						visible: false,
-						description: () => `E' di metallo nero, alto, con 4 braccia.` + (this.currentRoom.objects.piumino && this.currentRoom.objects.piumino.visible ? `\nIn uno di essi è appeso un piumino nero.` : ``),
+						description: () => `E' di metallo nero, alto, con quattro ganci.` + (this.currentRoom.objects.piumino && this.currentRoom.objects.piumino.visible ? `\nIn uno di essi è appeso un piumino nero.` : ``),
 						on: {
 							lookAt: () => this.discover(this.adventureData.objects.piumino)
 						}
@@ -210,15 +218,16 @@ class Adventure extends DemoEngine{
 								if(cavi.status == 0)
 									return `Perché dovrei?`
 								if(cavi.status == 2)
-									return `Meglio lasciarli in ordine!`
+									return `Meglio lasciarli in ordine.`
 								cavi.status = 2;
 								this.currentRoom.interactors.cassettiera.status = 1;
-								return `Adesso si che si ragiona! Li ho sistemati in modo che non intralcino più!`
+								return `Adesso si che si ragiona, li ho sistemati in modo che non intralcino più!`
 							},
-							lift: () => {
+							lift: async () => {
 								if(this.currentRoom.interactors.cavi.status == 0)
 									return `Perché dovrei?`
-								return `Li sollevi per un po'... poi ti stanchi e li lasci ricadere ancora più in disordine di prima!`
+								await this.CRT.printTyping(`Li sollevi per un po'... `,{cr:false,waitBefore:2000});
+								retutn `poi ti stanchi e li lasci ricadere ancora più in disordine di prima!`
 							},
 						}
 					},
@@ -235,20 +244,20 @@ class Adventure extends DemoEngine{
 					soffitto: this.commonInteractors.ceiling,
 					finestra: {
 						pattern: `finestr(?:a|one)`,
-						description: `Dalla finestra vedi il giardino e il parchegghio sottostante. Come al solito non ricordi dove hai messo la tua macchina!`,
+						description: `Dalla finestra vedi il giardino e il parchegghio sottostante. Come sempre, non ricordi dove hai messo la tua macchina!`,
 					},
 					porta: {
 						pattern: `porta`,
 						locked:true,
 						open:false,
-						description: `E' la porta del tuo ufficio. Non ha serrature, solo un pomolo. Accanto ad essa c'è un lettore badge con una pulsantiera.`,
+						description: `E' la porta del tuo ufficio. Non ha serrature, solo un pomolo. Accanto ad essa c'è un lettore badge.`,
 						on: {
 							lookAt: () => this.discover(this.currentRoom.interactors.lettoreBadge),
 							open: () => {
 								let porta = this.currentRoom.interactors.porta;
 
 								if(porta.locked) 
-									return `Provi a tirare il pomolo della porta, ma è bloccata...`
+									return `Provi a tirare il pomolo della porta, ma non riesci proprio ad aprirla... è bloccata...`
 								if(porta.open)
 									return `La porta è già aperta`
 								porta.open = true
@@ -276,14 +285,7 @@ class Adventure extends DemoEngine{
 					},
 					lettoreBadge: {
 						pattern: `lettore(?: badge)?`,
-						description: () => this.currentRoom.interactors.lettoreBadge.visible ? `E' un lettore rfid, credo serva per aprire la porta col badge personale.` : `Mi sembrava di averne visto uno... ma dove?`
-					},
-					pulsantiera: {
-						pattern: `pulsanti(?:era)?`,
-						description: `Nella pulsantiera ci sono solo numeri da 0 a 9.`,
-						on: {
-							'press|push': `Non saprei davvero cosa digitare...`
-						},
+						description: () => this.currentRoom.interactors.lettoreBadge.visible ? `E' un lettore RFID, credo serva per aprire la porta col badge personale.` : `Mi sembrava di averne visto uno... ma dove?`
 					}
 				},
 				onEnter: async () => {
@@ -294,27 +296,31 @@ class Adventure extends DemoEngine{
 					this.startTimedEvent(`earthquake`)
 				},
 				onExit: async () => {
-					await this.runSequence(`crollo`);
+					let occhiali = this.adventureData.objects.occhiali;
 					if(this.playerHas(this.adventureData.objects.occhiali)){
-						this._removeFromInventory(this.adventureData.objects.occhiali,`quasiFuori`)
-						this.discover(this.adventureData.objects.occhiali, true)
+						occhiali.visible = false
+						this._removeFromInventory(occhiali,`quasiFuori`)
 					}
+					await this.runSequence(`crollo`);
 				}
 			},
 			quasiFuori: {
 				label: `Quasi fuori`,
-				description: `Sei al piano terra dell'edificio, in una stanza quadrata. Le scale che ti hanno portato qui sono crollate. Davanti a te c'è il grosso portone a vetri dal quale riesci a vedere l'esterno!`,
+				description: `Sei al piano terra dell'edificio, in una stanza quadrata. Le scale che ti hanno portato qui sono crollate. Davanti a te c'è il grosso portone a vetri dal quale riesci a intravedere l'esterno, sebbene stia facendo buio.`,
+				directions: {
+					u: () =>this.currentRoom.interactors.scale.description(),
+					d: () =>this.currentRoom.interactors.scale.description()
+				},
 				override: {
 					commands: {
 						exit: async() => this.stringOrFalse(this.currentRoom.interactors.portone.on.open())
 					}
 				},
-
 				interactors: {
 					portone: {
 						pattern: `port(?:a|one)`,
 						locked: true,
-						description: `E' un portone a vetri, probabilmente blindato. Accanto ad esso c'è un display con una pulsantiera sotto.`,
+						description: `E' un portone a vetri, probabilmente blindato. Accanto ad esso c'è un piccolo display con una pulsantiera sotto.`,
 						on: {
 							open: () => {
 								if(this.currentRoom.interactors.portone.locked)
@@ -331,7 +337,7 @@ class Adventure extends DemoEngine{
 								if(!this.playerHas(this.adventureData.objects.occhiali))
 									return `Non riesco a leggerlo, senza occhiali!` + (this.adventureData.objects.occhiali.once ? `\nDevo averli persi durante il crollo...` : ``)
 
-								if(this.almostOneCode() == false)
+								if(this.maybeIKnowTheCode() == false)
 									return `Chiede un codice di sicurezza per uscire... Ma tu non hai idea di quale possa essere!!!`
 								if(await this.yesNoQuestion(`Chiede un codice di sicurezza per uscire... vuoi provare a digitarlo`) == false)
 									return true;
@@ -349,9 +355,9 @@ class Adventure extends DemoEngine{
 					},
 					pulsantiera: {
 						pattern: `pulsanti(?:era)?`,
-						description: `Nella pulsantiera ci sono solo numeri da 0 a 9.`,
+						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Nella pulsantiera ci sono solo numeri da 0 a 9 e un tasto verde.` : `Ha circa 11 tasti (mi pare)...`,
 						on: {
-							'press|push': `Non saprei davvero cosa digitare...`
+							'press|push': `Non saprei davvero cosa digitare.`
 						},
 					},
 					pareti: {
@@ -363,15 +369,22 @@ class Adventure extends DemoEngine{
 					soffitto: {
 						...this.commonInteractors.ceiling,
 						...{
-							description: `Mostra alcune crepe... Ma è ancora al suo posto`
+							description: `Mostra alcune crepe... Ma è ancora al suo posto.`
 						}
 					},
 					pavimento: {
 						...this.commonInteractors.floor,
 						...{
-							description: () => `Il pavimento sembra a posto...` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom ? `mi pare di vedere degli occhiali per terra...` : ``)
+							description: () => `Il pavimento sembra ok.` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom.key ? `Ehi, mi pare di vedere degli occhiali per terra...` : ``),
+							on: {
+								lookAt: () => this.discover(this.adventureData.objects.occhiali, true)
+							}
 						}
 					},
+					scale: {
+						pattern: `(?:rampa (?:di )?)?scal(a|e|ini)`,
+						description: `Ormai è tutto ridotto a un cumulo di macerie invalicabili...`
+					}
 
 				},
 
@@ -411,7 +424,7 @@ class Adventure extends DemoEngine{
 				description: () => (this.playerHas(this.adventureData.objects.occhiali) ? `Sono` : `Sembrano`) + ` occhiali per astigmatici e ipermetropi.`,
 				initialDescription: `Ci sono un paio di occhiali sulla scrivania.`,
 				location: `ufficio`,
-				visible:false,
+				visible: false,
 				once: false,
 				on: {
 					'take|wear': () => {
@@ -421,15 +434,14 @@ class Adventure extends DemoEngine{
 							occhiali.once = true;
 							answer = `Guardandoli da vicino ti accorgi che sono i tuoi occhiali da vista. Quindi li indossi....\nOra è tutto MOLTO più chiaro e definito!`
 						} else {
-							answer = `Sono proprio i tuoi occhiali, meno male li hai ritrovati! Li indossi nuovamente.`
+							answer = `Sono proprio i tuoi occhiali, per fortuna li hai ritrovati! Li indossi nuovamente.`
 						}
 
 						this._addInInventory(occhiali);
 						return answer;
 
 					},
-					drop: `Meglio di no, non ci vedi molto bene senza!`,
-					search: `Non saprei dove cercare...`
+					drop: `Meglio di no, non ci vedi molto bene senza!`
 				}
 			},
 			piumino: {
@@ -514,7 +526,7 @@ class Adventure extends DemoEngine{
 
 						if (this.playerHas(this.adventureData.objects.libro)){
 							this.inventory.libro.read = true;
-							return `E' un libro di lettura, di Stephen King, dal titolo INSOMNIA. Apri il libro al segnalibro. E' una pagina bianca sulla quale noti una scritta fatta a matita: "ymd"`
+							return `E' un romanzo di Stephen King, dal titolo INSOMNIA. Apri il libro all'altezza del segnalibro e trovi una pagina bianca sulla quale è stato scritto a matita: "ymd"`
 						}
 						return this.adventureData.objects.libro.visible ? `Dovrei prenderlo prima...` : this.adventureData.objects.libro.description()
 					},
@@ -544,9 +556,9 @@ class Adventure extends DemoEngine{
 			},
 			crollo: async () => {
 				await this.CRT.printTyping(`Appena esci dall'ufficio la porta dietro di te si richiude pesantamente!`, {waitAfter: 1500})
-				await this.CRT.printTyping(`Non vedi l'ora di tornare a casa. Il tuo ufficio è così claustrofobico e opprimente... Per fortuna adesso sei fuori da lì.`, {waitAfter: 2000})
-				await this.CRT.printTyping(`Percorri con passo svelto il corridoio che ti porta alle scale. Quindi inizi a scenderle, piano all'inizio, poi sempre più rapidamente...`, {waitAfter: 2500})
-				await this.CRT.printTyping(`Finalmente sei in fondo alle scale!`,{cr: false,waitAfter: 1500})
+				await this.CRT.printTyping(`Non vedi l'ora di tornare a casa. Il tuo ufficio è così claustrofobico... Per fortuna adesso sei fuori da quella stanza opprimente.`, {waitAfter: 2000})
+				await this.CRT.printTyping(`Percorri con passo svelto il corridoio fino in fondo, quindi inizi a scendere le scale che ti portano al piano terra. All'inizio procedi con cautela, poi sempre più rapidamente...`, {waitAfter: 2500})
+				await this.CRT.printTyping(`Finalmente arrivi in fondo alle scale!`,{cr: false,waitAfter: 1500})
 				await this.CRT.printTyping(` Improvvisamente però... `,{printDelay: 75, cr:false, waitAfter: 1500});
 				await this.CRT.printTyping(`BOOM!`, {waitAfter: 2000})
 				await this.CRT.printTyping(`Prima senti un'esplosione...`,{printDelay: 75, cr:false, waitAfter: 1000})
@@ -554,11 +566,25 @@ class Adventure extends DemoEngine{
 				await this.CRT.printTyping(`Cerchi riparo mentre le scale dietro di te crollano...`,{nlAfter: 1, waitAfter: 3000})
 				if(this.adventureData.timedEvents.earthquake.currentStep > 6)
 					this.adventureData.timedEvents.earthquake.currentStep = 6
+			},
+			finale: async() => {
+				await this.CRT.printTyping(`Dopo aver aperto il portone quel poco che basta per farti uscire, corri come un forsennato verso il parcheggio.`, {waitBefore: 2000})
+				await this.CRT.printTyping(`Una tremenda scossa di terremoto di durata interminabile fa crollare l'edificio. Cadi a terra dalla violenza, ma essendo fuori all'aperto non hai conseguenze gravi.`, {waitBefore: 5000})
+				await this.CRT.printTyping(`Appena la scossa si attenua, riesci finalmente ad alzarti...`, {waitBefore: 2000, cr:false})
+				await this.CRT.printTyping(`Non credi ai tuoi occhi...`)
+				await this.CRT.wait();
+				await this.CRT.printTyping(`Osservi sbalordito la scena apocalittica davanti a te. Non solo l'edificio dove lavoravi è stato raso al suolo ma la stessa sorte è toccata a tutta la città...`, {waitBefore: 3000})
+				await this.CRT.printTyping(`Mentre l'oscurità della notte avanza, inizi a correre, per quanto ti è possibile, in direzione di casa tua, con la flebile speranza di poter riabbracciare la tua famiglia.......`, {waitBefore: 5000})
+				await this.CRT.wait();
+				await this.CRT.clear();
+				await this.CRT.printTyping(`-FINE-`, {waitAfter: 1000, waitBefore: 5000})
+				await this.CRT.clear();
+				this.byebye()
 			}
 		},
 		timedEvents: {
 			earthquake: {
-				start: 50,
+				start: 60,
 				onLimit: async () => {
 					await this.CRT.printTyping(`-RUMBLE-`,{blinking:true, nlBefore: 1, waitBefore: 1500});
 					await this.CRT.printTyping(`Ed eccola la madre di tutte le scosse di terremoto!`, {waitBefore: 1500});
@@ -567,13 +593,13 @@ class Adventure extends DemoEngine{
 					this.die();
 				},
 				steps: {
-					40: async () => this.CRT.printTyping(`Ehi...Mi è sembrato di sentire una vibrazione sotto i piedi...`,{nlBefore: 1, waitBefore: 1500}),
-					30: async () => this.CRT.printTyping(`Un'altra... Stavolta era proprio una scossa, l'ho avvertita bene!`,{nlBefore: 1, waitBefore: 1500}),
-					25: async () => this.CRT.printTyping(`Accipicchia, questa era forte... è durata anche diversi secondi...`,{nlBefore: 1, waitBefore: 1500}),
-					20: async () => this.CRT.printTyping(`Inizio a sentire degli scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
-					15: async () => this.CRT.printTyping(`Ancora una piccola scossa... e nuovi scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
-					10: async () => this.CRT.printTyping(`Un'altra scossa, stavolta più forte...`,{nlBefore: 1, waitBefore: 1500}),
-					5: async () => this.CRT.printTyping(`L'ennesima scossa... abbastanza forte! E' oscillato tutto qui! Sarà meglio sbrigarsi ad uscire!`,{nlBefore: 1, waitBefore: 1500}),
+					50: async () => this.CRT.printTyping(`Ehi...Mi è sembrato di sentire una vibrazione sotto i piedi...`,{nlBefore: 1, waitBefore: 1500}),
+					39: async () => this.CRT.printTyping(`Un'altra... Stavolta era proprio una scossa, l'ho avvertita bene!`,{nlBefore: 1, waitBefore: 1500}),
+					27: async () => this.CRT.printTyping(`Accipicchia, questa era forte... è durata anche diversi secondi...`,{nlBefore: 1, waitBefore: 1500}),
+					17: async () => this.CRT.printTyping(`Inizio a sentire degli scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
+					12: async () => this.CRT.printTyping(`Ancora una piccola scossa... e nuovi scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
+					7: async () => this.CRT.printTyping(`Un'altra scossa, stavolta più forte...`,{nlBefore: 1, waitBefore: 1500}),
+					5: async () => this.CRT.printTyping(`L'ennesima scossa... abbastanza forte! Oscilla tutto qui! Sarà meglio sbrigarsi ad uscire!`,{nlBefore: 1, waitBefore: 1500}),
 					
 				}
 			}

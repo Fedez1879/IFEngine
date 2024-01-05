@@ -177,9 +177,6 @@ class IFEngine{
 
 	// Parsing delle scelte
 	async choose(options, question, cr){
-		if(cr == undefined) 
-			cr = true;
-
 		let optionsList = "("+Object.keys(options).join(",")+") ";
 		
 		if(question === undefined)
@@ -644,6 +641,16 @@ class IFEngine{
 			} 
 		}
 		
+		// Roba scenica
+		if(this.currentRoom.scenic){
+
+			for(let pattern of this.currentRoom.scenic.pattern){
+				pattern = new RegExp("^"+pattern+"$", 'i');
+				if(testVerb.match(pattern)){
+					return await this.CRT.printTyping(this.currentRoom.scenic.defaultMessage ? this.currentRoom.scenic.defaultMessage : APO.actionObject.defaultMessage)
+				}
+			}
+		}
 		// Mappo i complementi con 
 		// - interattori della stanza
 		// - oggetti nella stanza
@@ -751,16 +758,22 @@ class IFEngine{
 				return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
 
 			case "search":
-				if(this.currentRoom.interactors[mSubjects[0].key] !== undefined){
-					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.HERE);
-				}
 				if(this.inventory[mSubjects[0].key] !== undefined){
 					return await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);
 				}
+				
+				if(this.currentRoom.interactors[mSubjects[0].key] !== undefined || 
+					(
+						this.currentRoom.objects[mSubjects[0].key] !== undefined && this.currentRoom.objects[mSubjects[0].key].initialDescription
+					)
+				){
+					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.HERE);
+				}
+				
 				if(this.currentRoom.objects[mSubjects[0].key] !== undefined && this.currentRoom.objects[mSubjects[0].key].visible){
 					return 	await this.listVisibleThings(this.currentRoom.objects);
 				}
-				return this.Thesaurus.defaultMessages.notFound;
+				return await this.CRT.printTyping(this.Thesaurus.defaultMessages.NOT_FOUND);
 		}
 
 
@@ -842,10 +855,12 @@ class IFEngine{
 	// Movimento
 	async _go(direction, defaultMessage){
 		let directions = this.currentRoom.directions;
+		if (directions === undefined)
+			directions = {}
 		let blockedDirections = this.currentRoom.blockedDirections === undefined ? [] : this.currentRoom.blockedDirections; 
 		
 		//Esiste la direzione
-		if(directions !== undefined && directions[direction] !== undefined && blockedDirections.includes(direction) === false){
+		if(directions[direction] !== undefined && blockedDirections.includes(direction) === false){
 			if(typeof directions[direction] == 'string'){
 				this.enterRoom(directions[direction]);
 				return false;

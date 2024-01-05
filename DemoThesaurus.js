@@ -13,10 +13,6 @@ class DemoThesaurus extends Thesaurus{
 		this.loadCommands();
 		this.loadVerbs();
 		
-		this.commands.exit = {
-			pattern: `esci|scappa|fuggi`,
-			callback: `Vorrei, ma sono bloccato qui.`
-		}
 	}
 	
 	loadVerbs(){
@@ -59,4 +55,22 @@ class DemoThesaurus extends Thesaurus{
 			}
 		};
 	}
+
+	loadCommands(){
+		super.loadCommands()
+		this.commands = {
+			...this.commands,
+			...{
+				exit: {
+					pattern: `esci|scappa|fuggi`,
+					callback: `Vorrei, ma sono bloccato qui.`
+				},
+				help: {
+					pattern: `aiuto`,
+					callback: ()=> this.parent.help(this.parent.currentRoom)
+				}
+			}
+		}
+	}
+
 }

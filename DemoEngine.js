@@ -29,6 +29,9 @@ class DemoEngine extends IFEngine{
 			ceiling: {
 				pattern: this.Thesaurus.commonPatterns.ceiling
 			},
+			exit:{
+				pattern: this.Thesaurus.commonPatterns.exit
+			}
 
 		}
 
@@ -46,6 +49,8 @@ class DemoEngine extends IFEngine{
 		}
 		this.CRT.clear();
 		await this.enterRoom(this.startingRoom)
+		await this._addInInventory(this.adventureData.objects.badge)
+		
 	}
 
 	async instructions(){
@@ -59,11 +64,15 @@ class DemoEngine extends IFEngine{
 		return false;
 	}
 
-	almostOneCode(){
-		return this.adventureData.rooms.ufficio.interactors.calendario.read || 
-			this.getObject("badge").read ||
-			this.getObject("libro").read
+	maybeIKnowTheCode(){
+		return this.adventureData.rooms.ufficio.interactors.calendario.read && this.getObject("libro").read
+	}
 
+	help(room){
+		switch(room){
+			default:
+				return "Cerca di guardarti intorno ed esamina più cosa possibili. Spesso i dettagli si notano quando si prendono in mano gli oggetti!"
+		}
 	}
 
 }

@@ -40,8 +40,6 @@ class Parser{
 					obj = { ...sorgente[chiave], ...overrideObj};
 			}
 			
-			if (typeof obj.pattern);
-
 			let pattern = 
 				obj.pattern === undefined ? 
 				"("+chiave+")" : 
@@ -62,7 +60,7 @@ class Parser{
 				(obj.single === undefined || obj.single == false) 
 			){
 				let matches = input.match(new RegExp("^"+pattern+"$", 'i'));
-				if( matches != null)
+				if(matches != null)
 					return input;
 			}
 
