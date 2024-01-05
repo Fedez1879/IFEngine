@@ -66,11 +66,4 @@ class DemoEngine extends IFEngine{
 
 	}
 
-	async gameLoop(describeCurrentRoom, ignoreTimedEvents){
-		console.log(this.almostOneCode())
-		super.gameLoop(describeCurrentRoom, ignoreTimedEvents);
-	}
-	
-
-
 }

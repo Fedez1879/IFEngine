@@ -329,7 +329,7 @@ class Adventure extends DemoEngine{
 						on: {
 							'lookAt|read': async () => {
 								if(!this.playerHas(this.adventureData.objects.occhiali))
-									return `Non riesco a leggerlo, senza occhiali!`
+									return `Non riesco a leggerlo, senza occhiali!` + (this.adventureData.objects.occhiali.once ? `\nDevo averli persi durante il crollo...` : ``)
 
 								if(this.almostOneCode() == false)
 									return `Chiede un codice di sicurezza per uscire... Ma tu non hai idea di quale possa essere!!!`
@@ -338,7 +338,7 @@ class Adventure extends DemoEngine{
 
 								let pin = await this.ask(`PIN:`,true)
 								await this.CRT.sleep(1500)
-								if(pin != `791810`){
+								if(pin != `791018`){
 									await this.CRT.println(`CODICE ERRATO.`)
 									return true
 								}
@@ -369,7 +369,7 @@ class Adventure extends DemoEngine{
 					pavimento: {
 						...this.commonInteractors.floor,
 						...{
-							description: () => `Il pavimento sembra a posto...` + (this.adventureData.objects.occhiali.visible === undefined ? `mi pare di vedere degli occhiali per terra...` : ``)
+							description: () => `Il pavimento sembra a posto...` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom ? `mi pare di vedere degli occhiali per terra...` : ``)
 						}
 					},
 
