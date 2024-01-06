@@ -22,11 +22,11 @@ class DemoThesaurus extends Thesaurus{
 			...{
 				move:{
 					pattern: `sposta|muovi`,
-					defaultMessage: `Non si muove.`
+					defaultMessage: i18n.Thesaurus.verbs.push.defaultMessage
 				},
 				lift:{
 					pattern: `alza|solleva`,
-					defaultMessage: `Non si muove.`
+					defaultMessage: i18n.Thesaurus.verbs.push.defaultMessage
 				},
 				read:{
 					pattern: `leggi`,
@@ -63,11 +63,15 @@ class DemoThesaurus extends Thesaurus{
 			...{
 				exit: {
 					pattern: `esci|scappa|fuggi`,
-					callback: `Vorrei, ma sono bloccato qui.`
+					defaultMessage: `Vorrei, ma sono bloccato qui.`
 				},
 				help: {
 					pattern: `aiuto`,
-					callback: ()=> this.parent.help(this.parent.currentRoom)
+					defaultMessage: () => this.parent.help(this.parent.currentRoom)
+				},
+				run: {
+					pattern: `corri`,
+					defaultMessage: `Non serve a niente`
 				}
 			}
 		}

@@ -613,10 +613,13 @@ class IFEngine{
 		}
 		
 		// è un comando imperativo con callback
-		if(APO.command && APO.actionObject.callback !== undefined){
-			let ret = await this._callbackOrString(APO.actionObject.callback, input);
-			if(ret !== null)
-				return ret;
+		if(APO.command){
+			let callback = APO.actionObject.callback ? APO.actionObject.callback : APO.actionObject.defaultMessage;
+			if(callback){
+				let ret = await this._callbackOrString(callback, input);
+				if(ret !== null)
+					return ret;
+			}
 		}
 
 		// Azione riconosciuta, ovvero promessa

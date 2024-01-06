@@ -227,7 +227,7 @@ class Adventure extends DemoEngine{
 								if(this.currentRoom.interactors.cavi.status == 0)
 									return `Perché dovrei?`
 								await this.CRT.printTyping(`Li sollevi per un po'... `,{cr:false,waitBefore:2000});
-								retutn `poi ti stanchi e li lasci ricadere ancora più in disordine di prima!`
+								return `poi ti stanchi e li lasci ricadere ancora più in disordine di prima!`
 							},
 						}
 					},
@@ -325,7 +325,7 @@ class Adventure extends DemoEngine{
 							open: () => {
 								if(this.currentRoom.interactors.portone.locked)
 									return `Il portone è bloccato, non riesco ad aprirlo!`
-								this.runSequence(`finale`);
+								return this.runSequence(`finale`);
 							},
 							close: () => `E' già chiuso!`
 						}
@@ -398,6 +398,7 @@ class Adventure extends DemoEngine{
 			chiaveCassettiera: {
 				label: `una piccola chiave di ferro`,
 				pattern: `(?:piccola )?chiave((?: di)? ferro)?`,
+				description: `E' una piccola chiave di ferro con la testa in plastica nera.`,
 				location: `ufficio`,
 				visible: false,
 				on: {
@@ -520,17 +521,27 @@ class Adventure extends DemoEngine{
 				location: `ufficio`,
 				read: false,
 				visible: false,
+				linkedObjects: ['segnalibro'],
 				description: () => this.adventureData.objects.libro.visible ? `Ha una copertina grigia e un segnalibro all'interno.` : `Non saprei quale scegliere.`,
 				on: {
+					lookAt: () => this.discover(this.adventureData.objects.segnalibro, true),
 					'open|read': () => {
 
 						if (this.playerHas(this.adventureData.objects.libro)){
+							this.discover(this.adventureData.objects.segnalibro, true)
 							this.inventory.libro.read = true;
 							return `E' un romanzo di Stephen King, dal titolo INSOMNIA. Apri il libro all'altezza del segnalibro e trovi una pagina bianca sulla quale è stato scritto a matita: "ymd"`
 						}
 						return this.adventureData.objects.libro.visible ? `Dovrei prenderlo prima...` : this.adventureData.objects.libro.description()
 					},
 					take: () => this.adventureData.objects.libro.visible ? null : this.adventureData.objects.libro.description()
+				}
+			},
+			segnalibro: {
+				visible: false,
+				pattern: `segnalibro`,
+				on:{
+					lookAt: `E' un segnalibro di cartoncino nero.`
 				}
 			}
 
@@ -549,7 +560,7 @@ class Adventure extends DemoEngine{
 			prologo: async () => {
 				await this.CRT.printTyping(`Accidenti che mal di testa....`, {waitBefore: 1000})
 				await this.CRT.printTyping(`Come ho fatto ad addormentarmi in ufficio?`, {waitBefore: 1500})
-				await this.CRT.printTyping(`E Quanto tempo è passato?`, {waitBefore:1000})
+				await this.CRT.printTyping(`E quanto tempo è passato?`, {waitBefore:1000})
 				await this.CRT.printTyping(`Uhm... `, {cr: false, waitBefore: 1500})
 				await this.CRT.printTyping(`E' tutto troppo silenzioso qui.`, {waitBefore: 2000});
 				await this.CRT.printTyping(`Sarà meglio tornare a casa.`, {nlAfter: 1,waitBefore: 1500,waitAfter: 2000})
@@ -568,18 +579,17 @@ class Adventure extends DemoEngine{
 					this.adventureData.timedEvents.earthquake.currentStep = 6
 			},
 			finale: async() => {
-				await this.CRT.printTyping(`Dopo aver aperto il portone quel poco che basta per farti uscire, corri come un forsennato verso il parcheggio.`, {waitBefore: 2000})
-				await this.CRT.printTyping(`Una tremenda scossa di terremoto di durata interminabile fa crollare l'edificio. Cadi a terra dalla violenza, ma essendo fuori all'aperto non hai conseguenze gravi.`, {waitBefore: 5000})
-				await this.CRT.printTyping(`Appena la scossa si attenua, riesci finalmente ad alzarti...`, {waitBefore: 2000, cr:false})
-				await this.CRT.printTyping(`Non credi ai tuoi occhi...`)
+				await this.CRT.printTyping(`Dopo aver aperto il portone quel poco che basta per farti uscire, corri come un forsennato verso il parcheggio.`, {waitAfter: 4000})
+				await this.CRT.printTyping(`Una tremenda scossa di terremoto di durata interminabile fa crollare l'edificio. Cadi a terra dalla violenza, ma essendo fuori all'aperto non hai conseguenze gravi.`, {waitAfter: 5000})
+				await this.CRT.printTyping(`Appena la scossa si attenua, riesci finalmente ad alzarti...`, {waitAfter: 2000, cr:false})
+				await this.CRT.printTyping(`Non credi ai tuoi occhi...`, {waitAfter: 1500})
 				await this.CRT.wait();
-				await this.CRT.printTyping(`Osservi sbalordito la scena apocalittica davanti a te. Non solo l'edificio dove lavoravi è stato raso al suolo ma la stessa sorte è toccata a tutta la città...`, {waitBefore: 3000})
-				await this.CRT.printTyping(`Mentre l'oscurità della notte avanza, inizi a correre, per quanto ti è possibile, in direzione di casa tua, con la flebile speranza di poter riabbracciare la tua famiglia.......`, {waitBefore: 5000})
+				await this.CRT.printTyping(`Osservi sbalordito la scena apocalittica davanti a te. Non solo l'edificio dove lavoravi è stato raso al suolo ma la stessa sorte è toccata a tutta la città...`, {waitAfter: 3000})
+				await this.CRT.printTyping(`Mentre l'oscurità della notte avanza, inizi a correre, per quanto ti è possibile, in direzione di casa tua, con la flebile speranza di poter riabbracciare la tua famiglia...`, {printDelay:50,waitAfter: 5000})
 				await this.CRT.wait();
-				await this.CRT.clear();
-				await this.CRT.printTyping(`-FINE-`, {waitAfter: 1000, waitBefore: 5000})
-				await this.CRT.clear();
-				this.byebye()
+				await this.CRT.printTyping(`-FINE-`, {waitBefore: 1000, waitAfter: 1000})
+				await this.byebye()
+				return false;
 			}
 		},
 		timedEvents: {

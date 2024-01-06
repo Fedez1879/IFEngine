@@ -17,7 +17,7 @@ class DemoEngine extends IFEngine{
 		this.Thesaurus.commands.where.pattern = "dove(?:sono|mi trovo)?";
 		this.Thesaurus.commands.instructions.pattern = "istruzioni";
 		
-		this.CRT.sleep = (ms) => true; // for speed test
+		//this.CRT.sleep = (ms) => true; // for speed test
 
 		this.commonInteractors = {
 			wall: {
@@ -43,18 +43,17 @@ class DemoEngine extends IFEngine{
 		this.CRT.clear();
 		let a = await this.yesNoQuestion("Vuoi leggere le istruzioni")
 		if (a) {
+			this.CRT.println()
 			await this.instructions()
 			this.CRT.println()
 			await this.CRT.wait();
 		}
 		this.CRT.clear();
 		await this.enterRoom(this.startingRoom)
-		await this._addInInventory(this.adventureData.objects.badge)
-		
 	}
 
 	async instructions(){
-		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo comando (es: SALTA) oppure dal verbo + oggetto (es: PRENDI LA CHIAVE); frasi più complesse vanno al di là della mia comprensione.\nPer rileggere la descrizione del luogo dove sei usa il comando DOVE.\n\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che lo chiudi!\n\nBuona fortuna e soprattutto buon divertimento!");
+		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo comando (es: SALTA) oppure dal verbo + oggetto (es: PRENDI LA CHIAVE); frasi più complesse vanno al di là della mia comprensione.\nPer rileggere la descrizione del luogo dove sei usa il comando DOVE.\nPer vedere l'elenco di oggetti che hai con te usa uno comando tra I/INV/INVENTARIO.\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che lo chiudi!\n\nBuona fortuna e soprattutto buon divertimento!");
 	}
 
 	// Override

@@ -101,12 +101,15 @@ class Parser{
 				}	
 				
 				// Rirotno un oggetto contenente l'azione e i soggetti
-				return {
+				let APO = {
 					verb: chiave,
 					actionObject: obj,
 					command: sorgente == this.commands, //patternEsatto == true,
 					subjects: subjects
 				}
+
+				console.log(APO)
+				return APO
 				
 			}
 			
