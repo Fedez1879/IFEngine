@@ -20,7 +20,7 @@ class Adventure extends DemoEngine{
 					}
 				},
 				scenic: {
-					pattern: [`chiodo`, `ruot(?:a|e)`, `viso`, `riflesso`, `ganci(?:o)`],
+					pattern: [`chiodo`, `ruot(?:a|e)`, `viso`, `riflesso`, `ganci(?:o)?`, `vetro`],
 					defaultMessage: `Lascia perdere, concentrati piuttosto su come trovare il modo di uscire da qui..`
 				},
 				interactors: {
@@ -112,7 +112,7 @@ class Adventure extends DemoEngine{
 					},
 					attaccapanni: {
 						label: `un attaccapanni`,
-						pattern: `attaccapanni|appendiabiti`,
+						pattern: `attacca(?:\s+)?panni|appendi(?:\s+)?abiti`,
 						visible: false,
 						description: () => `E' di metallo nero, alto, con quattro ganci.` + (this.currentRoom.objects.piumino && this.currentRoom.objects.piumino.visible ? `\nIn uno di essi è appeso un piumino nero.` : ``),
 						on: {
@@ -125,7 +125,19 @@ class Adventure extends DemoEngine{
 					},
 					appunti: {
 						pattern: `appunt(?:o|i)|fogli(?:o|i|etti)?`,
-						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Sono parti di codice e diagrammi di flusso, qualche schema di caso di uso di un qualche software e una serie di numeri` : `E' tutta roba illeggibile.`,
+						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Sono parti di codice, diagrammi di flusso e schemi di casi d'uso di un qualche software, presumibilmente scritto da me.` : `E' tutta roba illeggibile.`,
+						on: {
+							'lookAt|read': () => {
+								if(this.playerHas(this.adventureData.objects.occhiali))
+									this.discover(this.currentRoom.interactors.scritteAppunti, true);
+								return this.currentRoom.interactors.appunti.description()
+							}
+						}
+					},
+					scritteAppunti: {
+						visible:false,
+						pattern: `codice|diagramm(?:a|i)|schem(?:a|i)`,
+						description: `Non ci penso nemmeno... ora ho solo voglia di tornare a casa!`,
 						on: {
 							read: () => this.currentRoom.interactors.appunti.description()
 						}
@@ -211,7 +223,7 @@ class Adventure extends DemoEngine{
 						pattern: `cav(?:o|i)`,
 						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Sono cavi della corrente e cavi Ethernet...` : `Sono cavi bianchi e grigi...`,
 						on: {
-							move: () => {
+							'move|tidy': () => {
 
 								let cavi = this.currentRoom.interactors.cavi;
 

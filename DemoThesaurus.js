@@ -8,6 +8,7 @@ class DemoThesaurus extends Thesaurus{
 	constructor(parent){
 		super(parent),
 		this.defaultMessages.BE_SERIOUS = "Sii serio!"
+		this.defaultMessages.NOT_NOW = "Adesso non ho voglia."
 		this.defaultMessages.DONE = "Ok."
 			
 		this.loadCommands();
@@ -51,6 +52,10 @@ class DemoThesaurus extends Thesaurus{
 					defaultMessage: this.defaultMessages.NOTHING_HAPPENS,
 					inventory: true,
 					complex: true
+				},
+				tidy: {
+					pattern: `riordina|metti in ordine|sistema`,
+					defaultMessage: this.defaultMessages.NOT_NOW,
 				}
 			}
 		};
