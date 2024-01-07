@@ -53,7 +53,7 @@ class DemoEngine extends IFEngine{
 	}
 
 	async instructions(){
-		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo comando (es: SALTA) oppure dal verbo + oggetto (es: PRENDI LA CHIAVE); frasi più complesse vanno al di là della mia comprensione.\nPer rileggere la descrizione del luogo dove sei usa il comando DOVE.\nPer vedere l'elenco di oggetti che hai con te usa uno comando tra I/INV/INVENTARIO.\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che lo chiudi!\n\nBuona fortuna e soprattutto buon divertimento!");
+		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi attraverso le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi fatte da un singolo comando (es: ESCI) oppure dal verbo + oggetto (es: PRENDI LA CHIAVE); frasi più complesse vanno al di là della mia comprensione.\nPer rileggere la descrizione del luogo dove sei usa il comando DOVE.\nPer vedere l'elenco di oggetti che hai con te usa uno comando tra I/INV/INVENTARIO.\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che lo chiudi!\n\nBuona fortuna e soprattutto buon divertimento!");
 	}
 
 	// Override

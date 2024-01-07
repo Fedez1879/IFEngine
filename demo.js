@@ -1,6 +1,6 @@
 class Adventure extends DemoEngine{
 	adventureData = {
-		// stanza iniziale
+		// prologo
 		prologue: true,
 		
 		/* STANZE */
@@ -442,6 +442,8 @@ class Adventure extends DemoEngine{
 				on: {
 					'take|wear': () => {
 						let occhiali = this.adventureData.objects.occhiali
+						if(this.playerHas(occhiali))
+							return "Sono già sul tuo naso!"
 						let answer;
 						if(occhiali.once == false) {
 							occhiali.once = true;
@@ -524,7 +526,7 @@ class Adventure extends DemoEngine{
 							return `La porta ha vibrato per qualche secondo...`
 						}
 						return null
-					}
+					},
 				}
 			},
 			libro: {
