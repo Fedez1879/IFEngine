@@ -36,7 +36,7 @@ class Adventure extends DemoEngine{
 						...this.commonInteractors.wall,
 						...{
 							description: async () => {
-								await this.CRT.printTyping(`Nella parete di fronte, c'è il modile a vetri, in quella a est c'è la porta di ingresso. Nella parete opposta alla porta c'è l'unica finestra della stanza.\nLa parete dietro di te è completamente spoglia, a parte `+(this.playerHas(this.adventureData.objects.occhiali) ? ``: `(credo) `)+ `un calendario appeso a un chiodo.`);
+								await this.CRT.printTyping(`Nella parete di fronte, c'è il mobile a vetri, in quella a est c'è la porta di ingresso. Nella parete opposta alla porta c'è l'unica finestra della stanza.\nLa parete dietro di te è completamente spoglia, a parte `+(this.playerHas(this.adventureData.objects.occhiali) ? ``: `(credo) `)+ `un calendario appeso a un chiodo.`);
 								if( this.currentRoom.interactors.attaccapanni.visible == false){
 									await this.CRT.sleep(1500);
 									await this.CRT.printTyping(`Di fianco al mobile c'è un attaccapanni, mica l'avevo notato prima!`)
@@ -92,7 +92,7 @@ class Adventure extends DemoEngine{
 						label: 'alcuni libri',
 						pattern: `libri`,
 						visible: false,
-						description: () => this.currentRoom.interactors.mobile.open ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (this.adventureData.objects.libro.visible ? `C'è nè uno diverso dagli altri...` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri...`) : `Forse dovrei aprire le ante per esaminarli meglio`,
+						description: () => this.currentRoom.interactors.mobile.open ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (this.adventureData.objects.libro.visible ? `C'è nè uno diverso dagli altri.` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri...`) : `Forse dovrei aprire le ante per esaminarli meglio.`,
 						on: {
 							'lookAt|read|open': () => this.discover(this.adventureData.objects.libro, !this.playerHas(this.adventureData.objects.occhiali))
 						}
@@ -249,7 +249,7 @@ class Adventure extends DemoEngine{
 							description: () => {
 								if(this.currentRoom.interactors.cavi.status == 0)
 									this.currentRoom.interactors.cavi.status = 1
-								return `E' il classico pavimento flottante presente in quasi tutte le stanze del posto dove lavori... è grigio chiaro con striature più scure.` + (this.currentRoom.interactors.cavi.status == 1 ? `\nAccipicchia! vicino alla scrivania è tutto un groviglio di cavi!` : ``);
+								return `E' il classico pavimento flottante presente in quasi tutte le stanze del posto dove lavori... è grigio chiaro con striature più scure.` + (this.currentRoom.interactors.cavi.status == 1 ? `\nAccipicchia! Vicino alla scrivania è tutto un groviglio di cavi!` : ``);
 							}
 						}
 					},
@@ -269,7 +269,7 @@ class Adventure extends DemoEngine{
 								let porta = this.currentRoom.interactors.porta;
 
 								if(porta.locked) 
-									return `Provi a tirare il pomolo della porta, ma non riesci proprio ad aprirla... è bloccata...`
+									return `Provi a tirare il pomolo della porta, ma non si apre. Sembra bloccata...`
 								if(porta.open)
 									return `La porta è già aperta`
 								porta.open = true
@@ -617,7 +617,7 @@ class Adventure extends DemoEngine{
 					this.die();
 				},
 				steps: {
-					50: async () => this.CRT.printTyping(`Ehi...Mi è sembrato di sentire una vibrazione sotto i piedi...`,{nlBefore: 1, waitBefore: 1500}),
+					50: async () => this.CRT.printTyping(`Ehi... Mi è sembrato di sentire una vibrazione sotto i piedi...`,{nlBefore: 1, waitBefore: 1500}),
 					39: async () => this.CRT.printTyping(`Un'altra... Stavolta era proprio una scossa, l'ho avvertita bene!`,{nlBefore: 1, waitBefore: 1500}),
 					27: async () => this.CRT.printTyping(`Accipicchia, questa era forte... è durata anche diversi secondi...`,{nlBefore: 1, waitBefore: 1500}),
 					17: async () => this.CRT.printTyping(`Inizio a sentire degli scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
