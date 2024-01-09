@@ -557,10 +557,14 @@ class Adventure extends DemoEngine{
 				location: `ufficio`,
 				read: false,
 				visible: false,
-				linkedObjects: ['segnalibro'],
+				linkedObjects: ['copertina','segnalibro'],
 				description: () => this.adventureData.objects.libro.visible ? `Ha una copertina grigia e un segnalibro all'interno.` : `Non saprei quale scegliere.`,
 				on: {
-					lookAt: () => this.discover(this.adventureData.objects.segnalibro, true),
+					lookAt: () => {
+						this.discover(this.adventureData.objects.segnalibro, true)
+						this.discover(this.adventureData.objects.copertina, true)
+						return null
+					},
 					'open|read': () => {
 
 						if (this.playerHas(this.adventureData.objects.libro)){
@@ -572,6 +576,10 @@ class Adventure extends DemoEngine{
 					},
 					take: () => this.adventureData.objects.libro.visible ? null : this.adventureData.objects.libro.description()
 				}
+			},
+			copertina: {
+				visible:false,
+				pattern: `copertina`
 			},
 			segnalibro: {
 				visible: false,
