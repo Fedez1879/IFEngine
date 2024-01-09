@@ -493,12 +493,9 @@ class Adventure extends DemoEngine{
 						let objects = this.adventureData.objects;
 						if(objects.badge.visible)
 							return `Dopo un'attenta ispezione concludi che sono tutte e quattro vuote.`
-						objects.badge.location = this.currentRoom.key
-						if(this.playerHas(objects.piumino)){
+						this.discover(objects.badge)
+						if(this.playerHas(objects.piumino))
 							this._addInInventory(objects.badge)
-						} else {
-							this.discover(objects.badge)
-						}
 						return `Da una di esse estrai un oggetto rigido... è il tuo badge personale!`;
 					}
 				}
@@ -509,9 +506,12 @@ class Adventure extends DemoEngine{
 				visible: false,
 				read: false,
 				worn: false,
+				linkedObjects: ['foto'],
 				description: () =>  `Sopra c'è la tua foto e ` + (this.playerHas(this.adventureData.objects.occhiali) ? `il numero del badge: 098074` : `un numero poco distinguibile.`),
 				on: {
 					'lookAt|read': () => {
+						this.discover(this.adventureData.objects.foto, true)
+						
 						if(this.playerHas(this.adventureData.objects.occhiali))
 							this.getObject(`badge`).read = true
 						return null
@@ -532,8 +532,19 @@ class Adventure extends DemoEngine{
 						}
 						return null
 					},
+					drop: () => {
+						this.adventureData.objects.foto.visible = false
+						return null
+					},
 					wear: () => this.wear(`badge`, `Hai indossato il tuo badge.`),
 					takeOff: () => this.takeOff(`badge`),
+				}
+			},
+			foto: {
+				visible: false,
+				pattern: `foto`,
+				on: {
+					lookAt: () => `E' una foto di dieci anni fa...`
 				}
 			},
 			libro: {
