@@ -64,7 +64,7 @@ class Adventure extends DemoEngine{
 					},
 					riflesso: {
 						pattern: `riflesso`,
-						description: `Non hai una bella cera...`
+						description: `Non hai una bella cera.`
 					},
 					ante: {
 						pattern: `ant(?:a|e)`,
@@ -92,7 +92,7 @@ class Adventure extends DemoEngine{
 						label: 'alcuni libri',
 						pattern: `libri`,
 						visible: false,
-						description: () => this.currentRoom.interactors.mobile.open ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (this.adventureData.objects.libro.visible ? `C'è nè uno diverso dagli altri.` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri...`) : `Forse dovrei aprire le ante per esaminarli meglio.`,
+						description: () => this.currentRoom.interactors.mobile.open ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (this.adventureData.objects.libro.visible ? `C'è nè uno diverso dagli altri.` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri.`) : `Forse dovrei aprire le ante per esaminarli meglio.`,
 						on: {
 							'lookAt|read|open': () => this.discover(this.adventureData.objects.libro, !this.playerHas(this.adventureData.objects.occhiali))
 						}
@@ -121,7 +121,7 @@ class Adventure extends DemoEngine{
 					},
 					scrivania: {
 						pattern: `scrivania`,
-						description: () => `E’ una scrivania rettangolare in legno chiaro. Sotto di essa c’è una cassettiera in ferro e il piccolo cestino dell’immondizia. Sopra di essa un'accozzaglia di appunti scritti su fogli e foglietti.` + (this.adventureData.objects.occhiali.visible && playerHas(this.adventureData.objects.occhiali) == false ? this.adventureData.objects.occhiali.initialDescription : ``)
+						description: () => `E’ una scrivania rettangolare in legno chiaro. Sotto di essa c’è una cassettiera in ferro e il piccolo cestino dell’immondizia. Sulla scrivania sono sparsi un'accozzaglia di appunti scritti su fogli e foglietti.` + (this.adventureData.objects.occhiali.visible === undefined && this.playerHas(this.adventureData.objects.occhiali) == false ? `\n`+this.adventureData.objects.occhiali.initialDescription : ``)
 					},
 					appunti: {
 						pattern: `appunt(?:o|i)|fogli(?:o|i|etti)?`,
@@ -159,7 +159,7 @@ class Adventure extends DemoEngine{
 								this.discover(this.adventureData.objects.chiaveCassettiera)
 								await this.CRT.printTyping(`Con un rumoroso cigolio la cassettiera finalmente si è spostata...`,{cr: false});
 								await this.CRT.sleep(1500)
-								return `sotto di essa c'è una piccola chiave!`
+								return ` sotto di essa c'è una piccola chiave!`
 							},
 							lift: () => `E' toppo pesante!`
 						}
@@ -221,7 +221,7 @@ class Adventure extends DemoEngine{
 					cavi:{
 						status: 0,
 						pattern: `cav(?:o|i)`,
-						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Sono cavi della corrente e cavi Ethernet...` : `Sono cavi bianchi e grigi...`,
+						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Sono cavi della corrente e cavi Ethernet.` : `Sono cavi bianchi e grigi.`,
 						on: {
 							'move|tidy': () => {
 
@@ -230,7 +230,7 @@ class Adventure extends DemoEngine{
 								if(cavi.status == 0)
 									return `Perché dovrei?`
 								if(cavi.status == 2)
-									return `Meglio lasciarli in ordine.`
+									return `Sono già in ordine, meglio lasciarli stare.`
 								cavi.status = 2;
 								this.currentRoom.interactors.cassettiera.status = 1;
 								return `Adesso si che si ragiona, li ho sistemati in modo che non intralcino più!`
@@ -238,7 +238,7 @@ class Adventure extends DemoEngine{
 							lift: async () => {
 								if(this.currentRoom.interactors.cavi.status == 0)
 									return `Perché dovrei?`
-								await this.CRT.printTyping(`Li sollevi per un po'... `,{cr:false,waitBefore:2000});
+								await this.CRT.printTyping(`Li sollevi per un po'... `,{cr:false,waitAfter:2000});
 								return `poi ti stanchi e li lasci ricadere ancora più in disordine di prima!`
 							},
 						}
@@ -249,7 +249,7 @@ class Adventure extends DemoEngine{
 							description: () => {
 								if(this.currentRoom.interactors.cavi.status == 0)
 									this.currentRoom.interactors.cavi.status = 1
-								return `E' il classico pavimento flottante presente in quasi tutte le stanze del posto dove lavori... è grigio chiaro con striature più scure.` + (this.currentRoom.interactors.cavi.status == 1 ? `\nAccipicchia! Vicino alla scrivania è tutto un groviglio di cavi!` : ``);
+								return `E' il classico pavimento flottante presente in quasi tutte le stanze del posto dove lavori, è grigio chiaro con striature più scure.` + (this.currentRoom.interactors.cavi.status == 1 ? `\nAccipicchia! Vicino alla scrivania è tutto un groviglio di cavi!` : ``);
 							}
 						}
 					},
@@ -296,6 +296,7 @@ class Adventure extends DemoEngine{
 						}
 					},
 					lettoreBadge: {
+						label: 'un lettore badge',
 						pattern: `lettore(?: badge)?`,
 						description: () => this.currentRoom.interactors.lettoreBadge.visible ? `E' un lettore RFID, credo serva per aprire la porta col badge personale.` : `Mi sembrava di averne visto uno... ma dove?`
 					}
@@ -350,7 +351,7 @@ class Adventure extends DemoEngine{
 									return `Non riesco a leggerlo, senza occhiali!` + (this.adventureData.objects.occhiali.once ? `\nDevo averli persi durante il crollo...` : ``)
 
 								if(this.maybeIKnowTheCode() == false)
-									return `Chiede un codice di sicurezza per uscire... Ma tu non hai idea di quale possa essere!!!`
+									return `Chiede un codice di sicurezza per uscire... ma tu non hai idea di quale possa essere!!!`
 								if(await this.yesNoQuestion(`Chiede un codice di sicurezza per uscire... vuoi provare a digitarlo`) == false)
 									return true;
 
@@ -367,7 +368,7 @@ class Adventure extends DemoEngine{
 					},
 					pulsantiera: {
 						pattern: `pulsanti(?:era)?`,
-						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Nella pulsantiera ci sono solo numeri da 0 a 9 e un tasto verde.` : `Ha circa 11 tasti (mi pare)...`,
+						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Nella pulsantiera ci sono solo numeri da 0 a 9 e un tasto verde.` : `Ha (credo) circa 11 tasti...`,
 						on: {
 							'press|push': `Non saprei davvero cosa digitare.`
 						},
@@ -381,13 +382,13 @@ class Adventure extends DemoEngine{
 					soffitto: {
 						...this.commonInteractors.ceiling,
 						...{
-							description: `Mostra alcune crepe... Ma è ancora al suo posto.`
+							description: `Mostra alcune crepe... ma è ancora al suo posto.`
 						}
 					},
 					pavimento: {
 						...this.commonInteractors.floor,
 						...{
-							description: () => `Il pavimento sembra ok.` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom.key ? `Ehi, mi pare di vedere degli occhiali per terra...` : ``),
+							description: () => `Il pavimento sembra ok.` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom.key ? `Ehi, mi pare di vedere degli occhiali per terra!` : ``),
 							on: {
 								lookAt: () => this.discover(this.adventureData.objects.occhiali, true)
 							}
@@ -395,7 +396,7 @@ class Adventure extends DemoEngine{
 					},
 					scale: {
 						pattern: `(?:rampa (?:di )?)?scal(a|e|ini)`,
-						description: `Ormai è tutto ridotto a un cumulo di macerie invalicabili...`
+						description: `Ormai è tutto ridotto a un cumulo di macerie invalicabili.`
 					}
 
 				},
@@ -421,6 +422,7 @@ class Adventure extends DemoEngine{
 						}
 						if(targets[1] == i.cassetti || targets[1] == i.serratura){
 							if(i.cassetti.open){
+								i.cassetti.open = false
 								await this.CRT.printTyping(`Prima chiudo i cassetti...`);
 								await this.CRT.sleep(1000)
 							}
@@ -439,44 +441,46 @@ class Adventure extends DemoEngine{
 				location: `ufficio`,
 				visible: false,
 				once: false,
+				worn: false,
 				on: {
-					'take|wear': () => {
+					'take': () => {
 						let occhiali = this.adventureData.objects.occhiali
-						if(this.playerHas(occhiali))
-							return "Sono già sul tuo naso!"
 						let answer;
 						if(occhiali.once == false) {
 							occhiali.once = true;
-							answer = `Guardandoli da vicino ti accorgi che sono i tuoi occhiali da vista. Quindi li indossi....\nOra è tutto MOLTO più chiaro e definito!`
+							answer = `Guardandoli da vicino ti accorgi che sono i tuoi occhiali da vista. Quindi li indossi...\nOra è tutto MOLTO più chiaro e definito!`
 						} else {
 							answer = `Sono proprio i tuoi occhiali, per fortuna li hai ritrovati! Li indossi nuovamente.`
 						}
 
 						this._addInInventory(occhiali);
-						return answer;
-
+						return this.wear(occhiali.key, answer);
 					},
+					wear: () => `Sono già sul tuo naso!`,
+					takeOff: () => this.inventory.occhiali.on.drop,
 					drop: `Meglio di no, non ci vedi molto bene senza!`
 				}
 			},
 			piumino: {
 				label: `un piumino nero`,
-				visible: false,
 				pattern: `(piumino|giacc(?:a|etto))(?: ner(?:o|a))?`,
 				description: () => `E' un piumino nero`+ (this.playerHas(this.adventureData.objects.occhiali) == false ? `. Sembra`:``)+` leggero, primaverile.`+ ((this.adventureData.objects.taschePiumino.visible === undefined) ? `\nHa quattro tasche, due interne e due esterne.`:``),
 				location: `ufficio`,
 				linkedObjects: [`taschePiumino`],
+				visible: false,
+				worn:false,
 				on: {
 					lookAt: () => {
 						if (this.playerHas(this.adventureData.objects.piumino)) 
 							this.discover(this.adventureData.objects.taschePiumino, true)
 						return null
 					},
-					wear: async (targets) => await this._take(targets[0]),
+					wear: () => this.wear(`piumino`, `Mi sta proprio bene.`),
+					takeOff: () => this.takeOff(`piumino`),
 					drop: async () => {
 						if (this.currentRoom == this.adventureData.rooms.ufficio) 
-							await this.CRT.printTyping(`Lo rimetti nell'attaccapanni...`, {cr: false})
-						return null
+							await this.CRT.printTyping(`Lo rimetti nell'attaccapanni.`)
+						return await this._removeFromInventory(this.inventory.piumino)
 					}
 				}
 			},
@@ -495,20 +499,21 @@ class Adventure extends DemoEngine{
 						} else {
 							this.discover(objects.badge)
 						}
-						return `Da una di esse estrai un oggetto rigido... E' il tuo badge personale!`;
+						return `Da una di esse estrai un oggetto rigido... è il tuo badge personale!`;
 					}
 				}
 			},
 			badge: {
 				label: `un badge`,
-				visible: false,
 				pattern: `badge`,
+				visible: false,
 				read: false,
-				description: () =>  `Sopra c'è la tua foto e ` + (this.playerHas(this.adventureData.objects.occhiali) ? `il numero del badge: 098074` : `un numero poco distinguibile...`),
+				worn: false,
+				description: () =>  `Sopra c'è la tua foto e ` + (this.playerHas(this.adventureData.objects.occhiali) ? `il numero del badge: 098074` : `un numero poco distinguibile.`),
 				on: {
 					'lookAt|read': () => {
 						if(this.playerHas(this.adventureData.objects.occhiali))
-							this.getObject("badge").read = true
+							this.getObject(`badge`).read = true
 						return null
 					},
 					'useWith|bringCloser': async (mSubjects) => {
@@ -521,12 +526,14 @@ class Adventure extends DemoEngine{
 							i.porta.locked = false;
 							await this.CRT.printTyping(`Avvicini il badge al lettore e...`,{printDelay: 75, cr: false});
 							await this.CRT.sleep(1000);
-							await this.CRT.printTyping(`Bzzzzzzz...`);
+							await this.CRT.printTyping(`Bzzzzzzz`);
 							await this.CRT.sleep(1500);
 							return `La porta ha vibrato per qualche secondo...`
 						}
 						return null
 					},
+					wear: () => this.wear(`badge`, `Hai indossato il tuo badge.`),
+					takeOff: () => this.takeOff(`badge`),
 				}
 			},
 			libro: {
@@ -581,7 +588,7 @@ class Adventure extends DemoEngine{
 			},
 			crollo: async () => {
 				await this.CRT.printTyping(`Appena esci dall'ufficio la porta dietro di te si richiude pesantamente!`, {waitAfter: 1500})
-				await this.CRT.printTyping(`Non vedi l'ora di tornare a casa. Il tuo ufficio è così claustrofobico... Per fortuna adesso sei fuori da quella stanza opprimente.`, {waitAfter: 2000})
+				await this.CRT.printTyping(`Non vedi l'ora di tornare a casa. Il tuo ufficio è così claustrofobico... per fortuna adesso sei fuori da quella stanza opprimente.`, {waitAfter: 2000})
 				await this.CRT.printTyping(`Percorri con passo svelto il corridoio fino in fondo, quindi inizi a scendere le scale che ti portano al piano terra. All'inizio procedi con cautela, poi sempre più rapidamente...`, {waitAfter: 2500})
 				await this.CRT.printTyping(`Finalmente arrivi in fondo alle scale!`,{cr: false,waitAfter: 1500})
 				await this.CRT.printTyping(` Improvvisamente però... `,{printDelay: 75, cr:false, waitAfter: 1500});
@@ -617,8 +624,8 @@ class Adventure extends DemoEngine{
 					this.die();
 				},
 				steps: {
-					50: async () => this.CRT.printTyping(`Ehi... Mi è sembrato di sentire una vibrazione sotto i piedi...`,{nlBefore: 1, waitBefore: 1500}),
-					39: async () => this.CRT.printTyping(`Un'altra... Stavolta era proprio una scossa, l'ho avvertita bene!`,{nlBefore: 1, waitBefore: 1500}),
+					50: async () => this.CRT.printTyping(`Ehi... mi è sembrato di sentire una vibrazione sotto i piedi...`,{nlBefore: 1, waitBefore: 1500}),
+					39: async () => this.CRT.printTyping(`Un'altra... stavolta era proprio una scossa, l'ho avvertita bene!`,{nlBefore: 1, waitBefore: 1500}),
 					27: async () => this.CRT.printTyping(`Accipicchia, questa era forte... è durata anche diversi secondi...`,{nlBefore: 1, waitBefore: 1500}),
 					17: async () => this.CRT.printTyping(`Inizio a sentire degli scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
 					12: async () => this.CRT.printTyping(`Ancora una piccola scossa... e nuovi scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
