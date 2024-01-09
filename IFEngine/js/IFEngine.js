@@ -561,6 +561,27 @@ class IFEngine{
 		let o = this._get(key,this.inventory) 
 		return o ? o : this._get(key,this.adventureData.objects)
 	}
+
+	wear(key, defaultMessage){
+		let o = this._get(key,this.inventory)
+		if(o.worn)
+			return i18n.IFEngine.messages.alreadyDone
+		o.worn = true;
+		return defaultMessage === undefined ? 
+			this.Thesaurus.defaultMessages.DONE :
+			defaultMessage
+	}
+
+	takeOff(key, defaultMessage){
+		let o = this._get(key,this.inventory)
+		if(o.worn == false)
+			return i18n.IFEngine.messages.alreadyDone
+		o.worn = false;
+		return defaultMessage === undefined ? 
+			this.Thesaurus.defaultMessages.DONE :
+			defaultMessage
+	}
+
 	// Stampa i punti del gioco
 	async _points(){
 		if (this.dataPoints.actionPoints === undefined)
@@ -614,6 +635,8 @@ class IFEngine{
 		
 		// è un comando imperativo con callback
 		if(APO.command){
+			if(APO.actionObject.movement) return await this._go(APO.subjects[0], APO.actionObject.defaultMessage);
+		
 			let callback = APO.actionObject.callback ? APO.actionObject.callback : APO.actionObject.defaultMessage;
 			if(callback){
 				let ret = await this._callbackOrString(callback, input);
@@ -628,9 +651,11 @@ class IFEngine{
 
 	async _action(APO, input){
 		let actionObject = APO.actionObject;
+		/*
 		if(actionObject.movement){
 			return await this._go(APO.subjects[0], actionObject.defaultMessage);
 		}
+		*/
 
 		// è un'azione!
 		// vediamo se è fattibile
@@ -863,6 +888,7 @@ class IFEngine{
 		let blockedDirections = this.currentRoom.blockedDirections === undefined ? [] : this.currentRoom.blockedDirections; 
 		
 		//Esiste la direzione
+		console.log(direction,directions)
 		if(directions[direction] !== undefined && blockedDirections.includes(direction) === false){
 			if(typeof directions[direction] == 'string'){
 				this.enterRoom(directions[direction]);
@@ -887,7 +913,7 @@ class IFEngine{
 		if(Object.keys(this.inventory).length == 0){
 			output = i18n.IFEngine.messages.noObjects
 		} else {
-			output = "* "+i18n.IFEngine.messages.carriedObjectsLabel+" *"+"\n"
+			output = i18n.IFEngine.messages.carriedObjectsLabel
 			for(let i in this.inventory){
 				let label = Array.isArray(this.inventory[i].label) ? 
 					this.inventory[i].label[this.inventory[i].status] : 
@@ -914,6 +940,10 @@ class IFEngine{
 			location === undefined ? 
 			this.currentRoom.key :
 			location;
+
+		if(object.worn)
+			object.worn = false
+
 		this.adventureData.objects[object.key] = object
 
 		//console.log(object)

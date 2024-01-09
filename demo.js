@@ -298,7 +298,7 @@ class Adventure extends DemoEngine{
 					lettoreBadge: {
 						label: 'un lettore badge',
 						pattern: `lettore(?: badge)?`,
-						description: () => this.currentRoom.interactors.lettoreBadge.visible ? `E' un lettore RFID, credo serva per aprire la porta col badge personale.` : `Mi sembrava di averne visto uno... ma dove?`
+						description: () => this.currentRoom.interactors.lettoreBadge.visible ? `E' un lettore RFID, credo serva per aprire la porta col badge personale.` : `Mi sembrava di aver visto un lettore badge... ma dove?`
 					}
 				},
 				onEnter: async () => {
@@ -321,8 +321,8 @@ class Adventure extends DemoEngine{
 				label: `Quasi fuori`,
 				description: `Sei al piano terra dell'edificio, in una stanza quadrata. Le scale che ti hanno portato qui sono crollate. Davanti a te c'è il grosso portone a vetri dal quale riesci a intravedere l'esterno, sebbene stia facendo buio.`,
 				directions: {
-					u: () =>this.currentRoom.interactors.scale.description(),
-					d: () =>this.currentRoom.interactors.scale.description()
+					u: () =>this.currentRoom.interactors.scale.description,
+					d: () =>this.currentRoom.interactors.scale.description
 				},
 				override: {
 					commands: {
@@ -396,7 +396,7 @@ class Adventure extends DemoEngine{
 					},
 					scale: {
 						pattern: `(?:rampa (?:di )?)?scal(a|e|ini)`,
-						description: `Ormai è tutto ridotto a un cumulo di macerie invalicabili.`
+						description: `Ormai le scale sono ridotte a un cumulo di macerie invalicabili.`
 					}
 
 				},
@@ -520,7 +520,7 @@ class Adventure extends DemoEngine{
 						let i = this.currentRoom.interactors
 						let o = this.currentRoom.objects
 						if(mSubjects[1] == i.lettoreBadge){
-							if (i.lettoreBadge.visible == false)
+							if (i.lettoreBadge.visible != true)
 								return i.lettoreBadge.description()
 
 							i.porta.locked = false;

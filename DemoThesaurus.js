@@ -44,11 +44,17 @@ class DemoThesaurus extends Thesaurus{
 					defaultMessage: this.defaultMessages.BE_SERIOUS
 				},
 				wear: {
-					pattern: `indossa`,
-					defaultMessage: this.defaultMessages.BE_SERIOUS
+					pattern: `indossa|infila`,
+					defaultMessage: this.defaultMessages.BE_SERIOUS,
+					inventory: true
+				},
+				takeOff: {
+					pattern: `togli|leva`,
+					defaultMessage: this.defaultMessages.NOT_POSSIBLE,
+					inventory: true
 				},
 				bringCloser: {
-					pattern: `avvicina (.+)? a (.+)`,
+					pattern: `avvicina (.+) a (.+)`,
 					defaultMessage: this.defaultMessages.NOTHING_HAPPENS,
 					inventory: true,
 					complex: true

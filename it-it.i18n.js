@@ -65,8 +65,9 @@ var i18n = {
 			noPoints: `Quest'avventura non prevede un punteggio`,
 			points: (points, maxPoints) => `Hai conquistato ${points} punti su ${maxPoints}`,
 			noObjects: `Non hai oggetti con te.`,
-			carriedObjectsLabel: `Attualmente possiedi:`,
-			alreadyHaveIt: `Ce l'hai già`,
+			carriedObjectsLabel: `Stai portando con te:`,
+			alreadyHaveIt: `Ce l'hai già.`,
+			alreadyDone: `L'hai già fatto.`,
 			notHere: `Non vedi nulla del genere.`
 		},
 		questionMark: `?`,
