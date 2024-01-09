@@ -30,7 +30,7 @@ class DemoThesaurus extends Thesaurus{
 					defaultMessage: i18n.Thesaurus.verbs.push.defaultMessage
 				},
 				read:{
-					pattern: `leggi`,
+					pattern: `leggi|sfoglia`,
 					defaultMessage: this.defaultMessages.PREFER_NOT
 				},
 				putInto: {

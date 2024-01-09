@@ -194,7 +194,7 @@ var i18n = {
 				pattern: `(usa) (.+) (?:con) (.+)`,
 			},
 			lookAt: {
-				pattern: `guarda|esamina|ispeziona`
+				pattern: `guarda(?: in?)?|esamina|ispeziona`
 			},
 			search:{
 				pattern: `cerca|trova`

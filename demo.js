@@ -131,7 +131,9 @@ class Adventure extends DemoEngine{
 								if(this.playerHas(this.adventureData.objects.occhiali))
 									this.discover(this.currentRoom.interactors.scritteAppunti, true);
 								return this.currentRoom.interactors.appunti.description()
-							}
+							},
+							'move|lift': () => `Non c'è niente sotto.`,
+							'open|close': () => this.Thesaurus.defaultMessages.BE_SERIOUS
 						}
 					},
 					scritteAppunti: {
@@ -139,8 +141,10 @@ class Adventure extends DemoEngine{
 						pattern: `codice|diagramm(?:a|i)|schem(?:a|i)`,
 						description: `Non ci penso nemmeno... ora ho solo voglia di tornare a casa!`,
 						on: {
-							read: () => this.currentRoom.interactors.appunti.description()
+							read: () => this.currentRoom.interactors.appunti.description(),
+							'move|lift|open|close': () => this.Thesaurus.defaultMessages.BE_SERIOUS
 						}
+
 					},
 					cassettiera: {
 						pattern: `cassettiera((?: di)? ferro)?`,
