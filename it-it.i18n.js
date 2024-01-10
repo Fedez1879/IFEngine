@@ -191,10 +191,10 @@ var i18n = {
 				pattern: `(dai) (.+) (?:a) (.+)`,
 			},
 			useWith: {
-				pattern: `(usa) (.+) (?:con) (.+)`,
+				pattern: `(usa) (.+) (?:con|su) (.+)`,
 			},
 			lookAt: {
-				pattern: `guarda(?: in?)?|esamina|ispeziona`
+				pattern: `guarda(?: in| su?)?|esamina|ispeziona`
 			},
 			search:{
 				pattern: `cerca|trova`

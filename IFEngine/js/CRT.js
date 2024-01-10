@@ -16,6 +16,7 @@ class CRT{
 		this.capsLock 			= false;
 		//this.acceptedKeyCodes 	= [188,190,13,32,222,8,219,49,173,59,220];
 		this.waitText 			= i18n.CRT.waitText;
+		this.skip			= false
 		
 		this.printOptions		= {
 			printDelay: 5,
@@ -29,6 +30,8 @@ class CRT{
 		this.refreshScreen();
 		document.body.onresize = () => {this.refreshScreen()}
 		this.mobileInput.addEventListener("paste", this.onPasteHandler, true);
+		document.addEventListener('keydown', (keyEvent) => {if(keyEvent.key === 'Escape') this.skip = true })
+		document.addEventListener('keyup', (keyEvent) => {if(keyEvent.key === 'Escape') this.skip = false })
 	}
 
 	refreshScreen(){
@@ -44,6 +47,8 @@ class CRT{
 	}
 
 	async sleep(ms){
+		if(this.skip)
+			return;
 		return new Promise(
 			resolve => setTimeout(resolve, ms)
 	  	);

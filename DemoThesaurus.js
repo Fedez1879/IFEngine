@@ -73,7 +73,7 @@ class DemoThesaurus extends Thesaurus{
 			...this.commands,
 			...{
 				exit: {
-					pattern: `esci|scappa|fuggi`,
+					pattern: `(esci|scappa|fuggi)(?: da )?(?:stanza|qui)?`,
 					defaultMessage: `Vorrei, ma sono bloccato qui.`
 				},
 				help: {
