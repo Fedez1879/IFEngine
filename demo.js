@@ -260,7 +260,7 @@ class Adventure extends DemoEngine{
 					soffitto: this.commonInteractors.ceiling,
 					finestra: {
 						pattern: `finestr(?:a|one)`,
-						description: `Dalla finestra vedi il giardino e il parchegghio sottostante. Come sempre, non ricordi dove hai messo la tua macchina!`,
+						description: `Dalla finestra vedi il giardino e il parcheggio sottostante. Come sempre, non ricordi dove hai messo la tua macchina!`,
 					},
 					porta: {
 						pattern: `porta`,
