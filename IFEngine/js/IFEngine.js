@@ -409,6 +409,8 @@ class IFEngine{
 		let tbs = this._getTbs();
 		this.storage.setItem(this.SAVED+"-"+saveLabel, JSON.stringify(tbs, (k,v) => typeof v === 'function' ? "" + v : v));
 		await this.CRT.printTyping(i18n.IFEngine.messages.saved);
+		this.gameLoop(false,true)
+		return false;
 	}
 
 	// Ritorna i dati principali da salvare

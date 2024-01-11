@@ -63,7 +63,7 @@ class Thesaurus{
 			save:{
 				callback: async () =>{
 					let res = await this.parent.save();
-					return !res;
+					return res;
 				},
 			},
 			load: {

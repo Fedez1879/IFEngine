@@ -55,7 +55,7 @@ class Adventure extends DemoEngine{
 					mobile: {
 						pattern: `(?:moderno )?mobile`,
 						open:false,
-						description: () => `E' un massicico mobile di legno con le ante di vetro scuro.` + (this.currentRoom.interactors.mobile.open ? `All'interno il mobile è ricolmo di libri` : `\nRiesco ad intravedere qualcosa al suo interno...`),
+						description: () => `E' un massicico mobile di legno con le ante di vetro scuro.\n` + (this.currentRoom.interactors.mobile.open ? `All'interno il mobile è ricolmo di libri.` : `Riesco ad intravedere qualcosa al suo interno...`),
 						on: {
 							lookAt: () => this.currentRoom.interactors.mobile.description(),
 							open: () => this.currentRoom.interactors.ante.on.open(),
@@ -74,23 +74,30 @@ class Adventure extends DemoEngine{
 								if(this.currentRoom.interactors.mobile.open)
 									return `Le ante sono già aperte.`
 								this.currentRoom.interactors.mobile.open = true;
+								
 								if(this.currentRoom.interactors.libri.visible == false){
 									this.discover(this.currentRoom.interactors.libri,true)
 									return `Il mobile è pieno zeppo di libri.`
-								}
+								} 
+								
+								if(this.currentRoom.objects.libro && this.currentRoom.objects.libro.visible == false)
+									this.currentRoom.objects.libro.visible = true
+								
 								return this.Thesaurus.defaultMessages.DONE
 							},
 							close: () => {
 								if(this.currentRoom.interactors.mobile.open == false)
 									return `Le ante sono già chiuse.`
 								this.currentRoom.interactors.mobile.open = false;
+								if(this.currentRoom.key == "ufficio" && this.currentRoom.objects.libro)
+									this.currentRoom.objects.libro.visible = false
 								return this.Thesaurus.defaultMessages.DONE
 							}
 						}
 					},
 					libri: {
 						label: 'alcuni libri',
-						pattern: `libri`,
+						pattern: `(?:costole )?(?:di )?libri`,
 						visible: false,
 						description: () => this.currentRoom.interactors.mobile.open ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (this.adventureData.objects.libro.visible ? `C'è nè uno diverso dagli altri.` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri.`) : `Forse dovrei aprire le ante per esaminarli meglio.`,
 						on: {
@@ -574,7 +581,15 @@ class Adventure extends DemoEngine{
 						}
 						return this.adventureData.objects.libro.visible ? `Dovrei prenderlo prima...` : this.adventureData.objects.libro.description()
 					},
-					take: () => this.adventureData.objects.libro.visible ? null : this.adventureData.objects.libro.description()
+					take: () => this.adventureData.objects.libro.visible ? null : this.adventureData.objects.libro.description(),
+					drop: () => {
+						if(this.currentRoom.key == "ufficio"){
+							this.inventory.libro.visible = this.currentRoom.ante.open;
+							this._removeFromInventory(this.inventory.libro,this.currentRoom)
+							return "Lo rimetti nel mobile."
+						}
+						return null
+					}
 				}
 			},
 			copertina: {
