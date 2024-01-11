@@ -220,7 +220,7 @@ class IFEngine{
 	
 	
 	// Entra nella stanza
-	async enterRoom(roomLabel){
+	async enterRoom(roomLabel, ignoreTimedEvents){
 		if(await this._breakRoomAction("onExit"))
 			return;
 
@@ -233,7 +233,7 @@ class IFEngine{
 
 		await this.printRoomLabel();
 		this.refreshRoomObjects();
-		await this.gameLoop(true);
+		await this.gameLoop(true, ignoreTimedEvents);
 	}
 
 	async printRoomLabel(){
@@ -404,7 +404,7 @@ class IFEngine{
 			if(saveLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase()){
 				return false;
 			}
-		} while (saveLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
+		} while (saveLabel.length == 0 || saveLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
 		
 		let tbs = this._getTbs();
 		this.storage.setItem(this.SAVED+"-"+saveLabel, JSON.stringify(tbs, (k,v) => typeof v === 'function' ? "" + v : v));
@@ -460,8 +460,8 @@ class IFEngine{
 				
 
 				if(Object.keys(savedGames).length == 0){
-					await this.CRT.printTyping(i18n.IFEngine.warnings.noData+"\n");
-					return false;	
+					await this.CRT.printTyping(i18n.IFEngine.warnings.noData);
+					return undefined;	
 				}
 
 
@@ -473,7 +473,7 @@ class IFEngine{
 
 			}
 
-		} while (loadLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase() || loadLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
+		} while ( loadLabel.length == 0 || loadLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase() || loadLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
 		
 		let realLabel = this.SAVED+"-"+loadLabel;
 		if(this.storage[realLabel] === undefined){
@@ -484,7 +484,7 @@ class IFEngine{
 		let stored = this.storage.getItem(realLabel);
 		if(stored == null) {
 			await this.CRT.printTyping(i18n.IFEngine.warnings.noData+"\n");
-			return false;	
+			return this.restore();	
 		}
 
 		let tbr = await this.reload(stored);
@@ -493,7 +493,7 @@ class IFEngine{
 
 		await this.CRT.printTyping(i18n.IFEngine.messages.loaded+"\n");
 		
-		this.enterRoom(tbr.currentRoom);
+		this.enterRoom(tbr.currentRoom, true);
 		return true;
 	}
 	
