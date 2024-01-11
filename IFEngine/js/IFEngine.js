@@ -478,7 +478,7 @@ class IFEngine{
 		let realLabel = this.SAVED+"-"+loadLabel;
 		if(this.storage[realLabel] === undefined){
 			await this.CRT.printTyping(i18n.IFEngine.warnings.notFound(loadLabel.toUpperCase())+"\n");
-			return false;	
+			return this.restore();	
 		}
 		
 		let stored = this.storage.getItem(realLabel);

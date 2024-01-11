@@ -41,12 +41,23 @@ class DemoEngine extends IFEngine{
 	async run(){
 		await this.runSequence("titolo");
 		this.CRT.clear();
-		let a = await this.yesNoQuestion("Vuoi leggere le istruzioni")
+		let a, r;
+		a = await this.yesNoQuestion("Vuoi leggere le istruzioni")
 		if (a) {
 			this.CRT.println()
 			await this.instructions()
 			this.CRT.println()
 			await this.CRT.wait();
+		}
+		this.CRT.clear();
+		a = await this.yesNoQuestion("Vuoi caricare una partita salvata precedentemente")
+		if (a) {
+			this.CRT.println()
+			r = await this.restore();
+			if(r == true){
+				this.CRT.clear();
+				return
+			}
 		}
 		this.CRT.clear();
 		await this.enterRoom(this.startingRoom)
