@@ -16,7 +16,7 @@ class Adventure extends DemoEngine{
 				},
 				override: {
 					commands: {
-						exit: async() => this.stringOrFalse(this.currentRoom.directions.e())
+						exit: async() => this.currentRoom.interactors.porta.open ? this.stringOrFalse(this.currentRoom.directions.e()) : this.Thesaurus.commands.exit.defaultMessage
 					}
 				},
 				scenic: {
@@ -337,7 +337,7 @@ class Adventure extends DemoEngine{
 				},
 				override: {
 					commands: {
-						exit: async() => this.stringOrFalse(this.currentRoom.interactors.portone.on.open())
+						exit: async () => this.currentRoom.interactors.portone.locked ? this.Thesaurus.commands.exit.defaultMessage : this.stringOrFalse(this.currentRoom.interactors.portone.on.open())
 					}
 				},
 				interactors: {

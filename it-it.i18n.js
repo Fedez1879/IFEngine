@@ -134,7 +134,10 @@ var i18n = {
 			notPossible: `Non è possibile.`,
 			tooDarkHere: `E' troppo buio.`,
 			here: `Quello che cerchi è qui!`,
-			alreadyHaveIt: `Ce l'hai già.`
+			alreadyHaveIt: `Ce l'hai già.`,
+			doesntOpen: `Non si apre.`,
+			doesntClose: `Non si chiude.`,
+			doesntMove: `Non si muove.`
 		},
 		commands: {
 			north: {
@@ -165,21 +168,18 @@ var i18n = {
 		verbs: {
 			open: {
 				pattern: `apri`,
-				defaultMessage: `Non si apre.`
 			},
 			close: {
-				pattern: `chiudi`,
-				defaultMessage: `Non si chiude.`
+				pattern: `chiudi`
 			},
 			pull: {
-				pattern: `tira`,
+				pattern: `tira`
 			},
 			press: {
 				pattern: `premi`
 			},
 			push: {
-				pattern: `spingi`,
-				defaultMessage: `Non si muove.`
+				pattern: `spingi`
 			},
 			take: {
 				pattern: `prendi|raccogli`
@@ -188,13 +188,13 @@ var i18n = {
 				pattern: `lascia|posa`
 			},
 			give: {
-				pattern: `(dai) (.+) (?:a) (.+)`,
+				pattern: `(dai) (.+) (?:a) (.+)`
 			},
 			useWith: {
-				pattern: `(usa) (.+) (?:con|su) (.+)`,
+				pattern: `(usa) (.+) (?:con|su) (.+)`
 			},
 			lookAt: {
-				pattern: `guarda(?: in| su?)?|esamina|ispeziona`
+				pattern: `guarda(?: in| su| da)?|esamina|ispeziona`
 			},
 			search:{
 				pattern: `cerca|trova`
@@ -202,10 +202,31 @@ var i18n = {
 		}
 	},
 	DemoThesaurus: {
+		defaultMessages: {
+			beSerious: `Sii serio!`,
+			notNow: `Adesso non ho voglia.`,
+			done: `Ok.`
+		},
 		commonPatterns: {
 			wall: `mur(?:o|a)|paret(?:e|i)`,
 			floor: `pavimento`,
 			ceiling: `soffitto`
+		},
+		commands: {
+			exit: {
+				pattern: `(esci|scappa|fuggi)(?: da )?(?:stanza|qui)?`,
+				defaultMessage: `Vorrei, ma sono bloccato qui.`
+			},
+			help: {
+				pattern: `aiuto`
+			},
+			run: {
+				pattern: `corri`,
+				defaultMessage: `Non serve a niente.`
+			}
+		},
+		verbs: {
+
 		}
 	}
 }

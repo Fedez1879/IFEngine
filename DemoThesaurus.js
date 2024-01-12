@@ -7,9 +7,9 @@ class DemoThesaurus extends Thesaurus{
 
 	constructor(parent){
 		super(parent),
-		this.defaultMessages.BE_SERIOUS = "Sii serio!"
-		this.defaultMessages.NOT_NOW = "Adesso non ho voglia."
-		this.defaultMessages.DONE = "Ok."
+		this.defaultMessages.BE_SERIOUS = i18n.DemoThesaurus.defaultMessages.beSerious,
+		this.defaultMessages.NOT_NOW = i18n.DemoThesaurus.defaultMessages.notNow,
+		this.defaultMessages.DONE = i18n.DemoThesaurus.defaultMessages.done
 			
 		this.loadCommands();
 		this.loadVerbs();
@@ -23,24 +23,24 @@ class DemoThesaurus extends Thesaurus{
 			...{
 				move:{
 					pattern: `sposta|muovi`,
-					defaultMessage: i18n.Thesaurus.verbs.push.defaultMessage
+					defaultMessage: this.verbs.push.defaultMessage
 				},
 				lift:{
 					pattern: `alza|solleva`,
-					defaultMessage: i18n.Thesaurus.verbs.push.defaultMessage
+					defaultMessage: this.verbs.push.defaultMessage
 				},
 				read:{
 					pattern: `leggi|sfoglia`,
 					defaultMessage: this.defaultMessages.PREFER_NOT
 				},
 				putInto: {
-					pattern: "(infila|inserisci) (.+) in (.+)",
+					pattern: `(infila|inserisci) (.+) in (.+)`,
 					defaultMessage: this.defaultMessages.BE_SERIOUS,
 					inventory: true,
 					complex: true
 				},
 				break: {
-					pattern: "rompi|distruggi|spacca",
+					pattern: `rompi|distruggi|spacca`,
 					defaultMessage: this.defaultMessages.BE_SERIOUS
 				},
 				wear: {
@@ -73,16 +73,16 @@ class DemoThesaurus extends Thesaurus{
 			...this.commands,
 			...{
 				exit: {
-					pattern: `(esci|scappa|fuggi)(?: da )?(?:stanza|qui)?`,
-					defaultMessage: `Vorrei, ma sono bloccato qui.`
+					pattern: i18n.DemoThesaurus.commands.exit.pattern,
+					defaultMessage: i18n.DemoThesaurus.commands.exit.defaultMessage
 				},
 				help: {
-					pattern: `aiuto`,
+					pattern: i18n.DemoThesaurus.commands.help.pattern,
 					defaultMessage: () => this.parent.help(this.parent.currentRoom)
 				},
 				run: {
-					pattern: `corri`,
-					defaultMessage: `Non serve a niente`
+					pattern: i18n.DemoThesaurus.commands.run.pattern,
+					defaultMessage: i18n.DemoThesaurus.commands.run.defaultMessage
 				}
 			}
 		}
