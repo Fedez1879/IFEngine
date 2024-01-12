@@ -5,18 +5,12 @@ class DemoEngine extends IFEngine{
 		
 		document.title = i18n.htmlTitle;
 
-		this.CRT.defaultCR = "\n";
-		this.defaultInput = "\n] "
-		this.startingRoom = "ufficio";
+		this.CRT.defaultCR = `\n`;
+		this.defaultInput = `\n] `
+		this.startingRoom = `ufficio`;
 
 		this.Thesaurus = new DemoThesaurus(this)
 
-		this.Thesaurus.commands.save.pattern = "save|salva";
-		this.Thesaurus.commands.load.pattern = "load|carica";
-		this.Thesaurus.commands.inventory.pattern = "i(?:nv)?|inventario";
-		this.Thesaurus.commands.where.pattern = "dove(?:sono|mi trovo)?";
-		this.Thesaurus.commands.instructions.pattern = "istruzioni";
-		
 		//this.CRT.sleep = (ms) => true; // for speed test
 
 		this.commonInteractors = {
@@ -39,10 +33,10 @@ class DemoEngine extends IFEngine{
 
 	// Override di IFEngine.run
 	async run(){
-		await this.runSequence("titolo");
+		await this.runSequence(`titolo`);
 		this.CRT.clear();
 		let a, r;
-		a = await this.yesNoQuestion("Vuoi leggere le istruzioni")
+		a = await this.yesNoQuestion(`Vuoi leggere le istruzioni`)
 		if (a) {
 			this.CRT.println()
 			await this.instructions()
@@ -50,7 +44,7 @@ class DemoEngine extends IFEngine{
 			await this.CRT.wait();
 		}
 		this.CRT.clear();
-		a = await this.yesNoQuestion("Vuoi caricare una partita salvata precedentemente")
+		a = await this.yesNoQuestion(`Vuoi caricare una partita salvata precedentemente`)
 		if (a) {
 			this.CRT.println()
 			r = await this.restore();
@@ -64,7 +58,7 @@ class DemoEngine extends IFEngine{
 	}
 
 	async instructions(){
-		await this.CRT.printTyping("Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi utilizzando le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi composte da un singolo comando (es: ESCI) oppure dal verbo + oggetto (es: PRENDI LA CHIAVE); frasi più complesse vanno al di là della mia comprensione.\nPer rileggere la descrizione del luogo dove sei usa il comando DOVE.\nPer vedere l'elenco degli oggetti che hai con te usa uno comando tra I/INV/INVENTARIO.\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che lo chiudi!\n\nBuona fortuna e soprattutto buon divertimento!");
+		await this.CRT.printTyping(`Come per ogni avventura testuale, io sono il tuo alter ego. Puoi muovermi utilizzando le direzioni cardinali (nord, sud, est, ovest, alto, basso) o le loro iniziali.\n\nDi solito capisco frasi composte da un singolo comando (es: ESCI) oppure dal verbo + oggetto (es: PRENDI LA CHIAVE); frasi più complesse vanno al di là della mia comprensione.\nPer rileggere la descrizione del luogo dove sei usa il comando DOVE.\nPer vedere l'elenco degli oggetti che hai con te usa uno comando tra I/INV/INVENTARIO.\nPuoi salvare e caricare i tuoi progressi quante volte vuoi (con i comandi SALVA e CARICA) a patto che il LocalStorage del browser sia attivo e non si cancelli in automatico ogni volta che lo chiudi!\n\nBuona fortuna e soprattutto buon divertimento!`);
 	}
 
 	// Override
@@ -75,13 +69,13 @@ class DemoEngine extends IFEngine{
 	}
 
 	maybeIKnowTheCode(){
-		return this.adventureData.rooms.ufficio.interactors.calendario.read && this.getObject("libro").read
+		return this.adventureData.rooms.ufficio.interactors.calendario.read && this.getObject(`libro`).read
 	}
 
 	help(room){
 		switch(room){
 			default:
-				return "Cerca di guardarti intorno ed esamina più cosa possibili. Spesso i dettagli si notano quando si prendono in mano gli oggetti!"
+				return `Cerca di guardarti intorno ed esamina più cosa possibili. Spesso i dettagli si notano quando si prendono in mano gli oggetti!`
 		}
 	}
 

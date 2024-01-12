@@ -163,6 +163,27 @@ var i18n = {
 			down: {
 				pattern: `(scendi|(vai verso |vai in |vai )?b(asso)?|d(own)?|giu)`,
 				defaultMessage: `Più in basso di così non riesco a scendere.`
+			},
+			save:{
+				pattern: `save|salva`,
+			},
+			load: {
+				pattern: `load|carica`,
+			},
+			instructions: {
+				pattern: `istruzioni`,
+			},
+			inventory: {
+				pattern: `i(?:nv)?|inventario`,
+			},
+			quit: {
+				pattern: `esci da gioco|basta|stop`,
+			},
+			where: {
+				pattern: `dove(?:sono|mi trovo)?`,
+			},
+			points: {
+				pattern: `punt(?:i|eggio)`,
 			}
 		},
 		verbs: {

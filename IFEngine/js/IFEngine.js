@@ -402,7 +402,7 @@ class IFEngine{
 			}
 
 			if(saveLabel == i18n.IFEngine.questions.cancelLetter.toLowerCase()){
-				return false;
+				return true;
 			}
 		} while (saveLabel.length == 0 || saveLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
 		

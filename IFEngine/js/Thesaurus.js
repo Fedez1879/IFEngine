@@ -64,52 +64,59 @@ class Thesaurus{
 				direction: "d"
 			},
 			save:{
+				pattern: i18n.Thesaurus.commands.save.pattern,
 				callback: async () =>{
 					let res = await this.parent.save();
 					return res;
 				},
 			},
 			load: {
+				pattern: i18n.Thesaurus.commands.load.pattern,
 				callback: async () =>{
 					let res = await this.parent.restore();
 					return !res;
 				},
 			},
 			instructions: {
+				pattern: i18n.Thesaurus.commands.instructions.pattern,
 				callback: async () => {
 					await this.parent.instructions();
 					return true;
 				},
 			},
 			inventory: {
+				pattern: i18n.Thesaurus.commands.inventory.pattern,
 				callback: async () => {
 					await this.parent._inventory();
 					return true;
 				},
 			},
 			quit: {
+				pattern: i18n.Thesaurus.commands.quit.pattern,
 				callback: async () => {
 					let answer = await this.parent.yesNoQuestion(i18n.IFEngine.questions.quitQuestion);
 					if(answer){
-						this.parent.displayMenu(this.parent.menu.contextual);
-						return false;
+						this.parent.byebye();
+					} else {
+						this.parent.gameLoop(false,true)
 					}
-					return true;
+					return false;
 				}
 			},
 			where: {
+				pattern: i18n.Thesaurus.commands.where.pattern,
 				callback: async () => {
 					await this.parent.currentRoomDescription();
 					return true;
 				},
 			},
 			points: {
+				pattern: i18n.Thesaurus.commands.points.pattern,
 				callback: async () => {
 					await this.parent._points();
 					return true;
 				},	
 			}
-		
 		}
 	}
 
