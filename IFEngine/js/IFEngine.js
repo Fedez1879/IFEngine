@@ -522,12 +522,19 @@ class IFEngine{
 	}
 
 	// Scopri oggetto, quindi diventa visibile
-	discover(object, justRemove){
+	discover(object, justRemove, propagate){
 		if(justRemove)
 			delete object.visible
 		else{
 			object.visible = true
 			delete object.initialDescription
+		}
+		if(propagate && object.linkedObjects){
+			for (let lo_key of object.linkedObjects){
+				let otd = this._get(lo_key,this.adventureData.objects)
+				if(otd)
+					this.discover(otd, justRemove, propagate)
+			}
 		}
 		this.refreshRoomObjects();
 		return null		
