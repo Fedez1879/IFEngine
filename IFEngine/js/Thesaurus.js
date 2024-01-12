@@ -14,7 +14,10 @@ class Thesaurus{
 			BE_MORE_SPECIFIC: 		i18n.Thesaurus.defaultMessages.beMoreSpecific,
 			NOT_POSSIBLE: 			i18n.Thesaurus.defaultMessages.notPossible,
 			TOO_DARK_HERE: 			i18n.Thesaurus.defaultMessages.tooDarkHere,
-			HERE: 					i18n.Thesaurus.defaultMessages.here, 
+			HERE: 					i18n.Thesaurus.defaultMessages.here,
+			DOESNT_OPEN:			i18n.Thesaurus.defaultMessages.doesntOpen,
+			DOESNT_CLOSE:			i18n.Thesaurus.defaultMessages.doesntClose,
+			DOESNT_MOVE:			i18n.Thesaurus.defaultMessages.doesntMove
 		}
 
 		this.loadCommands();
@@ -114,11 +117,11 @@ class Thesaurus{
 		this.verbs = {
 			open: {
 				pattern: i18n.Thesaurus.verbs.open.pattern,
-				defaultMessage: i18n.Thesaurus.verbs.open.defaultMessage
+				defaultMessage: this.defaultMessages.DOESNT_OPEN
 			},
 			close: {
 				pattern: i18n.Thesaurus.verbs.close.pattern,
-				defaultMessage: i18n.Thesaurus.verbs.close.defaultMessage
+				defaultMessage: this.defaultMessages.DOESNT_CLOSE
 
 			},
 			pull: {
@@ -131,7 +134,7 @@ class Thesaurus{
 			},
 			push: {
 				pattern: i18n.Thesaurus.verbs.push.pattern,
-				defaultMessage: i18n.Thesaurus.verbs.push.defaultMessage
+				defaultMessage: this.defaultMessages.DOESNT_MOVE
 			},
 			take: {
 				pattern: i18n.Thesaurus.verbs.take.pattern,
