@@ -49,6 +49,7 @@ class DemoEngine extends IFEngine{
 			this.CRT.println()
 			r = await this.restore();
 			if(r == true){
+				await this.CRT.sleep(1500);
 				this.CRT.clear();
 				return
 			}
