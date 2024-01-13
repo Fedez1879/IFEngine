@@ -492,7 +492,7 @@ class IFEngine{
 		
 
 		await this.CRT.printTyping(i18n.IFEngine.messages.loaded+"\n");
-		await this.CRT.sleep(1500);
+		await this.CRT.sleep(1000);
 		this.enterRoom(tbr.currentRoom, true);
 		return true;
 	}
