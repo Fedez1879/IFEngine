@@ -461,7 +461,8 @@ class IFEngine{
 
 				if(Object.keys(savedGames).length == 0){
 					await this.CRT.printTyping(i18n.IFEngine.warnings.noData);
-					return undefined;	
+					await this.CRT.sleep(1000);
+					return;	
 				}
 
 
@@ -493,6 +494,7 @@ class IFEngine{
 
 		await this.CRT.printTyping(i18n.IFEngine.messages.loaded+"\n");
 		await this.CRT.sleep(1000);
+		this.CRT.clear()
 		this.enterRoom(tbr.currentRoom, true);
 		return true;
 	}

@@ -49,11 +49,9 @@ class DemoEngine extends IFEngine{
 			this.CRT.println()
 			r = await this.restore();
 			if(r == true){
-				this.CRT.clear()
 				return
 			}
 		}
-		await this.CRT.sleep(1500);
 		this.CRT.clear();
 		await this.enterRoom(this.startingRoom);
 	}
