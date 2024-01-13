@@ -53,7 +53,7 @@ class DemoEngine extends IFEngine{
 				return
 			}
 		}
-		this.CRT.sleep(1500);
+		await this.CRT.sleep(1500);
 		this.CRT.clear();
 		await this.enterRoom(this.startingRoom);
 	}
