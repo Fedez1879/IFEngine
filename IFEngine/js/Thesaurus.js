@@ -162,7 +162,7 @@ class Thesaurus{
 				inventory: true,
 				pattern: i18n.Thesaurus.verbs.useWith.pattern,
 				complex: true,
-				defaultMessage: this.defaultMessages.NOTHING_HAPPENS
+				defaultMessage: this.defaultMessages.BE_MORE_SPECIFIC
 			},
 			lookAt: {
 				pattern: i18n.Thesaurus.verbs.lookAt.pattern,

@@ -54,7 +54,7 @@ class DemoThesaurus extends Thesaurus{
 					inventory: true
 				},
 				bringCloser: {
-					pattern: `avvicina (.+) a (.+)`,
+					pattern: `(avvicina|appoggia|metti) (.+) (?:a|su) (.+)`,
 					defaultMessage: this.defaultMessages.NOTHING_HAPPENS,
 					inventory: true,
 					complex: true
