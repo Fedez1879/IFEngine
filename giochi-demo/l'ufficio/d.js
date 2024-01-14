@@ -20,7 +20,7 @@ class Adventure extends DemoEngine{
 					}
 				},
 				scenic: {
-					pattern: [`chiodo`, `ruot(?:a|e)`, `viso`, `riflesso`, `ganci(?:o)?`, `vetro`, `parcheggio`, `macchin(?:a|e)|auto`],
+					pattern: [`chiodo`, `ruot(?:a|e)`, `viso`, `riflesso`, `ganci(?:o)?`, `vetro`,`macchin(?:a|e)|auto(?:mobil(e|i)?)?`],
 					defaultMessage: `Lascia perdere, concentrati piuttosto su come trovare il modo di uscire da qui..`
 				},
 				interactors: {
@@ -156,7 +156,7 @@ class Adventure extends DemoEngine{
 					cassettiera: {
 						pattern: `cassettiera((?: di)? ferro)?`,
 						status: 0,
-						description: () => `E’ una cassettiera di ferro di colore grigio scuro, con la serratura nel primo cassetto e le ruote.`,
+						description: () => `E’ una cassettiera di ferro con ruote, è di colore grigio scuro e ha tre cassetti. In cima alla cassettiera c'è una serratura.`,
 						on: {
 							'close|open': `Dovresti agire sui cassetti...`,
 							'push|pull|move': async () => {
@@ -180,7 +180,7 @@ class Adventure extends DemoEngine{
 						description: `E' la serratura della cassettiera. Serve per chiudere a chiave i cassetti.`
 					},
 					cassetti: {
-						pattern: `cassett(?:o|i)`,
+						pattern: `((?:primo |secondo |terzo )?cassetto|cassetti)`,
 						locked: true,
 						attempt: 0,
 						open: false,
@@ -204,7 +204,7 @@ class Adventure extends DemoEngine{
 								
 								cassetti.attempt = -1
 								
-								return `Hai ${finalmente}aperto i cassetti.${occhiali}`
+								return `Nonti limiti ad un solo cassetto, ma ${finalmente}li apri tutti quanti.${occhiali}`
 							},
 							close: () => {
 								if(this.currentRoom.interactors.cassetti.locked || this.currentRoom.interactors.cassetti.open == false)
@@ -212,9 +212,9 @@ class Adventure extends DemoEngine{
 								
 								this.currentRoom.interactors.cassetti.open = false
 								this.currentRoom.interactors.cianfrusaglie.visible = false
-								return `Richiudi delicatamente i cassetti.`
+								return `Richiudi delicatamente tutti cassetti.`
 							},
-							lookAt: () => this.currentRoom.interactors.cassetti.open ? `Sono pieni di cianfrusaglie.` : this.Thesaurus.defaultMessages.NOTHING_PARTICULAR,
+							lookAt: () => this.currentRoom.interactors.cassetti.open ? `Ispezioni con cura tutti i cassetti, ma sono solo pieni di cianfrusaglie.` : this.Thesaurus.defaultMessages.NOTHING_PARTICULAR,
 							move: () => this.Thesaurus.defaultMessages.NOT_POSSIBLE
 						}
 					},
@@ -268,6 +268,13 @@ class Adventure extends DemoEngine{
 					finestra: {
 						pattern: `finestr(?:a|one)`,
 						description: `Dalla finestra vedi il giardino e il parcheggio sottostante. Come sempre, non ricordi dove hai messo la tua macchina!`,
+					},
+					parcheggio: {
+						pattern: `parcheggio`,
+						description: `Il parcheggio è quasi vuoto.`,
+						on: {
+							'lift|move|read|search|open|close|push|pull|press': this.Thesaurus.defaultMessages.BE_SERIOUS
+						}
 					},
 					porta: {
 						pattern: `porta`,
