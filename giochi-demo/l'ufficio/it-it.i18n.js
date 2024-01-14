@@ -1,5 +1,5 @@
 var i18n = {
-	htmlTitle: `L'ufficio - IFDemo`,
+	htmlTitle: `L'ufficio - IFEngine Demo`,
 	title: `       _                         
  __   | |    ___ ___ _     _     
 |  |  |_|_ _|  _|  _|_|___|_|___ 
