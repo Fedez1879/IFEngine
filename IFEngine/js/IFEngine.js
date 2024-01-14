@@ -226,6 +226,14 @@ class IFEngine{
 
 		this.currentRoom = this.adventureData.rooms[roomLabel];
 
+		if(this.currentRoom.interactors === undefined)
+			this.currentRoom.interactors = {};
+		
+		if(this.currentRoom.firstEnter === undefined)
+			this.currentRoom.firstEnter = true 
+		else
+			this.currentRoom.firstEnter = false
+
 		this.Parser.setOverride(this.currentRoom.override);
 
 		if(await this._breakRoomAction("onEnter"))
@@ -259,13 +267,21 @@ class IFEngine{
 	}
 
 	// Descrive la stanza corrente
-	async currentRoomDescription(){
+	async currentRoomDescription(longDescription){
 		if(this.currentRoom.dark){
 
 			await this.CRT.printTyping(this.currentRoom.darkDescription ? this._cos(this.currentRoom.darkDescription) : this.Thesaurus.defaultMessages.TOO_DARK_HERE);
 			return;
 		}
-		let description = this._cos(this.currentRoom.description);
+		let description = longDescription ? 
+			this.currentRoom.description : 
+			( 
+				this.currentRoom.shortDescription ? 
+				this.currentRoom.shortDescription :
+				this.currentRoom.description
+			)
+		
+		description = this._cos(description);
 		description += this.addInitialDescription(this.currentRoom.interactors);
 		description += this.addInitialDescription(this.currentRoom.objects);
 		
@@ -332,7 +348,7 @@ class IFEngine{
 	async gameLoop(describeCurrentRoom, ignoreTimedEvents){
 		
 		if(describeCurrentRoom){
-			await this.currentRoomDescription();
+			await this.currentRoomDescription(this.currentRoom.firstEnter);
 		}
 
 		// Esistono eventi a tempo attivi?

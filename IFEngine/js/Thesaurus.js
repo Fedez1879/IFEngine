@@ -106,7 +106,7 @@ class Thesaurus{
 			where: {
 				pattern: i18n.Thesaurus.commands.where.pattern,
 				callback: async () => {
-					await this.parent.currentRoomDescription();
+					await this.parent.currentRoomDescription(true);
 					return true;
 				},
 			},
