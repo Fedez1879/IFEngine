@@ -148,19 +148,22 @@ class IFEngine{
 	async displayMenu(aMenu){
 		let menu = { ...aMenu }
 		await this.CRT.printTyping(menu.label+"\n");
-		for(let o in menu.options){
-			if(menu.options[o].displayIf ===undefined || menu.options[o].displayIf)
-				await this.CRT.printTyping("("+o+") "+menu.options[o].label+"\n");
-			else 
-				delete menu.options[o];
-		}
-		
-		let res;
-		res = await this.choose(menu.options, undefined, true);
+		let res = await this.multipleChoiche(menu)
 		if(res == false)
 			this.displayMenu(aMenu);
 	}
 
+	async multipleChoiche(list){
+		for(let o in list.options){
+			if(list.options[o].displayIf ===undefined || list.options[o].displayIf)
+				await this.CRT.printTyping(o+") "+list.options[o].label);
+			else 
+				delete list.options[o];
+		}
+		
+		await this.CRT.println();
+		return await this.choose(list.options, undefined, true);
+	}
 	// si o no
 	async yesNoQuestion(question, cr){
 		let options = {}

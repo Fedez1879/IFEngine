@@ -195,6 +195,9 @@ var i18n = {
 			useWith: {
 				pattern: `(usa) (.+) (?:con|su) (.+)`
 			},
+			use: {
+				pattern: `usa`
+			},
 			lookAt: {
 				pattern: `guarda(?: in| su| da)?|esamina|ispeziona`
 			},

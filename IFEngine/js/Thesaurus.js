@@ -164,6 +164,10 @@ class Thesaurus{
 				complex: true,
 				defaultMessage: this.defaultMessages.BE_MORE_SPECIFIC
 			},
+			use: {
+				pattern: i18n.Thesaurus.verbs.use.pattern,
+				defaultMessage: this.defaultMessages.BE_MORE_SPECIFIC
+			},
 			lookAt: {
 				pattern: i18n.Thesaurus.verbs.lookAt.pattern,
 				defaultMessage: this.defaultMessages.NOTHING_PARTICULAR
