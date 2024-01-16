@@ -30,6 +30,7 @@ class IFEngine{
 		// Elenco degli eventi "a tempo"
 		this.timedEvents = [];
 
+		this.startingRoom = "startingRoom"
 		// Menu
 		this.menu = {
 			main: {

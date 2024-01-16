@@ -10,10 +10,6 @@ class DemoThesaurus extends Thesaurus{
 		this.defaultMessages.BE_SERIOUS = i18n.DemoThesaurus.defaultMessages.beSerious,
 		this.defaultMessages.NOT_NOW = i18n.DemoThesaurus.defaultMessages.notNow,
 		this.defaultMessages.DONE = i18n.DemoThesaurus.defaultMessages.done
-			
-		this.loadCommands();
-		this.loadVerbs();
-		
 	}
 	
 	loadVerbs(){

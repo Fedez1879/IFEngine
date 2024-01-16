@@ -113,7 +113,8 @@ class Adventure extends DemoEngine{
 								if (this.playerHas(this.adventureData.objects.occhiali))
 									this.currentRoom.interactors.calendario.read = true
 								return null
-							}
+							},
+							'move|lift': `Sposti il calendario per vedere se c'è qualcosa dietro, ma non noti nulla di particolare. Quindi lo rimetti a posto.`
 						}
 
 					},
