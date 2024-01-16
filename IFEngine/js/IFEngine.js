@@ -25,7 +25,11 @@ class IFEngine{
 		this.inventory = {};
 
 		// Dati specifici di ogni avventura da salvare
-		this.otherData = {};
+		this.otherData = {
+			points: null,
+			pointsMax: null,
+			moves: 0
+		};
 
 		// Elenco degli eventi "a tempo"
 		this.timedEvents = [];
@@ -395,6 +399,7 @@ class IFEngine{
 		// Attendo il comando
 		await this.CRT.print(this.defaultInput);
 		let input = await this.CRT.input();
+		this.otherData.moves++
 		input = this._prepare(input);
 		// Faccio il parsing del comando. 
 		// Se la funzione mi restituisce undefined o true allora ciclo nuovament il loop
@@ -615,12 +620,22 @@ class IFEngine{
 
 	// Stampa i punti del gioco
 	async _points(){
-		if (this.dataPoints.actionPoints === undefined)
+		this.otherData.moves--;
+		if (this.dataPoints === undefined)
 			await this.CRT.printTyping(i18n.IFEngine.messages.noPoints);
 		else{
-			await this.CRT.printTyping(i18n.IFEngine.messages.points(this.otherData.ponts, this.otherData.pontsMax)+".\n");
+			await this.CRT.printTyping(i18n.IFEngine.messages.points(this.otherData.points, this.otherData.pointsMax));
 		}
-		return true;
+		this.gameLoop(false,true)
+		return false;
+	}
+
+	// Stampa il numero di mosse eseguite
+	async _moves(){
+		this.otherData.moves--;
+		await this.CRT.printTyping(i18n.IFEngine.messages.moves(this.otherData.moves));
+		this.gameLoop(false,true)
+		return false;
 	}
 
 	// AggiungePunti

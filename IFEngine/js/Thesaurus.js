@@ -113,8 +113,13 @@ class Thesaurus{
 			points: {
 				pattern: i18n.Thesaurus.commands.points.pattern,
 				callback: async () => {
-					await this.parent._points();
-					return true;
+					return await this.parent._points();
+				},	
+			},
+			moves: {
+				pattern: i18n.Thesaurus.commands.moves.pattern,
+				callback: async () => {
+					return await this.parent._moves();
 				},	
 			}
 		}
