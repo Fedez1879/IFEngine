@@ -24,17 +24,19 @@ class IFEngine{
 		// L'inventario
 		this.inventory = {};
 
-		// Dati specifici di ogni avventura da salvare
+		// DAltri dati da salvare
 		this.otherData = {
 			points: null,
-			pointsMax: null,
+			maxPoints: null,
 			moves: 0
 		};
 
 		// Elenco degli eventi "a tempo"
 		this.timedEvents = [];
 
+		// Stanzza iniziale
 		this.startingRoom = "startingRoom"
+
 		// Menu
 		this.menu = {
 			main: {
@@ -624,7 +626,7 @@ class IFEngine{
 		if (this.dataPoints === undefined)
 			await this.CRT.printTyping(i18n.IFEngine.messages.noPoints);
 		else{
-			await this.CRT.printTyping(i18n.IFEngine.messages.points(this.otherData.points, this.otherData.pointsMax));
+			await this.CRT.printTyping(i18n.IFEngine.messages.points(this.otherData));
 		}
 		this.gameLoop(false,true)
 		return false;

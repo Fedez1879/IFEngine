@@ -44,7 +44,7 @@ var i18n = {
 			noInstructions: `Nessuna istruzione qui...`,
 			death: `SEI MORTO!!!`,
 			noPoints: `Quest'avventura non prevede un punteggio`,
-			points: (points, maxPoints) => `Hai conquistato ${points} punti su ${maxPoints} in ${moves} mosse`,
+			points: (data) => `Hai conquistato ${data.points} punti su ${data.maxPoints} in ${data.moves} mosse`,
 			moves: (moves) => `Hai giocato ${moves} mosse`,
 			noObjects: `Non hai oggetti con te.`,
 			carriedObjectsLabel: `Stai portando con te:`,
