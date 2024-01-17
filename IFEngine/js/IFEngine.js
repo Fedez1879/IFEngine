@@ -572,7 +572,7 @@ class IFEngine{
 	linkObjects(object, key_list){
 		if(object.linkedObjects === undefined)
 			object.linkedObjects = [];
-		for (let obj_key in key_list){
+		for (let obj_key of key_list){
 			if(object.linkedObjects.indexOf(obj_key) == -1)
 				object.linkedObjects.push(obj_key)
 		}
@@ -581,7 +581,7 @@ class IFEngine{
 	unlinkObjects(object, key_list){
 		if(Array.isArray(object.linkedObjects) == false)
 			return
-		for (let obj_key in key_list){
+		for (let obj_key of key_list){
 			let index = object.linkedObjects.indexOf(obj_key)
 			if(index >= 0)
 				object.linkedObjects.splice(index,1)
@@ -936,7 +936,7 @@ class IFEngine{
 		let blockedDirections = this.currentRoom.blockedDirections === undefined ? [] : this.currentRoom.blockedDirections; 
 		
 		//Esiste la direzione
-		console.log(direction,directions)
+		//console.log(direction,directions)
 		if(directions[direction] !== undefined && blockedDirections.includes(direction) === false){
 			if(typeof directions[direction] == 'string'){
 				this.enterRoom(directions[direction]);
