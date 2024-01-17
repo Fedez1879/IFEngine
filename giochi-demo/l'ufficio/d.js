@@ -274,7 +274,7 @@ class Adventure extends DemoEngine{
 						pattern: `parcheggio`,
 						description: `Il parcheggio è quasi vuoto.`,
 						on: {
-							'lift|move|read|search|open|close|push|pull|press': this.Thesaurus.defaultMessages.BE_SERIOUS
+							'lift|move|read|open|close|push|pull|press': this.Thesaurus.defaultMessages.BE_SERIOUS
 						}
 					},
 					porta: {
@@ -500,7 +500,7 @@ class Adventure extends DemoEngine{
 						if (this.currentRoom == this.adventureData.rooms.ufficio) 
 							await this.CRT.printTyping(`Lo rimetti nell'attaccapanni.`)
 						return await this._removeFromInventory(this.inventory.piumino)
-					}
+					},
 				}
 			},
 
@@ -522,6 +522,7 @@ class Adventure extends DemoEngine{
 			badge: {
 				label: `un badge`,
 				pattern: `badge`,
+				location: `ufficio`,
 				visible: false,
 				read: false,
 				worn: false,

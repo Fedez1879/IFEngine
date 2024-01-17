@@ -106,7 +106,7 @@ var i18n = {
 		defaultMessages: {
 			done: `Fatto!`,
 			preferNot: `Preferisco di no.`,
-			notFound: `Ricerca infruttuosa.`,
+			notFound: `Il verbo "cerca" è troppo generico per me. Devi indicarmi azioni più specifiche...`,
 			dontUnderstand: `Non ho capito...`,
 			dontNoticeAnythingInParticular: `Non noto nulla di particolare.`,
 			notSeenHere: `Qui non ne vedo.`, 

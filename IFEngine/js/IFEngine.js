@@ -809,7 +809,7 @@ class IFEngine{
 
 		let visibile = mSubjects[0].visible === undefined ? true : mSubjects[0].visible;
 
-		if(visibile){
+		if(visibile || APO.verb == "search"){
 			// Eseguji l'azione sugli oggetti/interattori mappati
 			let actionResult = await this._playAction(APO, mSubjects);
 			
@@ -820,7 +820,7 @@ class IFEngine{
 				return actionResult;
 		}
 		
-		if(visibile == false && actionObject.inventory == undefined){
+		if(visibile == false && actionObject.inventory == undefined && APO.verb != "search"){
 			return this._notSeen(mSubjects[0]);
 		}
 		if(actionObject.inventory){
@@ -850,24 +850,6 @@ class IFEngine{
 				}
 
 				return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
-
-			case "search":
-				if(this.inventory[mSubjects[0].key] !== undefined){
-					return await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);
-				}
-				
-				if(this.currentRoom.interactors[mSubjects[0].key] !== undefined || 
-					(
-						this.currentRoom.objects[mSubjects[0].key] !== undefined && this.currentRoom.objects[mSubjects[0].key].initialDescription
-					)
-				){
-					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.HERE);
-				}
-				
-				if(this.currentRoom.objects[mSubjects[0].key] !== undefined && this.currentRoom.objects[mSubjects[0].key].visible){
-					return 	await this.listVisibleThings(this.currentRoom.objects);
-				}
-				return await this.CRT.printTyping(this.Thesaurus.defaultMessages.NOT_FOUND);
 		}
 
 
