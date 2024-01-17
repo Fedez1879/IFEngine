@@ -25,6 +25,9 @@ class DemoEngine extends IFEngine{
 			},
 			exit:{
 				pattern: this.Thesaurus.commonPatterns.exit
+			},
+			outside: {
+				pattern: this.Thesaurus.commonPatterns.outside
 			}
 
 		}

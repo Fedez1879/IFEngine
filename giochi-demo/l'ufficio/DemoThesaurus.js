@@ -3,6 +3,7 @@ class DemoThesaurus extends Thesaurus{
 		wall: i18n.DemoThesaurus.commonPatterns.wall,
 		floor: i18n.DemoThesaurus.commonPatterns.floor,
 		ceiling: i18n.DemoThesaurus.commonPatterns.ceiling,
+		outside: i18n.DemoThesaurus.commonPatterns.outside
 	}
 
 	constructor(parent){
@@ -40,7 +41,7 @@ class DemoThesaurus extends Thesaurus{
 					defaultMessage: this.defaultMessages.BE_SERIOUS
 				},
 				wear: {
-					pattern: `indossa|infila`,
+					pattern: `indossa|infila|metti`,
 					defaultMessage: this.defaultMessages.BE_SERIOUS,
 					inventory: true
 				},
