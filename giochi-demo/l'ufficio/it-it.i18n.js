@@ -30,7 +30,7 @@ i18n = {
 				done: `Ok.`
 			},
 			commonPatterns: {
-				wall: `mur(?:o|a)|paret(?:e|i)`,
+				wall: `mur(?:o|i|a)|paret(?:e|i)`,
 				floor: `pavimento`,
 				ceiling: `soffitto`,
 				outside: `fuori`
