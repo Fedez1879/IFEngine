@@ -569,6 +569,25 @@ class IFEngine{
 		return null		
 	}
 
+	linkObjects(object, key_list){
+		if(object.linkedObjects === undefined)
+			object.linkedObjects = [];
+		for (let obj_key in key_list){
+			if(object.linkedObjects.indexOf(obj_key) == -1)
+				object.linkedObjects.push(obj_key)
+		}
+	}
+
+	unlinkObjects(object, key_list){
+		if(Array.isArray(object.linkedObjects) == false)
+			return
+		for (let obj_key in key_list){
+			let index = object.linkedObjects.indexOf(obj_key)
+			if(index >= 0)
+				object.linkedObjects.splice(index,1)
+		}
+	}
+
 	// Abilita direzione in una stanza
 	enableDirection(direction, room){
 		if(room === undefined) room = this.currentRoom;
@@ -596,8 +615,7 @@ class IFEngine{
 	}
 
 	getObject(key){
-		let o = this._get(key,this.inventory) 
-		return o ? o : this._get(key,this.adventureData.objects)
+		return this.inventory[key] ? this.inventory[key] : this.adventureData.objects[key]
 	}
 
 	wear(key, defaultMessage){
@@ -1050,6 +1068,7 @@ class IFEngine{
 	// definito nell'oggetto stesso (se definito)
 	// altrimenti ritorna false
 	_get(needle, jsonObjList){
+
 		for (let k in jsonObjList){
 			
 			let jsonObj = jsonObjList[k];
