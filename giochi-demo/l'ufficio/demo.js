@@ -490,7 +490,7 @@ class Adventure extends DemoEngine{
 				description: () => (this.playerHas(this.adventureData.objects.occhiali) ? `Sono` : `Sembrano`) + ` occhiali per astigmatici e ipermetropi.`,
 				initialDescription: `Ci sono un paio di occhiali sulla scrivania.`,
 				location: `ufficio`,
-				visible: true,
+				visible: false,
 				once: false,
 				worn: false,
 				on: {
