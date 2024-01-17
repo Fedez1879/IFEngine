@@ -9,7 +9,7 @@ class Adventure extends DemoEngine{
 			ufficio: {
 				label: `Ufficio`,
 				description: () => {
-					return `Sei nel tuo ufficio. La scrivania è come sempre piena di appunti. Di fronte a te, il moderno mobile con le ante vetrate riflette il tuo viso pallido. Dalla finestra a ovest entra una fioca luce arancione.`
+					return `Sei nel tuo ufficio. La scrivania è come sempre piena di appunti. Di fronte a te, le ante vetrate del mobile riflettono il tuo viso pallido. Dalla finestra a ovest entra una fioca luce arancione.`
 				},
 				directions: {
 					e: () => this.currentRoom.interactors.porta.open ? this.enterRoom(`quasiFuori`) : `La porta dell'ufficio è chiusa.`
