@@ -687,7 +687,7 @@ class IFEngine{
 	async _parse(input){
 		// Approfondiamo
 		let APO = this.Parser.parse(input);
-		//console.log(APO);
+		console.log(APO);
 		
 		if(APO === false){
 			return this.inputNotUnderstood(input);

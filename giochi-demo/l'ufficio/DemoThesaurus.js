@@ -7,10 +7,12 @@ class DemoThesaurus extends Thesaurus{
 	}
 
 	constructor(parent){
-		super(parent),
-		this.defaultMessages.BE_SERIOUS = i18n.DemoThesaurus.defaultMessages.beSerious,
-		this.defaultMessages.NOT_NOW = i18n.DemoThesaurus.defaultMessages.notNow,
+		super(parent)
+		this.defaultMessages.BE_SERIOUS = i18n.DemoThesaurus.defaultMessages.beSerious
+		this.defaultMessages.NOT_NOW = i18n.DemoThesaurus.defaultMessages.notNow
 		this.defaultMessages.DONE = i18n.DemoThesaurus.defaultMessages.done
+		this.loadVerbs()
+		this.loadCommands()
 	}
 	
 	loadVerbs(){
@@ -58,6 +60,10 @@ class DemoThesaurus extends Thesaurus{
 				},
 				tidy: {
 					pattern: `riordina|metti in ordine|sistema`,
+					defaultMessage: this.defaultMessages.NOT_NOW,
+				},
+				unplug: {
+					pattern: `stacca`,
 					defaultMessage: this.defaultMessages.NOT_NOW,
 				}
 			}

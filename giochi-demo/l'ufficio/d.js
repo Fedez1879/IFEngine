@@ -24,6 +24,14 @@ class Adventure extends DemoEngine{
 					defaultMessage: `Lascia perdere, concentrati piuttosto su come trovare il modo di uscire da qui..`
 				},
 				interactors: {
+					fuori: {
+						...this.commonInteractors.outside, 
+						...{
+							on: {
+								lookAt: () => this.currentRoom.interactors.finestra.description
+							}
+						}
+					},
 					ufficio: {
 						pattern: `ufficio`,
 						description: () => this.currentRoom.description()
@@ -99,7 +107,7 @@ class Adventure extends DemoEngine{
 						label: 'alcuni libri',
 						pattern: `(?:costole )?(?:di )?libri`,
 						visible: false,
-						description: () => this.currentRoom.interactors.mobile.open ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (this.adventureData.objects.libro.visible ? `C'è nè uno diverso dagli altri.` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri.`) : `Forse dovrei aprire le ante per esaminarli meglio.`,
+						description: () => this.currentRoom.interactors.mobile.open ? (this.playerHas(this.adventureData.objects.occhiali) ? `Sono tutti libri di programmazione: PHP, JAVA, PYTHON...` + (this.adventureData.objects.libro.visible && this.playerHas(this.adventureData.objects.libro) == false ? `C'è nè uno diverso dagli altri.` : ``) : `Sulle costole dei libri ci sono scritti i vari titoli, purtroppo senza occhiali non riesco a distinguere bene i caratteri.`) : `Forse dovrei aprire le ante per esaminarli meglio.`,
 						on: {
 							'lookAt|read|open': () => this.discover(this.adventureData.objects.libro, !this.playerHas(this.adventureData.objects.occhiali))
 						}
@@ -228,7 +236,10 @@ class Adventure extends DemoEngine{
 					},
 					cestino: {
 						pattern: `cestino|spazzatura`,
-						description: `E' un cestino di plastica nera, completamente vuoto.`
+						description: `E' un cestino di plastica nera, completamente vuoto.`,
+						on: {
+							'move|lift': `Sposti il cestino per vedere se c'è qualcosa sotto, ma non noti nulla di particolare.`
+						}
 					},
 					cavi:{
 						status: 0,
@@ -263,6 +274,13 @@ class Adventure extends DemoEngine{
 									this.currentRoom.interactors.cavi.status = 1
 								return `E' il classico pavimento flottante presente in quasi tutte le stanze del posto dove lavori, è grigio chiaro con striature più scure.` + (this.currentRoom.interactors.cavi.status == 1 ? `\nAccipicchia! Vicino alla scrivania è tutto un groviglio di cavi!` : ``);
 							}
+						}
+					},
+					striature: {
+						pattern: `striature`,
+						description: `Sono irregolari e di colore grigio scuro.`,
+						on: {
+							'lift|move|read|open|close|push|pull|press': this.Thesaurus.defaultMessages.BE_SERIOUS
 						}
 					},
 					soffitto: this.commonInteractors.ceiling,
@@ -349,6 +367,14 @@ class Adventure extends DemoEngine{
 					}
 				},
 				interactors: {
+					fuori: {
+						...this.commonInteractors.outside, 
+						...{
+							on: {
+								lookAt: `Sta venendo buio in fretta.`
+							}
+						}
+					},
 					portone: {
 						pattern: `port(?:a|one)`,
 						locked: true,
@@ -416,6 +442,12 @@ class Adventure extends DemoEngine{
 					scale: {
 						pattern: `(?:rampa (?:di )?)?scal(a|e|ini)`,
 						description: `Ormai le scale sono ridotte a un cumulo di macerie invalicabili.`
+					},
+					macerie: {
+						pattern: `macerie`,
+						on: {
+							'lift|move|read|open|close|push|pull|press': this.Thesaurus.defaultMessages.BE_SERIOUS
+						}
 					}
 
 				},
@@ -458,7 +490,7 @@ class Adventure extends DemoEngine{
 				description: () => (this.playerHas(this.adventureData.objects.occhiali) ? `Sono` : `Sembrano`) + ` occhiali per astigmatici e ipermetropi.`,
 				initialDescription: `Ci sono un paio di occhiali sulla scrivania.`,
 				location: `ufficio`,
-				visible: false,
+				visible: true,
 				once: false,
 				worn: false,
 				on: {
@@ -573,6 +605,7 @@ class Adventure extends DemoEngine{
 				location: `ufficio`,
 				read: false,
 				visible: false,
+				takenOnce: false,
 				linkedObjects: ['copertina','segnalibro'],
 				description: () => this.adventureData.objects.libro.visible ? `Ha una copertina grigia e un segnalibro all'interno.` : `Non saprei quale scegliere.`,
 				on: {
@@ -590,11 +623,13 @@ class Adventure extends DemoEngine{
 						}
 						return this.adventureData.objects.libro.visible ? `Dovrei prenderlo prima...` : this.adventureData.objects.libro.description()
 					},
-					take: () => this.adventureData.objects.libro.visible ? null : this.adventureData.objects.libro.description(),
+					take: () => this.adventureData.objects.libro.visible || this.adventureData.objects.libro.takenOnce ? null : this.adventureData.objects.libro.description(),
 					drop: () => {
+						this.inventory.libro.takenOnce = true
 						if(this.currentRoom.key == "ufficio"){
-							this.inventory.libro.visible = this.currentRoom.ante.open;
-							this._removeFromInventory(this.inventory.libro,this.currentRoom)
+							this.inventory.libro.visible = this.currentRoom.interactors.ante.open;
+							this._removeFromInventory(this.inventory.libro,this.currentRoom.key)
+							console.log(this.adventureData.objects.libro)
 							return "Lo rimetti nel mobile."
 						}
 						return null
