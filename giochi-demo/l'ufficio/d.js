@@ -177,9 +177,8 @@ class Adventure extends DemoEngine{
 									return `Non voglio muoverla più!`
 								cassettiera.status = 2;
 								this.discover(this.adventureData.objects.chiaveCassettiera)
-								await this.CRT.printTyping(`Con un rumoroso cigolio la cassettiera finalmente si è spostata...`,{cr: false});
-								await this.CRT.sleep(1500)
-								return ` sotto di essa c'è una piccola chiave!`
+								await this.CRT.printTyping(`Con un rumoroso cigolio la cassettiera finalmente si è spostata...`);
+								return `Sotto di essa c'è una piccola chiave!`
 							},
 							lift: () => `E' toppo pesante!`
 						}
@@ -213,7 +212,7 @@ class Adventure extends DemoEngine{
 								
 								cassetti.attempt = -1
 								
-								return `Nonti limiti ad un solo cassetto, ma ${finalmente}li apri tutti quanti.${occhiali}`
+								return `Non ti limiti ad un solo cassetto, ma ${finalmente}li apri tutti quanti.${occhiali}`
 							},
 							close: () => {
 								if(this.currentRoom.interactors.cassetti.locked || this.currentRoom.interactors.cassetti.open == false)
@@ -408,14 +407,15 @@ class Adventure extends DemoEngine{
 								if(!this.playerHas(this.adventureData.objects.occhiali))
 									return `Non riesco a leggerlo, senza occhiali!` + (this.adventureData.objects.occhiali.once ? `\nDevo averli persi durante il crollo...` : ``)
 
-								if(this.maybeIKnowTheCode() == false)
-									return `Chiede un codice di sicurezza per uscire... ma tu non hai idea di quale possa essere!!!`
-								await this.CRT.println(`Chiede un codice di sicurezza per uscire...`)
+								await this.CRT.printTyping(`Chiede un codice di sicurezza per aprire il portone...`,{cr:false,waitAfter:1500})
 
-								let pin = await this.ask(`PIN:`,true)
+								if(this.maybeIKnowTheCode() == false)
+									return ` ma tu non hai idea di quale possa essere!!!`
+								
+								let pin = await this.ask(`\nPIN:`,true)
 								await this.CRT.sleep(1500)
 								if(pin != `791018`){
-									await this.CRT.println(`CODICE ERRATO.`)
+									await this.CRT.println(`* CODICE ERRATO *`)
 									return true
 								}
 								this.currentRoom.interactors.portone.locked = false 
@@ -445,7 +445,7 @@ class Adventure extends DemoEngine{
 					pavimento: {
 						...this.commonInteractors.floor,
 						...{
-							description: () => `Il pavimento sembra ok.` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom.key ? `Ehi, mi pare di vedere degli occhiali per terra!` : ``),
+							description: () => `Il pavimento sembra ok.` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom.key ? ` Ehi, mi pare di vedere degli occhiali per terra!` : ``),
 							on: {
 								lookAt: () => this.discover(this.adventureData.objects.occhiali, true)
 							}
