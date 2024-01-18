@@ -154,21 +154,21 @@ class IFEngine{
 	async displayMenu(aMenu){
 		let menu = { ...aMenu }
 		await this.CRT.printTyping(menu.label+"\n");
-		let res = await this.multipleChoiche(menu)
+		let res = await this.multipleChoiche(menu.options)
 		if(res == false)
 			this.displayMenu(aMenu);
 	}
 
-	async multipleChoiche(list){
-		for(let o in list.options){
-			if(list.options[o].displayIf ===undefined || list.options[o].displayIf)
-				await this.CRT.printTyping(o+") "+list.options[o].label);
+	async multipleChoiche(options){
+		for(let o in options){
+			if(options[o].displayIf ===undefined || options[o].displayIf)
+				await this.CRT.printTyping(o+") "+options[o].label);
 			else 
-				delete list.options[o];
+				delete options[o];
 		}
 		
 		await this.CRT.println();
-		return await this.choose(list.options, undefined, true);
+		return await this.choose(options, undefined, true);
 	}
 	// si o no
 	async yesNoQuestion(question, cr){
@@ -679,8 +679,10 @@ class IFEngine{
 	}
 
 	async inputNotUnderstood(){
+		this.otherData.moves--;
 		await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_UNDERSTAND);
-		return true;
+		this.gameLoop(false,true)
+		return false;
 	}
 
 	// Parsing del comando

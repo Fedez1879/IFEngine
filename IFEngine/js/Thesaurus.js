@@ -106,8 +106,9 @@ class Thesaurus{
 			where: {
 				pattern: i18n.Thesaurus.commands.where.pattern,
 				callback: async () => {
-					await this.parent.currentRoomDescription(true);
-					return true;
+					this.parent.otherData.moves--;
+					this.parent.gameLoop(true, false)
+					return false;
 				},
 			},
 			points: {
