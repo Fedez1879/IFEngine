@@ -640,21 +640,25 @@ class IFEngine{
 
 	// Stampa i punti del gioco
 	async _points(){
-		this.otherData.moves--;
 		if (this.dataPoints === undefined)
 			await this.CRT.printTyping(i18n.IFEngine.messages.noPoints);
 		else{
 			await this.CRT.printTyping(i18n.IFEngine.messages.points(this.otherData));
 		}
-		this.gameLoop(false,true)
-		return false;
+		return this.noIncrement()
 	}
 
 	// Stampa il numero di mosse eseguite
 	async _moves(){
 		this.otherData.moves--;
 		await this.CRT.printTyping(i18n.IFEngine.messages.moves(this.otherData.moves));
-		this.gameLoop(false,true)
+		return this.noIncrement(true)
+	}
+
+	noIncrement(already){
+		if (!already)
+			this.otherData.moves--;
+		this.gameLoop(false, true)
 		return false;
 	}
 

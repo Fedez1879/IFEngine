@@ -89,9 +89,7 @@ class Thesaurus{
 				pattern: i18n.Thesaurus.commands.inventory.pattern,
 				callback: async () => {
 					await this.parent._inventory();
-					this.parent.otherData.moves--;
-					this.parent.gameLoop(false, true)
-					return false;
+					return this.parent.noIncrement();
 				},
 			},
 			quit: {
@@ -100,19 +98,16 @@ class Thesaurus{
 					let answer = await this.parent.yesNoQuestion(i18n.IFEngine.questions.quitQuestion);
 					if(answer){
 						this.parent.byebye();
-					} else {
-						this.parent.otherData.moves--;
-						this.parent.gameLoop(false,true)
-					}
-					return false;
+					} 
+					return this.parent.noIncrement();
+				
 				}
 			},
 			where: {
 				pattern: i18n.Thesaurus.commands.where.pattern,
 				callback: async () => {
-					this.parent.otherData.moves--;
-					this.parent.gameLoop(true, false)
-					return false;
+					await this.parent.currentRoomDescription(true);
+					return this.parent.noIncrement();
 				},
 			},
 			points: {
