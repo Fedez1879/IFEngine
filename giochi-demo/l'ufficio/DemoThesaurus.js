@@ -45,7 +45,6 @@ class DemoThesaurus extends Thesaurus{
 				wear: {
 					pattern: `indossa|infila|metti`,
 					defaultMessage: this.defaultMessages.BE_SERIOUS,
-					inventory: true
 				},
 				takeOff: {
 					pattern: `togli|leva`,
@@ -64,7 +63,19 @@ class DemoThesaurus extends Thesaurus{
 				},
 				unplug: {
 					pattern: `stacca`,
-					defaultMessage: this.defaultMessages.NOT_NOW,
+					defaultMessage: this.defaultMessages.PREFER_NOT,
+				},
+				turnOn: {
+					pattern: `accendi`,
+					defaultMessage: this.defaultMessages.NOT_POSSIBLE	
+				},
+				turnOff: {
+					pattern: `spengi|spegni`,
+					defaultMessage: this.defaultMessages.NOT_POSSIBLE	
+				},
+				follow: {
+					pattern: `(?:in)?segui`,
+					defaultMessage: this.defaultMessages.NOT_POSSIBLE	
 				}
 			}
 		};

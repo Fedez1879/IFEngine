@@ -31,8 +31,8 @@ i18n = {
 			},
 			commonPatterns: {
 				wall: `mur(?:o|i|a)|paret(?:e|i)`,
-				floor: `pavimento`,
-				ceiling: `soffitto`,
+				floor: `pavimento|(?:a|per) terra|giu`,
+				ceiling: `soffitto|per aria|su`,
 				outside: `fuori`
 			},
 			commands: {
