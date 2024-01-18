@@ -80,6 +80,7 @@ class Thesaurus{
 			instructions: {
 				pattern: i18n.Thesaurus.commands.instructions.pattern,
 				callback: async () => {
+					this.parent.otherData.moves--;
 					await this.parent.instructions();
 					return true;
 				},
@@ -88,7 +89,9 @@ class Thesaurus{
 				pattern: i18n.Thesaurus.commands.inventory.pattern,
 				callback: async () => {
 					await this.parent._inventory();
-					return true;
+					this.parent.otherData.moves--;
+					this.parent.gameLoop(false, true)
+					return false;
 				},
 			},
 			quit: {
@@ -98,6 +101,7 @@ class Thesaurus{
 					if(answer){
 						this.parent.byebye();
 					} else {
+						this.parent.otherData.moves--;
 						this.parent.gameLoop(false,true)
 					}
 					return false;
