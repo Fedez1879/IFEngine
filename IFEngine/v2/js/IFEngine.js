@@ -30,8 +30,21 @@ class IFEngine{
 		// Sequenze
 		this.sequences = {}
 
+		let rooms = []
+		
+		for (let r of Object.keys(R)){
+			rooms.push(R[r])
+		}
+
+		this.AD = {
+			currentRoom: null,
+			inventory: [],
+			rooms: rooms
+		}
+
 		// Stanzza iniziale
-		this.startingRoom = AD.rooms[0]
+		this.startingRoom = this.AD.rooms[0]
+
 
 		// Menu
 		this.menu = {
@@ -106,10 +119,6 @@ class IFEngine{
 		//Il parser delle azioni
 		this.Parser = new Parser(this.Thesaurus.verbs, this.Thesaurus.commands);
 		
-
-		if(AD === undefined){
-			throw i18n.IFEngine.warnings.notLoaded;
-		}
 
 		let datiIniziali = this._getTbs();
 
@@ -218,15 +227,15 @@ class IFEngine{
 		if(await this._breakRoomAction("onExit"))
 			return;
 
-		AD.currentRoom = room;
+		this.AD.currentRoom = room;
 
-		if(AD.currentRoom.interactors === undefined)
-			AD.currentRoom.interactors = {};
+		if(this.AD.currentRoom.interactors === undefined)
+			this.AD.currentRoom.interactors = {};
 		
-		if(AD.currentRoom.firstEnter === undefined)
-			AD.currentRoom.firstEnter = true 
+		if(this.AD.currentRoom.firstEnter === undefined)
+			this.AD.currentRoom.firstEnter = true 
 		else
-			AD.currentRoom.firstEnter = false
+			this.AD.currentRoom.firstEnter = false
 
 		//this.Parser.setOverride(AD.currentRoom.override);
 
@@ -238,15 +247,15 @@ class IFEngine{
 	}
 
 	async printRoomLabel(){
-		if(AD.currentRoom.label !== undefined && !AD.currentRoom.dark){
-			await this.CRT.println("<strong style='text-decoration:underline'>"+AD.currentRoom.label+"</strong>");
+		if(this.AD.currentRoom.label !== undefined && !this.AD.currentRoom.dark){
+			await this.CRT.println("<strong style='text-decoration:underline'>"+this.AD.currentRoom.label+"</strong>");
 		}
 	}
 		
 	// CONTROLLE CHE UN'AZIONE DI INGRESSO O USCITA NON SIA "definitiva...."
 	async _breakRoomAction(action){
-		if(AD.currentRoom && AD.currentRoom[action]){
-			let ret = await AD.currentRoom[action]();
+		if(this.AD.currentRoom && this.AD.currentRoom[action]){
+			let ret = await this.AD.currentRoom[action]();
 			return ret === false;
 		}
 	}
@@ -254,34 +263,34 @@ class IFEngine{
 	/*
 	// Aggiorna gli oggetti nella stanza in base alla loro posizione
 	refreshRoomObjects(){
-		AD.currentRoom.objects = this._filter(o => {
-			return o.location == AD.currentRoom.key;
+		this.AD.currentRoom.objects = this._filter(o => {
+			return o.location == this.AD.currentRoom.key;
 		}, this.adventureData.objects);
-		//console.log(AD.currentRoom.objects);
+		//console.log(this.AD.currentRoom.objects);
 	}
 	*/
 	// Descrive la stanza corrente
 	async currentRoomDescription(longDescription){
-		if(AD.currentRoom.dark){
+		if(this.AD.currentRoom.dark){
 
-			await this.CRT.printTyping(AD.currentRoom.darkDescription ? this._cos(AD.currentRoom.darkDescription) : this.Thesaurus.defaultMessages.TOO_DARK_HERE);
+			await this.CRT.printTyping(this.AD.currentRoom.darkDescription ? this._cos(this.AD.currentRoom.darkDescription) : this.Thesaurus.defaultMessages.TOO_DARK_HERE);
 			return;
 		}
 		let description = longDescription ? 
-			AD.currentRoom.description : 
+			this.AD.currentRoom.description : 
 			( 
-				AD.currentRoom.shortDescription ? 
-				AD.currentRoom.shortDescription :
-				AD.currentRoom.description
+				this.AD.currentRoom.shortDescription ? 
+				this.AD.currentRoom.shortDescription :
+				this.AD.currentRoom.description
 			)
 		
 		description = this._cos(description);
-		description += this.addInitialDescription(AD.currentRoom.interactors);
-		description += this.addInitialDescription(AD.currentRoom.objects);
+		description += this.addInitialDescription(this.AD.currentRoom.interactors);
+		description += this.addInitialDescription(this.AD.currentRoom.objects);
 		
 		await this.CRT.printTyping(description);
-		await this.listVisibleThings(AD.currentRoom.interactors);
-		await this.listVisibleThings(AD.currentRoom.objects);
+		await this.listVisibleThings(this.AD.currentRoom.interactors);
+		await this.listVisibleThings(this.AD.currentRoom.objects);
 	}
 
 	addInitialDescription(lista){
@@ -342,7 +351,7 @@ class IFEngine{
 	async gameLoop(describeCurrentRoom, ignoreTimedEvents){
 		
 		if(describeCurrentRoom){
-			await this.currentRoomDescription(AD.currentRoom.firstEnter);
+			await this.currentRoomDescription(this.AD.currentRoom.firstEnter);
 		}
 
 		// Esistono eventi a tempo attivi?
@@ -432,7 +441,7 @@ class IFEngine{
 	// Ritorna i dati principali da salvare
 	_getTbs(){
 		return {
-			...AD,
+			...this.AD,
 			...{ 
 				otherData: this.otherData
 			}
@@ -501,12 +510,12 @@ class IFEngine{
 			return this.restore();	
 		}
 
-		AD = await this.reload(stored);
+		this.AD = await this.reload(stored);
 
 		await this.CRT.printTyping(i18n.IFEngine.messages.loaded+"\n");
 		await this.CRT.sleep(1000);
 		this.CRT.clear()
-		this.enterRoom(AD.currentRoom, true);
+		this.enterRoom(this.AD.currentRoom, true);
 		return true;
 	}
 	
@@ -582,13 +591,13 @@ class IFEngine{
 
 	// Abilita direzione in una stanza
 	enableDirection(direction, room){
-		if(room === undefined) room = AD.currentRoom;
+		if(room === undefined) room = this.AD.currentRoom;
 		delete room.blockedDirections[room.blockedDirections.indexOf(direction)];
 	}
 
 	// Disabilita direzione in una stanza
 	disableDirection(direction, room){
-		if(room === undefined) room = AD.currentRoom;
+		if(room === undefined) room = this.AD.currentRoom;
 		if(room.blockedDirections === undefined)
 			room.blockedDirections = [];
 		if(room.blockedDirections.indexOf(direction) < 0)
@@ -603,7 +612,7 @@ class IFEngine{
 	
 	// Controlla se il giocatore ha un oggetto nell'inventario
 	playerHas(object){
-		return AD.inventory.indexOf(object) >= 0;
+		return this.AD.inventory.indexOf(object) >= 0;
 	}
 
 	wear(o, defaultMessage){
@@ -695,8 +704,8 @@ class IFEngine{
 			if(APO.actionObject.movement) return await this._go(APO.actionObject.direction, APO.actionObject.defaultMessage);
 		
 			let action = `on_${APO.verb}`;
-			if(AD.currentRoom.hasOwnProperty(action)){
-				let ret = typeof AD.currentRoom[action] == 'string' ? AD.currentRoom[action]: AD.currentRoom[action]();
+			if(this.AD.currentRoom.hasOwnProperty(action)){
+				let ret = typeof this.AD.currentRoom[action] == 'string' ? this.AD.currentRoom[action]: this.AD.currentRoom[action]();
 				if (typeof ret == 'string'){
 					await this.CRT.printTyping(ret)
 					return true
@@ -733,12 +742,12 @@ class IFEngine{
 		}
 		
 		// Roba scenica
-		if(AD.currentRoom.scenic){
+		if(this.AD.currentRoom.scenic){
 
-			for(let pattern of AD.currentRoom.scenic.pattern){
+			for(let pattern of this.AD.currentRoom.scenic.pattern){
 				pattern = new RegExp("^"+pattern+"$", 'i');
 				if(testVerb.match(pattern)){
-					return await this.CRT.printTyping(AD.currentRoom.scenic.defaultMessage ? AD.currentRoom.scenic.defaultMessage : APO.actionObject.defaultMessage)
+					return await this.CRT.printTyping(this.AD.currentRoom.scenic.defaultMessage ? this.AD.currentRoom.scenic.defaultMessage : APO.actionObject.defaultMessage)
 				}
 			}
 		}
@@ -748,9 +757,9 @@ class IFEngine{
 		// - oggetti nella stanza
 		// - oggetti nell'inventario
 		let mSubjects = APO.subjects.map(subject => {
-			let interactor = this._get(subject,AD.currentRoom.interactors);
-			let roomObject = this._get(subject, AD.currentRoom.objects);
-			let inventoryObject = this._get(subject, AD.inventory);
+			let interactor = this._get(subject,this.AD.currentRoom.interactors);
+			let roomObject = this._get(subject, this.AD.currentRoom.objects);
+			let inventoryObject = this._get(subject, this.AD.inventory);
 
 			return interactor ? interactor : 
 				(roomObject ? roomObject : 
@@ -769,7 +778,7 @@ class IFEngine{
 
 		//console.log(mSubjects)
 
-		if(AD.currentRoom.dark){
+		if(this.AD.currentRoom.dark){
 			await this.CRT.printTyping(this.Thesaurus.defaultMessages.TOO_DARK_HERE);
 			return
 		}
@@ -843,7 +852,7 @@ class IFEngine{
 				return ret === undefined ? true : ret;
 			
 			case "drop":
-	 			if(AD.inventory.indexOf(mSubjects[0]) >= 0){
+	 			if(this.AD.inventory.indexOf(mSubjects[0]) >= 0){
 					this._removeFromInventory(mSubjects[0]);
 					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
 				}
@@ -935,7 +944,7 @@ class IFEngine{
 			let inventoryKey = typeof APO.actionObject.inventory == 'boolean' ? [APO.actionObject.inventory] : APO.actionObject.inventory;
 			*/
 			for(let i in s){
-				if (AD.inventory.indexOf(s[i]) == -1){
+				if (this.AD.inventory.indexOf(s[i]) == -1){
 					await this.CRT.println(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
 					return true;
 				} 
@@ -953,8 +962,8 @@ class IFEngine{
 	// Movimento
 	async _go(direction, defaultMessage){
 
-		if(AD.currentRoom[direction]){
-			let ret = AD.currentRoom[direction]();
+		if(this.AD.currentRoom[direction]){
+			let ret = this.AD.currentRoom[direction]();
 			if(typeof ret == 'string'){
 				await this.CRT.printTyping(ret);
 				return true;
@@ -966,7 +975,7 @@ class IFEngine{
 
 		/*
 
-		let blockedDirections = AD.currentRoom.blockedDirections === undefined ? [] : AD.currentRoom.blockedDirections; 
+		let blockedDirections = this.AD.currentRoom.blockedDirections === undefined ? [] : this.AD.currentRoom.blockedDirections; 
 		
 		//Esiste la direzione
 		//console.log(direction,directions)
@@ -992,11 +1001,11 @@ class IFEngine{
 	// Mostra l'inventario
 	async _inventory(action){
 		let output;
-		if(AD.inventory.length == 0){
+		if(this.AD.inventory.length == 0){
 			output = i18n.IFEngine.messages.noObjects
 		} else {
 			output = i18n.IFEngine.messages.carriedObjectsLabel
-			for(let i of AD.inventory){
+			for(let i of this.AD.inventory){
 				let label = Array.isArray(i.label) ? 
 					i.label[i.status] : 
 					i.label
@@ -1010,19 +1019,19 @@ class IFEngine{
 	// Aggiungi oggetto nell'inventario
 	_addInInventory(object){
 		this.discover(object);
-		AD.currentRoom.objects.splice(AD.currentRoom.objects.indexOf(object),1)
-		AD.inventory.push(object);
+		this.AD.currentRoom.objects.splice(this.AD.currentRoom.objects.indexOf(object),1)
+		this.AD.inventory.push(object);
 	}
 
 	// Rimuovi oggetto dall'inventario
 	_removeFromInventory(object, destination){
 		if(destination === undefined){
-			if(AD.currentRoom.objects === undefined)
-				AD.currentRoom.objects = []
-			destination = AD.currentRoom.objects
+			if(this.AD.currentRoom.objects === undefined)
+				this.AD.currentRoom.objects = []
+			destination = this.AD.currentRoom.objects
 		}
 		
-		AD.inventory.splice(AD.inventory.indexOf(object),1)
+		this.AD.inventory.splice(this.AD.inventory.indexOf(object),1)
 		
 		destination.push(object)
 	}
@@ -1030,10 +1039,10 @@ class IFEngine{
 	// Prendi 
 	async _take(object){
 		console.log(object)
-		if(AD.currentRoom.objects.indexOf(object) >= 0){
+		if(this.AD.currentRoom.objects.indexOf(object) >= 0){
 			this._addInInventory(object);
 			await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
-		} else if(AD.inventory.indexOf(object) >= 0){
+		} else if(this.AD.inventory.indexOf(object) >= 0){
 			await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);
 		} else
 			await this.CRT.printTyping(this.Thesaurus.verbs.take.defaultMessage);
