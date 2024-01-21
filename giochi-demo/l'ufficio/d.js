@@ -633,12 +633,13 @@ class Adventure extends DemoEngine{
 				read: false,
 				visible: false,
 				takenOnce: false,
-				linkedObjects: ['copertina','segnalibro'],
+				linkedObjects: ['copertina','segnalibro',`pagina`],
 				description: () => this.adventureData.objects.libro.visible ? `Ha una copertina grigia e un segnalibro all'interno.` : `Non saprei quale scegliere.`,
 				on: {
 					lookAt: () => {
 						this.discover(this.adventureData.objects.segnalibro, true)
 						this.discover(this.adventureData.objects.copertina, true)
+						this.discover(this.adventureData.objects.pagina, true)
 						return null
 					},
 					'open|read': () => {
@@ -673,6 +674,10 @@ class Adventure extends DemoEngine{
 				on:{
 					lookAt: `E' un segnalibro di cartoncino nero.`
 				}
+			},
+			pagina: {
+				visible: false,
+				pattern: `pagin(?:a|e)`,
 			}
 
 
