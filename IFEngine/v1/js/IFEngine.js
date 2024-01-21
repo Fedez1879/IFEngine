@@ -701,8 +701,10 @@ class IFEngine{
 		
 		if(typeof APO == 'string'){
 			// comando = verbo, manca il resto
+			this.otherData.moves--;
 			await this.CRT.printTyping(APO.charAt(0).toUpperCase() + APO.slice(1)+" "+i18n.IFEngine.questions.what+" "+this.Thesaurus.defaultMessages.BE_MORE_SPECIFIC);
-			return true;
+			this.gameLoop(false, true)
+			return false;
 		}
 		
 		// è un comando imperativo con callback
