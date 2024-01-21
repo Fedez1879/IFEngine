@@ -701,7 +701,7 @@ class IFEngine{
 		
 		// è un comando imperativo con callback
 		if(APO.command){
-			if(APO.actionObject.movement) return await this._go(APO.actionObject.direction, APO.actionObject.defaultMessage);
+			if(APO.actionObject.movement) return await this.go(APO.actionObject.direction, APO.actionObject.defaultMessage);
 		
 			let action = `on_${APO.verb}`;
 			if(this.AD.currentRoom.hasOwnProperty(action)){
@@ -960,7 +960,7 @@ class IFEngine{
 	}
 
 	// Movimento
-	async _go(direction, defaultMessage){
+	async go(direction, defaultMessage){
 
 		if(this.AD.currentRoom[direction]){
 			let ret = this.AD.currentRoom[direction]();
@@ -1017,14 +1017,14 @@ class IFEngine{
 	}
 
 	// Aggiungi oggetto nell'inventario
-	_addInInventory(object){
+	addInInventory(object){
 		this.discover(object);
 		this.AD.currentRoom.objects.splice(this.AD.currentRoom.objects.indexOf(object),1)
 		this.AD.inventory.push(object);
 	}
 
 	// Rimuovi oggetto dall'inventario
-	_removeFromInventory(object, destination){
+	removeFromInventory(object, destination){
 		if(destination === undefined){
 			if(this.AD.currentRoom.objects === undefined)
 				this.AD.currentRoom.objects = []
