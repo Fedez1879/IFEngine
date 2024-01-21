@@ -645,7 +645,7 @@ class Adventure extends DemoEngine{
 					'open|read': () => {
 
 						if (this.playerHas(this.adventureData.objects.libro)){
-							this.discover(this.adventureData.objects.segnalibro, true)
+							this.adventureData.objects.libro.on.lookAt()
 							this.inventory.libro.read = true;
 							return `E' un romanzo di Stephen King, dal titolo INSOMNIA. Apri il libro all'altezza del segnalibro e trovi una pagina bianca sulla quale è stato scritto a matita: "ymd"`
 						}

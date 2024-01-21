@@ -1040,7 +1040,6 @@ class IFEngine{
 
 	// Prendi 
 	async _take(object){
-		console.log(object)
 		if(this.AD.currentRoom.objects.indexOf(object) >= 0){
 			this._addInInventory(object);
 			await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
