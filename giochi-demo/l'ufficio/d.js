@@ -390,7 +390,7 @@ class Adventure extends DemoEngine{
 					portone: {
 						pattern: `port(?:a|one)`,
 						locked: true,
-						description: `E' un portone a vetri, probabilmente blindato. Accanto ad esso c'è un piccolo display con una pulsantiera sotto.`,
+						description: `E' un portone a vetri, probabilmente blindato. Accanto ad esso c'è un piccolo display.`,
 						on: {
 							open: () => {
 								if(this.currentRoom.interactors.portone.locked)
@@ -402,8 +402,13 @@ class Adventure extends DemoEngine{
 					},
 					display: {
 						pattern: `display|schermo`,
+						enabled: false,
 						on: {
 							'lookAt|read': async () => {
+								if(this.currentRoom.interactors.display.enabled == false){
+									return `E' spento.`;
+								}
+								console.log("?")
 								if(!this.playerHas(this.adventureData.objects.occhiali))
 									return `Non riesco a leggerlo, senza occhiali!` + (this.adventureData.objects.occhiali.once ? `\nDevo averli persi durante il crollo...` : ``)
 
@@ -420,15 +425,16 @@ class Adventure extends DemoEngine{
 								}
 								this.currentRoom.interactors.portone.locked = false 
 								return `Il portone ha fatto -Click-`
+							},
+							'touch|push|press': async () => {
+								if(this.currentRoom.interactors.display.enabled == false){
+
+									this.currentRoom.interactors.display.enabled = true;
+									await this.CRT.printTyping(`Il display si è acceso...`,{waitAfter: 1000})
+								}
+								return this.currentRoom.interactors.display.on['lookAt|read']();
 							}
 						}
-					},
-					pulsantiera: {
-						pattern: `botton(?:e|i)|tast(?:o|i(?:era)?)|pulsant(?:e|i(?:era)?)`,
-						description: () => this.playerHas(this.adventureData.objects.occhiali) ? `Nella pulsantiera ci sono solo numeri da 0 a 9 e un tasto verde.` : `La pulsantiera ha (credo) circa 11 tasti...`,
-						on: {
-							'press|push': `Non saprei davvero cosa digitare.`
-						},
 					},
 					pareti: {
 						...this.commonInteractors.wall,

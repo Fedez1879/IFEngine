@@ -76,6 +76,10 @@ class DemoThesaurus extends Thesaurus{
 				follow: {
 					pattern: `(?:in)?segui`,
 					defaultMessage: this.defaultMessages.NOT_POSSIBLE	
+				},
+				touch: {
+					pattern: `tocca|sfiora`,
+					defaultMessage: this.defaultMessages.PREFER_NOT,
 				}
 			}
 		};
