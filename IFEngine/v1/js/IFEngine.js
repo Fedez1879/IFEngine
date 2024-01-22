@@ -1066,7 +1066,7 @@ class IFEngine{
 			let res = this._match(needle, jsonObj);
 			
 			if(!res) {
-				if(jsonObj.linkedObjects){
+				if(jsonObj.linkedObjects && jsonObj.visible !== false){
 					for(let j in jsonObj.linkedObjects){
 						let linked = this.Parser._getSource(jsonObj.linkedObjects[j],this.adventureData.objects);
 						if(linked){

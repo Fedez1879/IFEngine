@@ -1095,7 +1095,7 @@ class IFEngine{
 			let res = this._match(needle, jsonObj);
 			
 			if(!res) {
-				if(jsonObj.linkedObjects){
+				if(jsonObj.linkedObjects && jsonObj.visible !== false){
 					for(let linked of jsonObj.linkedObjects){
 						console.log(linked)
 						
