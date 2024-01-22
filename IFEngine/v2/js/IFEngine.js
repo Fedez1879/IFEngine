@@ -30,16 +30,10 @@ class IFEngine{
 		// Sequenze
 		this.sequences = {}
 
-		let rooms = []
-		
-		for (let r of Object.keys(R)){
-			rooms.push(R[r])
-		}
-
 		this.AD = {
 			currentRoom: null,
 			inventory: [],
-			rooms: rooms
+			rooms: []
 		}
 
 		// Stanzza iniziale
@@ -1102,8 +1096,6 @@ class IFEngine{
 			if(!res) {
 				if(jsonObj.linkedObjects && jsonObj.visible !== false){
 					for(let linked of jsonObj.linkedObjects){
-						console.log(linked)
-						
 						if(linked && this._match(needle, linked))
 							return linked;
 					}
