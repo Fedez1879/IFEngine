@@ -97,7 +97,8 @@ class Thesaurus{
 				callback: async () => {
 					let answer = await this.parent.yesNoQuestion(i18n.IFEngine.questions.quitQuestion);
 					if(answer){
-						this.parent.byebye();
+						this.parent.displayMenu(this.parent.menu.contextual);
+						return false
 					} 
 					return this.parent.noIncrement();
 				

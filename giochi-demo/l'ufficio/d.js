@@ -433,7 +433,8 @@ class Adventure extends DemoEngine{
 									await this.CRT.printTyping(`Il display si è acceso...`,{waitAfter: 1000})
 								}
 								return this.currentRoom.interactors.display.on['lookAt|read']();
-							}
+							},
+							turnOn: () => this.currentRoom.interactors.display.enabled ? `E' già acceso.` : `Ci deve essere un modo per accenderlo... devo solo capire come.`
 						}
 					},
 					pareti: {
@@ -710,8 +711,8 @@ class Adventure extends DemoEngine{
 				await this.CRT.printTyping(`Prima senti un'esplosione...`,{printDelay: 75, cr:false, waitAfter: 1000})
 				await this.CRT.printTyping(` poi la terra inizia a tremare fortissimo!`, {printDelay: 75, waitAfter: 2000})
 				await this.CRT.printTyping(`Cerchi riparo mentre le scale dietro di te crollano...`,{nlAfter: 1, waitAfter: 3000})
-				if(this.adventureData.timedEvents.earthquake.currentStep > 6)
-					this.adventureData.timedEvents.earthquake.currentStep = 6
+				if(this.adventureData.timedEvents.earthquake.currentStep > 10)
+					this.adventureData.timedEvents.earthquake.currentStep = 10
 			},
 			finale: async() => {
 				await this.CRT.printTyping(`Dopo aver aperto il portone quel poco che basta per farti uscire, corri come un forsennato verso il parcheggio.`, {waitAfter: 4000})

@@ -122,7 +122,12 @@ class IFEngine{
 
 		let datiIniziali = this._getTbs();
 
-		this.datiIniziali = JSON.stringify(datiIniziali, (k,v) => typeof v === 'function' ? "" + v : v);
+		this.datiIniziali = JSON.stringify(datiIniziali, function(key, value) {
+		  if (typeof value === "function") {
+		    return "/Function(" + value.toString() + ")/";
+		  }
+		  return value;
+		})
 		// Si parte!
 		this.run();
 	}
@@ -1041,7 +1046,7 @@ class IFEngine{
 	// Prendi 
 	async _take(object){
 		if(this.AD.currentRoom.objects.indexOf(object) >= 0){
-			this._addInInventory(object);
+			this.addInInventory(object);
 			await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
 		} else if(this.AD.inventory.indexOf(object) >= 0){
 			await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);

@@ -162,7 +162,7 @@ var i18n = {
 				pattern: `esci da gioco|basta|stop`,
 			},
 			where: {
-				pattern: `dove(?:sono|mi trovo)?`,
+				pattern: `dove(?:sono|mi trovo)?|guarda`,
 			},
 			points: {
 				pattern: `punt(?:i|eggio)`,
