@@ -155,7 +155,7 @@ class Adventure extends DemoEngine{
 					scritteAppunti: {
 						visible:false,
 						pattern: `codice|diagramm(?:a|i)|schem(?:a|i)`,
-						description: `Non ci penso nemmeno... ora ho solo voglia di tornare a casa!`,
+						description: `Non ci pensi nemmeno... ora hai solo voglia di tornare a casa!`,
 						on: {
 							read: () => this.currentRoom.interactors.appunti.description(),
 							'move|lift|open|close': () => this.Thesaurus.defaultMessages.BE_SERIOUS
@@ -174,7 +174,7 @@ class Adventure extends DemoEngine{
 								if(cassettiera.status == 0)
 									return `Non si muove, sembra incollata a terra!`
 								if(cassettiera.status == 2)
-									return `Non voglio muoverla più!`
+									return `Non hai più intenzione di muoverla!`
 								cassettiera.status = 2;
 								this.discover(this.adventureData.objects.chiaveCassettiera)
 								await this.CRT.printTyping(`Con un rumoroso cigolio la cassettiera finalmente si è spostata...`);
@@ -216,7 +216,7 @@ class Adventure extends DemoEngine{
 							},
 							close: () => {
 								if(this.currentRoom.interactors.cassetti.locked || this.currentRoom.interactors.cassetti.open == false)
-									return `Più di così non posso!`
+									return `Più di così non puoi!`
 								
 								this.currentRoom.interactors.cassetti.open = false
 								this.currentRoom.interactors.cianfrusaglie.visible = false
@@ -255,7 +255,7 @@ class Adventure extends DemoEngine{
 									return `Sono già in ordine, meglio lasciarli stare.`
 								cavi.status = 2;
 								this.currentRoom.interactors.cassettiera.status = 1;
-								return `Adesso si che si ragiona, li ho sistemati in modo che non intralcino più!`
+								return `Adesso si che si ragiona, li hai sistemati in modo che non intralcino più!`
 							},
 							lift: async () => {
 								if(this.currentRoom.interactors.cavi.status == 0)
@@ -410,7 +410,7 @@ class Adventure extends DemoEngine{
 								}
 								console.log("?")
 								if(!this.playerHas(this.adventureData.objects.occhiali))
-									return `Non riesco a leggerlo, senza occhiali!` + (this.adventureData.objects.occhiali.once ? `\nDevo averli persi durante il crollo...` : ``)
+									return `Non riesci a leggerlo, senza occhiali!` + (this.adventureData.objects.occhiali.once ? `\nDevi averli persi durante il crollo...` : ``)
 
 								await this.CRT.printTyping(`Chiede un codice di sicurezza per aprire il portone...`,{cr:false,waitAfter:1500})
 
@@ -452,7 +452,7 @@ class Adventure extends DemoEngine{
 					pavimento: {
 						...this.commonInteractors.floor,
 						...{
-							description: () => `Il pavimento sembra ok.` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom.key ? ` Ehi, mi pare di vedere degli occhiali per terra!` : ``),
+							description: () => `Il pavimento sembra ok.` + (this.playerHas(this.adventureData.objects.occhiali) == false && this.adventureData.objects.occhiali.location == this.currentRoom.key ? ` Ehi, ti pare di vedere degli occhiali per terra!` : ``),
 							on: {
 								lookAt: () => this.discover(this.adventureData.objects.occhiali, true)
 							}
@@ -464,7 +464,7 @@ class Adventure extends DemoEngine{
 					},
 					macerie: {
 						pattern: `cumul(?:o|i)|maceri(?:a|e)|detrit(?:o|i)`,
-						description: `Ciò che vedo è desolante, ma mi ricorda anche che devo brigarmi ad uscire!`,
+						description: `Ciò che vedi è desolante, ma ti ricorda anche che devi brigarmi ad uscire!`,
 						on: {
 							'lift|move|read|open|close|push|pull|press': this.Thesaurus.defaultMessages.BE_SERIOUS
 						}
@@ -553,7 +553,7 @@ class Adventure extends DemoEngine{
 					wear: () => {
 						if (!this.playerHas(this.adventureData.objects.piumino))
 							this._addInInventory(this.adventureData.objects.piumino)
-						return this.wear(`piumino`, `Mi sta proprio bene.`)
+						return this.wear(`piumino`, `Ti sta proprio bene.`)
 					},
 					takeOff: () => this.takeOff(`piumino`),
 					drop: async () => {
