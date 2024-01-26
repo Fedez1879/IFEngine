@@ -623,6 +623,12 @@ class IFEngine{
 
 		for(let ok of tbr.inventory)
 			this.AD.inventory.push(O[ok])
+                   
+		this.otherData = tbr.otherData;
+		this.activeTimedEvents = [];
+		for (let te in this.otherData.timedEventSteps){
+			this.activeTimedEvents.push(te)
+		}
 	}
 
 	async instructions(){
