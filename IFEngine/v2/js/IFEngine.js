@@ -20,7 +20,8 @@ class IFEngine{
 		this.otherData = {
 			points: null,
 			maxPoints: null,
-			moves: 0
+			moves: 0,
+			timedEventSteps: {}
 		};
 
 		// Elenco degli eventi "a tempo"
@@ -30,15 +31,13 @@ class IFEngine{
 		// Sequenze
 		this.sequences = {}
 
-		this.AD = {
-			currentRoom: null,
-			inventory: [],
-			rooms: []
-		}
-
 		// Stanzza iniziale
-		this.startingRoom = this.AD.rooms[0]
+		this.startingRoom = R[Object.keys(R).shift()]
 
+		this.AD = {
+			currentRoom: this.startingRoom,
+			inventory: []
+		}
 
 		// Menu
 		this.menu = {
@@ -113,7 +112,7 @@ class IFEngine{
 		//Il parser delle azioni
 		this.Parser = new Parser(this.Thesaurus.verbs, this.Thesaurus.commands);
 		
-
+		/*
 		let datiIniziali = this._getTbs();
 
 		this.datiIniziali = JSON.stringify(datiIniziali, function(key, value) {
@@ -122,6 +121,8 @@ class IFEngine{
 		  }
 		  return value;
 		})
+		*/
+		this.datiIniziali = this._getTbs();
 		// Si parte!
 		this.run();
 	}
@@ -223,7 +224,7 @@ class IFEngine{
 	
 	// Entra nella stanza
 	async enterRoom(room, ignoreTimedEvents){
-		if(await this._breakRoomAction("onExit"))
+		if(await this._breakRoomAction("afterExit"))
 			return;
 
 		this.AD.currentRoom = room;
@@ -238,7 +239,7 @@ class IFEngine{
 
 		//this.Parser.setOverride(AD.currentRoom.override);
 
-		if(await this._breakRoomAction("onEnter"))
+		if(await this._breakRoomAction("afterEnter"))
 			return;
 
 		await this.printRoomLabel();
@@ -341,7 +342,7 @@ class IFEngine{
 		
 		if(timedEvent !== undefined){
 			if(resetIndex)
-				timedEvent.currentStep = timedEvent.start;
+				this.otherData.timedEventSteps[eventLabel] = timedEvent.start;
 			this.activeTimedEvents = this.activeTimedEvents.filter(e => e != eventLabel);
 		}
 	}
@@ -355,19 +356,21 @@ class IFEngine{
 
 		// Esistono eventi a tempo attivi?
 		if(this.activeTimedEvents.length > 0 && !ignoreTimedEvents){
-			for(let i in this.activeTimedEvents){
-				let timedEvent = this.timedEvents[this.activeTimedEvents[i]];
+			for(let te_label of this.activeTimedEvents){
+				let timedEvent = this.timedEvents[te_label];
 				if(timedEvent !== undefined){
 					var limit = 0;
 					
 					// Se non ho definito currentStep, lo definisco ora
 					// con valore uguale a start;
-					if(timedEvent.currentStep === undefined)
-						timedEvent.currentStep = timedEvent.start;
+					if(this.otherData.timedEventSteps[te_label] === undefined)
+						this.otherData.timedEventSteps[te_label] = timedEvent.start;
+					
+					let current_step = this.otherData.timedEventSteps[te_label];
 					
 					// ho raggiunto il limite ?
-					if(timedEvent.currentStep <= limit){
-						this.stopTimedEvent(this.activeTimedEvents[i]);
+					if(current_step <= limit){
+						this.stopTimedEvent(te_label);
 						let goOn = await timedEvent.onLimit();
 						if(goOn)
 							break;
@@ -376,10 +379,10 @@ class IFEngine{
 					
 
 					// Eseguo se esiste lo step i-esimo
-					if(timedEvent.steps && timedEvent.steps[timedEvent.currentStep] !== undefined)
-						await timedEvent.steps[timedEvent.currentStep]();
+					if(timedEvent.steps && timedEvent.steps[current_step] !== undefined)
+						await timedEvent.steps[current_step]();
 
-					timedEvent.currentStep--;
+					this.otherData.timedEventSteps[te_label]--;
 				}
 			}
 			
@@ -426,12 +429,8 @@ class IFEngine{
 		} while (saveLabel.length == 0 || saveLabel == i18n.IFEngine.questions.listLetter.toLowerCase())
 		
 		let tbs = this._getTbs();
-		this.storage.setItem(this.SAVED+"-"+saveLabel, JSON.stringify(tbs, function(key, value) {
-		  if (typeof value === "function") {
-		    return "/Function(" + value.toString() + ")/";
-		  }
-		  return value;
-		}));
+		this.storage.setItem(this.SAVED+"-"+saveLabel, tbs)
+
 		await this.CRT.printTyping(i18n.IFEngine.messages.saved);
 		this.gameLoop(false,true)
 		return false;
@@ -439,12 +438,71 @@ class IFEngine{
 
 	// Ritorna i dati principali da salvare
 	_getTbs(){
-		return {
-			...this.AD,
-			...{ 
-				otherData: this.otherData
-			}
+		let tbs = {
+			currentRoom: null,
+			inventory: [],
+			I: {},
+			O: {},
+			R: {},
+			otherData: this.otherData
 		};
+
+
+		for(let k in R){
+			console.log(k)
+			if(this.AD.currentRoom == R[k]){
+				tbs.currentRoom = k
+				break
+			}
+		}
+
+		for(let p in O){
+			let pos = this.AD.inventory.indexOf(O[p])
+			if(pos >= 0){
+				tbs.inventory.push(p)
+			}
+		}
+
+		for(let k of Object.keys(I)){
+			tbs.I[k] = {...I[k]}
+		}
+
+		for(let k of Object.keys(O)){
+			tbs.O[k] = {...O[k]}
+			if(tbs.O[k].linkedObjects){
+				tbs.O[k].linkedObjects = [...tbs.O[k].linkedObjects]
+			
+				for(let p in O){
+					let pos = tbs.O[k].linkedObjects.indexOf(O[p])
+					if(pos >= 0)
+						tbs.O[k].linkedObjects[pos] = p
+				}
+			}
+		}
+		for(let k of Object.keys(R)){
+
+			tbs.R[k] = {...R[k]}
+
+			if(tbs.R[k].objects){
+				tbs.R[k].objects = [...tbs.R[k].objects]
+			
+				for(let p in O){
+					let pos = tbs.R[k].objects.indexOf(O[p])
+					if(pos >= 0)
+						tbs.R[k].objects[pos] = p
+				}
+			}
+			if(tbs.R[k].interactors){
+				tbs.R[k].interactors = [...tbs.R[k].interactors]
+			
+				for(let p in I){
+					let pos = tbs.R[k].interactors.indexOf(I[p])
+					if(pos >= 0)
+						tbs.R[k].interactors[pos] = p
+				}
+			}
+		}
+		return JSON.stringify(tbs)
 	}
 
 	// Carica il gioco
@@ -509,7 +567,7 @@ class IFEngine{
 			return this.restore();	
 		}
 
-		this.AD = await this.reload(stored);
+		this.reload(stored);
 
 		await this.CRT.printTyping(i18n.IFEngine.messages.loaded+"\n");
 		await this.CRT.sleep(1000);
@@ -519,24 +577,52 @@ class IFEngine{
 	}
 	
 	reload (stored){
-		let tbr = JSON.parse(stored, function(key, value) {
-		  if (typeof value === "string" &&
-		      value.startsWith("/Function(") &&
-		      value.endsWith(")/")) {
-		    value = value.substring(10, value.length - 2);
-		    return (0, eval)("(" + value + ")");
-		  }
-		  return value;
-		});
 
-		if(tbr.currentRoom === undefined)
-			tbr.currentRoom = this.startingRoom;
-		/*
-		for (let k in tbr)
-			this[k] = Array.isArray(tbr[k]) ? [ ...tbr[k] ] : { ...tbr[k] };
-		*/
-	
-		return tbr;
+		let tbr = JSON.parse(stored)
+		
+		for(let k in tbr.I){
+
+			if (tbr.I[k].visible === undefined)
+				delete I[k].visible
+			
+			I[k] = {
+				...I[k],
+				...tbr.I[k]
+			}
+
+		}
+
+		for(let k in tbr.O){
+			if (tbr.O[k].visible === undefined)
+				delete O[k].visible
+			
+			O[k] = {
+				...O[k],
+				...tbr.O[k]
+			}
+
+			if(O[k].linkedObjects)
+				O[k].linkedObjects = O[k].linkedObjects.map((e) => O[e])
+		}
+
+
+
+		for(let k in tbr.R){
+			R[k] = {
+				...R[k],
+				...tbr.R[k]
+			}
+			if(R[k].interactors)
+				R[k].interactors = R[k].interactors.map((e) => I[e])
+			if(R[k].objects)
+				R[k].objects = R[k].objects.map((e) => O[e])
+		}
+
+		this.AD.currentRoom = R[tbr.currentRoom]
+		this.AD.inventory = []
+
+		for(let ok of tbr.inventory)
+			this.AD.inventory.push(O[ok])
 	}
 
 	async instructions(){
