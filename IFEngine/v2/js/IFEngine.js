@@ -946,7 +946,7 @@ class IFEngine{
 			
 			case "drop":
 	 			if(this.AD.inventory.indexOf(mSubjects[0]) >= 0){
-					this._removeFromInventory(mSubjects[0]);
+					this.removeFromInventory(mSubjects[0]);
 					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
 				}
 
