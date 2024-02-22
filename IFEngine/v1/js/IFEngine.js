@@ -320,12 +320,13 @@ class IFEngine{
 		if (list == null)
 			return;
 		if( Object.keys(list).length > 0){
-			for(let i in list){
-				if(list[i].visible){
+			for(let obj of list){
+				if(obj.visible){
 					//console.log(list[i]);
-					let whatISee = Array.isArray(list[i].label) ? 
-						list[i].label[list[i].status] : 
-						list[i].label;
+					let whatISee = Array.isArray(obj.label) ? 
+						obj.label[obj.status] : 
+						obj.label;
+					
 					await this.CRT.printTyping(i18n.IFEngine.ISee+" "+whatISee.trim()+".");
 				}
 			}

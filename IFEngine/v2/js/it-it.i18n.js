@@ -53,6 +53,7 @@ var i18n = {
 			notHere: `Non vedi nulla del genere.`
 		},
 		questionMark: `?`,
+		containing: `contenente`,
 		prepareInputSteps: [
 			{
 				pattern: `[\\.,:;!"£\\$%&\\/\\(\\)=°\\+\\*]*`,
@@ -100,7 +101,7 @@ var i18n = {
 			},
 
 		],
-		ISee: `Vedo`
+		ISee: `Vedi`
 	},
 	Thesaurus: {
 		defaultMessages: {

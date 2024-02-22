@@ -312,15 +312,30 @@ class IFEngine{
 	async listVisibleThings(list){
 		if (list == null)
 			return;
-		if( Object.keys(list).length > 0){
-			for(let i in list){
-				if(list[i].visible){
-					//console.log(list[i]);
-					let whatISee = Array.isArray(list[i].label) ? 
-						list[i].label[list[i].status] : 
-						list[i].label;
-					await this.CRT.printTyping(i18n.IFEngine.ISee+" "+whatISee.trim()+".");
-				}
+		if( Object.keys(list).length > 0 && list.filter(e => e.visible).length){
+			await this.CRT.printTyping(i18n.IFEngine.ISee+":")
+			for(let obj of list){
+				//if(obj.visible){
+					//console.log(obj);
+					let whatISee = Array.isArray(obj.label) ? 
+						obj.label[obj.status] : 
+						obj.label;
+						if(obj.container && obj.linkedObjects.length){
+							let linkedObjects = obj.linkedObjects.map(e => {
+								let label = Array.isArray(e.label) ? 
+									e.label[e.status] : 
+									e.label;
+								return `    ${label}`
+							});
+							if(linkedObjects.length == 1)
+								linkedObjects = " "+linkedObjects.join().trim()
+							else
+								linkedObjects = ":\n"+linkedObjects.join("\n")
+								whatISee += ` ${i18n.IFEngine.containing}${linkedObjects}`
+							
+						}
+					await this.CRT.printTyping("  "+whatISee.trim());
+				//}
 			}
 		}
 	}
@@ -805,7 +820,8 @@ class IFEngine{
 				}
 				return ret;
 			}
-			
+
+
 
 			let callback = APO.actionObject.callback ? APO.actionObject.callback : APO.actionObject.defaultMessage;
 			if(callback){
@@ -945,10 +961,12 @@ class IFEngine{
 				return ret === undefined ? true : ret;
 			
 			case "drop":
-	 			if(this.AD.inventory.indexOf(mSubjects[0]) >= 0){
+	 			if(this.playerHas(mSubjects[0])){
 					this.removeFromInventory(mSubjects[0]);
 					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
 				}
+
+
 
 				return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
 		}
@@ -1001,7 +1019,17 @@ class IFEngine{
 				}
 				return ret;
 			}
-			
+
+			let merged_action = Object.keys(s[0]).filter(e => e.indexOf(action) >= 0).pop()
+
+			if(merged_action){
+				let ret = typeof s[0][merged_action] == 'string' ? s[0][merged_action] : s[0][merged_action](s);
+				if (typeof ret == 'string'){
+					await this.CRT.printTyping(ret)
+					return true
+				}
+				return ret;
+			}
 		}
 				
 		return null;
@@ -1037,7 +1065,7 @@ class IFEngine{
 			let inventoryKey = typeof APO.actionObject.inventory == 'boolean' ? [APO.actionObject.inventory] : APO.actionObject.inventory;
 			*/
 			for(let i in s){
-				if (this.AD.inventory.indexOf(s[i]) == -1){
+				if (!this.playerHas(s[i])){
 					await this.CRT.println(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
 					return true;
 				} 
@@ -1103,28 +1131,45 @@ class IFEngine{
 					i.label[i.status] : 
 					i.label
 				;
-				output += "\n- "+label.trim()+".";
+
+				if(i.container && i.linkedObjects.length){
+					let linkedObjects = i.linkedObjects.map(e => {
+						let label = Array.isArray(e.label) ? 
+							e.label[e.status] : 
+							e.label;
+						return `    ${label}`
+					})
+					if(linkedObjects.length == 1)
+						linkedObjects = " "+linkedObjects.join().trim()
+					else
+						linkedObjects = ":\n"+linkedObjects.join("\n")
+					
+					label += ` ${i18n.IFEngine.containing}${linkedObjects}`
+				}
+				output += "\n  "+label.trim();
 			}
 		}
 		await this.CRT.printTyping(output);
 	}
 
 	// Aggiungi oggetto nell'inventario
-	addInInventory(object){
+	addInInventory(object, from = undefined){
 		this.discover(object);
-		this.AD.currentRoom.objects.splice(this.AD.currentRoom.objects.indexOf(object),1)
+		from = from || this.AD.currentRoom.objects
+		from.splice(from.indexOf(object),1)
 		this.AD.inventory.push(object);
 	}
 
 	// Rimuovi oggetto dall'inventario
-	removeFromInventory(object, destination){
+	removeFromInventory(object, destination, from = undefined){
 		if(destination === undefined){
 			if(this.AD.currentRoom.objects === undefined)
 				this.AD.currentRoom.objects = []
 			destination = this.AD.currentRoom.objects
 		}
 		
-		this.AD.inventory.splice(this.AD.inventory.indexOf(object),1)
+		from = from || this.AD.inventory
+		from.splice(from.indexOf(object),1)
 		
 		destination.push(object)
 	}
@@ -1134,10 +1179,22 @@ class IFEngine{
 		if(this.AD.currentRoom.objects.indexOf(object) >= 0){
 			this.addInInventory(object);
 			await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
-		} else if(this.AD.inventory.indexOf(object) >= 0){
+			return
+		}
+		for (let o of this.AD.currentRoom.objects){
+			if(o.linkedObjects && o.linkedObjects.indexOf(object) >= 0){
+				this.addInInventory(object, o.linkedObjects);
+				await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONE);
+				return
+			}
+		}
+
+		if(this.playerHas(object)){
 			await this.CRT.printTyping(i18n.IFEngine.messages.alreadyHaveIt);
-		} else
-			await this.CRT.printTyping(this.Thesaurus.verbs.take.defaultMessage);
+			return
+		}
+
+		await this.CRT.printTyping(this.Thesaurus.verbs.take.defaultMessage);
 	}
 
 	_prepare(input){
