@@ -1,9 +1,14 @@
 class I{
 	static porta = {
+		label: ['porta chiusa','porta aperta'],
+		status: 0,
 		pattern: `porta`,
 		locked:true,
 		open:false,
 		description: `E' la porta del tuo ufficio. Non ha serrature, solo un pomolo. Accanto ad essa c'è un lettore badge.`,
+		initialDescription: function() {
+			return `C'è anche una ${this.label[this.status]}.`
+		},
 		on_lookAt: function(){
 			return A.discover(I.lettoreBadge)
 		},
@@ -30,6 +35,8 @@ class I{
 		pattern: `lettore(?: badge)?`,
 		description: function(){
 			return this.visible ? `E' un lettore RFID, credo serva per aprire la porta col badge personale.` : `Mi sembrava di aver visto un lettore badge... ma dove?`
-		}
+		},
+		initialDescription: `Accanto alla porta c'è un lettore badge.`
+		
 	}	
 }

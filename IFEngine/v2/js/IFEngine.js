@@ -273,7 +273,7 @@ class IFEngine{
 	async currentRoomDescription(longDescription){
 		if(this.AD.currentRoom.dark){
 
-			await this.CRT.printTyping(this.AD.currentRoom.darkDescription ? this._cos(this.AD.currentRoom.darkDescription) : this.Thesaurus.defaultMessages.TOO_DARK_HERE);
+			await this.CRT.printTyping(this.AD.currentRoom.darkDescription ? this._cos(this.AD.currentRoom.darkDescription, this.AD.currentRoom) : this.Thesaurus.defaultMessages.TOO_DARK_HERE);
 			return;
 		}
 		let description = longDescription ? 
@@ -284,13 +284,12 @@ class IFEngine{
 				this.AD.currentRoom.description
 			)
 		
-		description = this._cos(description);
+		description = this._cos(description, this.AD.currentRoom);
 		description += this.addInitialDescription(this.AD.currentRoom.interactors);
 		description += this.addInitialDescription(this.AD.currentRoom.objects);
 		
 		await this.CRT.printTyping(description);
-		await this.listVisibleThings(this.AD.currentRoom.interactors);
-		await this.listVisibleThings(this.AD.currentRoom.objects);
+		await this.listVisibleThings();
 	}
 
 	addInitialDescription(lista){
@@ -299,24 +298,38 @@ class IFEngine{
 		for(let i in lista){
 			if(lista[i].visible == undefined && lista[i].initialDescription){
 				//console.log(typeof lista[i].initialDescription)	
-				let initialDescription = this._cos(lista[i].initialDescription);
+				let initialDescription = this._cos(lista[i].initialDescription, lista[i]);
 				more.push(initialDescription);
 			} 
 
 		}
-		return more.length == 0 ? "" : "\n"+more.join("\n\n");
+		return more.length == 0 ? "" : "\n\n"+more.join("\n");
 	}	
 
 	
 	// Elenca una lista "cose" visibili
-	async listVisibleThings(list){
-		if (list == null)
-			return;
-		if( Object.keys(list).length > 0 && list.filter(e => e.visible).length){
-			await this.CRT.printTyping(i18n.IFEngine.ISee+":")
-			for(let obj of list){
-				//if(obj.visible){
-					//console.log(obj);
+	async listVisibleThings(){
+		let list_of_things = [
+			this.AD.currentRoom.interactors,
+			this.AD.currentRoom.objects
+		]
+		
+		let ISee = false;
+
+		for (let list of list_of_things){
+			if (list == null)
+				continue;
+			
+			if(Object.keys(list).length > 0 && list.filter(e => e.visible).length){
+				
+				if(!ISee){
+					ISee = true
+					await this.CRT.printTyping(i18n.IFEngine.ISee+":",{nlBefore:1})
+				}
+				
+				for(let obj of list){
+					if(!obj.visible)
+						continue
 					let whatISee = Array.isArray(obj.label) ? 
 						obj.label[obj.status] : 
 						obj.label;
@@ -335,7 +348,7 @@ class IFEngine{
 							
 						}
 					await this.CRT.printTyping("  "+whatISee.trim());
-				//}
+				}
 			}
 		}
 	}
@@ -464,7 +477,7 @@ class IFEngine{
 
 
 		for(let k in R){
-			console.log(k)
+			//console.log(k)
 			if(this.AD.currentRoom == R[k]){
 				tbs.currentRoom = k
 				break
@@ -894,15 +907,6 @@ class IFEngine{
 
 		// Ho scritto solo il verbo
 		if(APO.subjects.length == 0 && (actionObject.singolo === true)){
-			/*
-			// Se è un verbo che necessita di un complemento
-			// Sii più preciso!
-			if(actionObject.singolo === undefined || actionObject.singolo == false){
-				await this.CRT.printTyping(this.Thesaurus.defaultMessages.SII_PIU_SPECIFICO);
-				return true;
-			} 
-			*/
-		
 			// Ok, si può usare da solo.
 			if(actionObject.callback){
 				let ret = this._callbackOrString(actionObject.callback);
@@ -940,6 +944,7 @@ class IFEngine{
 		if(visibile == false && actionObject.inventory == undefined && APO.verb != "search"){
 			return this._notSeen(mSubjects[0]);
 		}
+
 		if(actionObject.inventory){
 			if(Array.isArray(actionObject.inventory)){
 
@@ -951,8 +956,8 @@ class IFEngine{
 		switch (APO.verb){
 			case "lookAt":
 
-				let descrizione = mSubjects[0].description ?  
-					(Array.isArray(mSubjects[0].description) ? mSubjects[0].description[mSubjects[0].stato] : this._cos(mSubjects[0].description)) :
+				let descrizione = mSubjects[0].description !== undefined?  
+					(Array.isArray(mSubjects[0].description) ? mSubjects[0].description[mSubjects[0].stato] : this._cos(mSubjects[0].description, mSubjects[0])) :
 					actionObject.defaultMessage;
 				return await this.CRT.printTyping(descrizione);
 			
@@ -1215,8 +1220,8 @@ class IFEngine{
 		*/
 	}
 
-	_cos(what){
-		return typeof what == "string" ? what : (what)()
+	_cos(what, bind){
+		return typeof what == "string" ? what : what.bind(bind)()
 	}
 
 	// Filtra JSON

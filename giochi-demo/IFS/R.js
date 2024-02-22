@@ -6,11 +6,14 @@ class R{
 			pattern: [`chiodo`, `ruot(?:a|e)`, `viso`, `riflesso`, `ganci(?:o)?`, `vetro`,`macchin(?:a|e)|auto(?:mobil(e|i)?)?`],
 			defaultMessage: `Lascia perdere, concentrati piuttosto su come trovare il modo di uscire da qui..`
 		},
-		interactors: [I.porta],
+		interactors: [I.porta, I.lettoreBadge],
 		objects: [O.occhiali, O.piumino, O.scatola],
 		e: () => I.porta.open ? R.stanza : `La porta dell'ufficio è chiusa.`,
 		afterEnter: () => A.startTimedEvent(`earthquake`),
-		on_exit: () => A.go("e")
+		on_exit: function(){
+			console.log(this)
+			return A.go("e")
+		}
 	}
 
 	static stanza = {

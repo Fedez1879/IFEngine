@@ -87,7 +87,14 @@ class O{
 	static scatola = {
 		label: 'una scatola',
 		pattern: 'scatola',
-		visible: true,
+		description: function() {
+			return this.linkedObjects.length ? `ci sono degli oggetti dentro` : `è vuota`
+		},
+		initialDescription: `Appoggiata su un tavolo c'è una scatola.`,
+		on_lookAt: function() {
+			console.log(this)
+			return this.description()
+		},
 		container: true,
 		linkedObjects: [O.pila]
 	}

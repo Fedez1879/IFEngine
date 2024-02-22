@@ -163,7 +163,7 @@ var i18n = {
 				pattern: `esci da gioco|basta|stop`,
 			},
 			where: {
-				pattern: `dove(?:sono|mi trovo)?|guarda`,
+				pattern: `dove(?:sono|mi trovo)?|guarda|l`,
 			},
 			points: {
 				pattern: `punt(?:i|eggio)`,
@@ -204,7 +204,7 @@ var i18n = {
 				pattern: `usa`
 			},
 			lookAt: {
-				pattern: `guarda(?: in| su| da)?|esamina|ispeziona`
+				pattern: `guarda(?: in| su| da)?|esamina|ispeziona|x`
 			},
 			search:{
 				pattern: `cerca|trova`

@@ -832,13 +832,8 @@ class IFEngine{
 		if(visibile == false && actionObject.inventory == undefined && APO.verb != "search"){
 			return this._notSeen(mSubjects[0]);
 		}
-		if(actionObject.inventory){
-			if(Array.isArray(actionObject.inventory)){
-
-			} else {
-				if (!this.playerHas(mSubjects[0]))
-					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
-			}
+		if(actionObject.inventory && !this.playerHas(mSubjects[0])
+			return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
 		}
 		switch (APO.verb){
 			case "lookAt":
