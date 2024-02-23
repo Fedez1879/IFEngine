@@ -319,7 +319,7 @@ class IFEngine{
 	async listVisibleThings(list){
 		if (list == null)
 			return;
-		console.log(Object.keys(list))
+		//console.log(Object.keys(list))
 		if( Object.keys(list).length > 0){
 			for(let i in list){
 				if(list[i].visible){

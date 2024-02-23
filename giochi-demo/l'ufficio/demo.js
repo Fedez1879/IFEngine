@@ -409,7 +409,7 @@ class Adventure extends DemoEngine{
 								if(this.currentRoom.interactors.display.enabled == false){
 									return `E' spento.`;
 								}
-								console.log("?")
+								//console.log("?")
 								if(!this.playerHas(this.adventureData.objects.occhiali))
 									return `Non riesci a leggerlo, senza occhiali!` + (this.adventureData.objects.occhiali.once ? `\nDevi averli persi durante il crollo...` : ``)
 
@@ -659,7 +659,7 @@ class Adventure extends DemoEngine{
 						if(this.currentRoom.key == "ufficio"){
 							this.inventory.libro.visible = this.currentRoom.interactors.ante.open;
 							this._removeFromInventory(this.inventory.libro,this.currentRoom.key)
-							console.log(this.adventureData.objects.libro)
+							//console.log(this.adventureData.objects.libro)
 							return "Lo rimetti nel mobile."
 						}
 						return null
