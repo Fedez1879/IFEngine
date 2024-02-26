@@ -120,7 +120,8 @@ var i18n = {
 			alreadyHaveIt: `Ce l'hai già.`,
 			doesntOpen: `Non si apre.`,
 			doesntClose: `Non si chiude.`,
-			doesntMove: `Non si muove.`
+			doesntMove: `Non si muove.`,
+			whichOne: `Quale? Sii più specifico.`
 		},
 		commands: {
 			north: {

@@ -680,10 +680,10 @@ class IFEngine{
 			delete object.initialDescription
 		}
 		if(propagate && object.linkedObjects){
-			for (let lo_key of object.linkedObjects){
-				let otd = this._get(lo_key,this.adventureData.objects)
-				if(otd)
-					this.discover(otd, justRemove, propagate)
+			for (let lo of object.linkedObjects){
+				//let otd = this._get(lo,this.adventureData.objects)
+				//if(otd)
+				this.discover(lo, justRemove, propagate)
 			}
 		}
 		return null		
@@ -878,6 +878,7 @@ class IFEngine{
 		// - interattori della stanza
 		// - oggetti nella stanza
 		// - oggetti nell'inventario
+		
 		let mSubjects = APO.subjects.map(subject => {
 			let interactor = this._get(subject,this.AD.currentRoom.interactors);
 			let roomObject = this._get(subject, this.AD.currentRoom.objects);
@@ -888,16 +889,26 @@ class IFEngine{
 				(inventoryObject ? inventoryObject : null));
 		}); 
 
-		console.log(mSubjects)
+		console.log(mSubjects, APO.subjects)
 		//mSubjects = mSubjects.filter( i => {return i != null});
 
 		// non sono riuscito a mappare tutto
-		if(APO.subjects.length != mSubjects.filter(i=>{return i!=null}).length){
+		if(APO.subjects.length != mSubjects.filter( i => i != null ).length){
 			// Recupero l'indice dell'oggetto
 			let nullIndex = mSubjects.indexOf(null);
 			let wtf = this.Thesaurus.verbs[APO.verb] === undefined ? input : APO.subjects[nullIndex];
 			return await this.wtf(APO, wtf);
 		}
+
+		for (let mi in APO.subjects){
+			if(mSubjects[mi].length > 1){
+				await this.CRT.printTyping(this.Thesaurus.defaultMessages.WHICH_ONE);
+				return true
+				
+			}
+		}
+
+		mSubjects = mSubjects.map(e => e.pop())
 
 		//console.log(mSubjects)
 
@@ -1241,7 +1252,8 @@ class IFEngine{
 	// definito nell'oggetto stesso (se definito)
 	// altrimenti ritorna false
 	_get(needle, jsonObjList){
-
+		let retObj = []
+		
 		for (let k in jsonObjList){
 			
 			let jsonObj = jsonObjList[k];
@@ -1252,17 +1264,22 @@ class IFEngine{
 				if(jsonObj.linkedObjects && jsonObj.visible !== false){
 					for(let linked of jsonObj.linkedObjects){
 						if(linked && this._match(needle, linked, true))
-							return linked;
+							retObj.push[linked]
+							//return linked;
 					}
 				}
 				continue;
 			} else {
-				jsonObj.key = k;
-				return jsonObj;
-
+				//jsonObj.key = k;
+				//return jsonObj;
+				retObj.push(jsonObj)
+							
 			}
 		
 		}
+
+		if (retObj.length)
+			return retObj
 
 		for (let k in jsonObjList){
 			
@@ -1274,19 +1291,21 @@ class IFEngine{
 				if(jsonObj.linkedObjects && jsonObj.visible !== false){
 					for(let linked of jsonObj.linkedObjects){
 						if(linked && this._match(needle, linked))
-							return linked;
+							retObj.push[linked]
+							//return linked;
 					}
 				}
 				continue;
 			} else {
-				jsonObj.key = k;
-				return jsonObj;
-
+				//jsonObj.key = k;
+				//return jsonObj;
+				retObj.push(jsonObj)
+				
 			}
 		
 		}
 		
-		return false;
+		return retObj.length ? retObj : false;
 	}
 
 	_match(needle, obj, double=false){

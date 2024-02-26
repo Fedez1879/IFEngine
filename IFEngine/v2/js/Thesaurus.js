@@ -17,7 +17,8 @@ class Thesaurus{
 			HERE: 					i18n.Thesaurus.defaultMessages.here,
 			DOESNT_OPEN:			i18n.Thesaurus.defaultMessages.doesntOpen,
 			DOESNT_CLOSE:			i18n.Thesaurus.defaultMessages.doesntClose,
-			DOESNT_MOVE:			i18n.Thesaurus.defaultMessages.doesntMove
+			DOESNT_MOVE:			i18n.Thesaurus.defaultMessages.doesntMove,
+			WHICH_ONE: 				i18n.Thesaurus.defaultMessages.whichOne
 		}
 
 		this.loadCommands();
