@@ -888,6 +888,7 @@ class IFEngine{
 				(inventoryObject ? inventoryObject : null));
 		}); 
 
+		console.log(mSubjects)
 		//mSubjects = mSubjects.filter( i => {return i != null});
 
 		// non sono riuscito a mappare tutto
@@ -1245,6 +1246,28 @@ class IFEngine{
 			
 			let jsonObj = jsonObjList[k];
 
+			let res = this._match(needle, jsonObj, true);
+
+			if(!res) {
+				if(jsonObj.linkedObjects && jsonObj.visible !== false){
+					for(let linked of jsonObj.linkedObjects){
+						if(linked && this._match(needle, linked, true))
+							return linked;
+					}
+				}
+				continue;
+			} else {
+				jsonObj.key = k;
+				return jsonObj;
+
+			}
+		
+		}
+
+		for (let k in jsonObjList){
+			
+			let jsonObj = jsonObjList[k];
+
 			let res = this._match(needle, jsonObj);
 			
 			if(!res) {
@@ -1266,7 +1289,7 @@ class IFEngine{
 		return false;
 	}
 
-	_match(needle, obj){
+	_match(needle, obj, double=false){
 		let pattern;
 
 		// Se non è definito il patten ma il label si
@@ -1281,9 +1304,17 @@ class IFEngine{
 			pattern = obj.pattern;
 	
 		
+		if(double && pattern.indexOf("|")){
+			pattern = pattern.substring(0,pattern.indexOf("|")).replace(/\(/,'')
+		}
+
+		if(pattern.length == 0)
+			return false
+
 		let regExp = new RegExp("^(?:"+pattern+")","i");
 		let res = needle.match(regExp);
 		return res;
+		
 	}
 
 	_simplePattern(string){

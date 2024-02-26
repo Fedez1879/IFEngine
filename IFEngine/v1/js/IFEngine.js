@@ -1103,7 +1103,7 @@ class IFEngine{
 		else
 			pattern = obj.pattern;
 	
-		
+		console.log(pattern);
 		let regExp = new RegExp("^(?:"+pattern+")","i");
 		let res = needle.match(regExp);
 		return res;

@@ -2,7 +2,7 @@ var i18n = {
 	htmlTitle: `IFEngine Demo`,
 	title: `IFEngine Demo`,
 	CRT: {
-		waitText: `Premere invio per continuare...`
+		waitText: `Premere un tasto per continuare...`
 	},
 	IFEngine: {
 		SAVEDPrefix: `Avventura`,

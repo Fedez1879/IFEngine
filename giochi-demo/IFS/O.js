@@ -99,4 +99,18 @@ class O{
 		linkedObjects: [O.pila]
 	}
 
+	static chiave_rossa = {
+		label: 'una chiave rossa',
+		pattern: 'chiave rossa|chiave',
+		visible: true,
+		description: `una chiave di colore rosso`
+	}
+
+	static chiave_blu = {
+		label: 'una chiave blu',
+		pattern: 'chiave blu|chiave',
+		visible: true,
+		description: `una chiave di colore blu`
+	}
+
 }

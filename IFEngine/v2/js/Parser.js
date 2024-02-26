@@ -108,7 +108,6 @@ class Parser{
 					subjects: subjects
 				}
 
-				//console.log(APO)
 				return APO
 				
 			}

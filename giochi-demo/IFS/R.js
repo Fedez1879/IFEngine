@@ -7,7 +7,7 @@ class R{
 			defaultMessage: `Lascia perdere, concentrati piuttosto su come trovare il modo di uscire da qui..`
 		},
 		interactors: [I.porta, I.lettoreBadge],
-		objects: [O.occhiali, O.piumino, O.scatola],
+		objects: [O.occhiali, O.piumino, O.scatola, O.chiave_rossa, O.chiave_blu],
 		e: () => I.porta.open ? R.stanza : `La porta dell'ufficio è chiusa.`,
 		afterEnter: () => A.startTimedEvent(`earthquake`),
 		on_exit: function(){
