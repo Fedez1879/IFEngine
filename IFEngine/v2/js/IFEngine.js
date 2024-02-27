@@ -880,16 +880,25 @@ class IFEngine{
 		// - oggetti nell'inventario
 		
 		let mSubjects = APO.subjects.map(subject => {
-			let interactor = this._get(subject,this.AD.currentRoom.interactors);
-			let roomObject = this._get(subject, this.AD.currentRoom.objects);
-			let inventoryObject = this._get(subject, this.AD.inventory);
 
-			return interactor ? interactor : 
-				(roomObject ? roomObject : 
-				(inventoryObject ? inventoryObject : null));
+			/*
+			let interactor = this._get(subject,this.AD.currentRoom.interactors,true);
+			let roomObject = this._get(subject, this.AD.currentRoom.objects,true);
+			let inventoryObject = this._get(subject, this.AD.inventory,true);
+
+			let merged = [...interactor, ...roomObject, ...inventoryObject]
+			
+			if(merged.length == 0){
+				interactor = this._get(subject,this.AD.currentRoom.interactors,false);
+				roomObject = this._get(subject, this.AD.currentRoom.objects,false);
+				inventoryObject = this._get(subject, this.AD.inventory,false);
+
+				merged = [...interactor, ...roomObject, ...inventoryObject]
+			}
+			*/
+			return this._merged(subject, true) || this._merged(subject, false);
 		}); 
 
-		console.log(mSubjects, APO.subjects)
 		//mSubjects = mSubjects.filter( i => {return i != null});
 
 		// non sono riuscito a mappare tutto
@@ -908,9 +917,8 @@ class IFEngine{
 			}
 		}
 
-		mSubjects = mSubjects.map(e => e.pop())
-
-		//console.log(mSubjects)
+		for (let mi in mSubjects)
+			mSubjects[mi] = mSubjects[mi][0]
 
 		if(this.AD.currentRoom.dark){
 			await this.CRT.printTyping(this.Thesaurus.defaultMessages.TOO_DARK_HERE);
@@ -943,6 +951,9 @@ class IFEngine{
 		let visibile = mSubjects[0].visible === undefined ? true : mSubjects[0].visible;
 
 		if(visibile || APO.verb == "search"){
+
+			console.log("here")
+		
 			// Eseguji l'azione sugli oggetti/interattori mappati
 			let actionResult = await this._playAction(APO, mSubjects);
 			
@@ -965,6 +976,7 @@ class IFEngine{
 					return await this.CRT.printTyping(this.Thesaurus.defaultMessages.DONT_HAVE_ANY);
 			}
 		}
+
 		switch (APO.verb){
 			case "lookAt":
 
@@ -1004,6 +1016,16 @@ class IFEngine{
 
 	}
 
+	_merged(subject, multiple = false){
+		let interactor = this._get(subject,this.AD.currentRoom.interactors, multiple);
+		let roomObject = this._get(subject, this.AD.currentRoom.objects, multiple);
+		let inventoryObject = this._get(subject, this.AD.inventory, multiple);
+
+		let merged = [...interactor, ...roomObject, ...inventoryObject]
+
+		return merged.length ? merged : null
+	}
+
 	async _notSeen(s){
 		await this.CRT.printTyping(this.Thesaurus.defaultMessages.NOT_SEEN_HERE);
 		return true;
@@ -1037,7 +1059,10 @@ class IFEngine{
 				return ret;
 			}
 
-			let merged_action = Object.keys(s[0]).filter(e => e.indexOf(action) >= 0).pop()
+			let merged_action = Object.keys(s[0]).filter(e => {
+				let a = e.split("|")
+				return a.includes(action)
+			}).pop()
 
 			if(merged_action){
 				let ret = typeof s[0][merged_action] == 'string' ? s[0][merged_action] : s[0][merged_action](s);
@@ -1048,7 +1073,7 @@ class IFEngine{
 				return ret;
 			}
 		}
-				
+			
 		return null;
 	}
 
@@ -1251,14 +1276,14 @@ class IFEngine{
 	// Recuprea Oggetto da JSON in base al pattern
 	// definito nell'oggetto stesso (se definito)
 	// altrimenti ritorna false
-	_get(needle, jsonObjList){
+	_get(needle, jsonObjList, multiple = false){
 		let retObj = []
 		
 		for (let k in jsonObjList){
 			
 			let jsonObj = jsonObjList[k];
 
-			let res = this._match(needle, jsonObj, true);
+			let res = this._match(needle, jsonObj, multiple);
 
 			if(!res) {
 				if(jsonObj.linkedObjects && jsonObj.visible !== false){
@@ -1277,35 +1302,7 @@ class IFEngine{
 			}
 		
 		}
-
-		if (retObj.length)
-			return retObj
-
-		for (let k in jsonObjList){
-			
-			let jsonObj = jsonObjList[k];
-
-			let res = this._match(needle, jsonObj);
-			
-			if(!res) {
-				if(jsonObj.linkedObjects && jsonObj.visible !== false){
-					for(let linked of jsonObj.linkedObjects){
-						if(linked && this._match(needle, linked))
-							retObj.push[linked]
-							//return linked;
-					}
-				}
-				continue;
-			} else {
-				//jsonObj.key = k;
-				//return jsonObj;
-				retObj.push(jsonObj)
-				
-			}
-		
-		}
-		
-		return retObj.length ? retObj : false;
+		return retObj.length ? retObj : [];
 	}
 
 	_match(needle, obj, double=false){

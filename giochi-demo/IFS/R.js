@@ -9,6 +9,7 @@ class R{
 		interactors: [I.porta, I.lettoreBadge],
 		objects: [O.occhiali, O.piumino, O.scatola, O.chiave_rossa, O.chiave_blu],
 		e: () => I.porta.open ? R.stanza : `La porta dell'ufficio è chiusa.`,
+		s: () => R.stanza,
 		afterEnter: () => A.startTimedEvent(`earthquake`),
 		on_exit: function(){
 			console.log(this)

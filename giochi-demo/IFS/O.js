@@ -63,8 +63,9 @@ class O{
 			return null
 		},
 		on_wear: function(){
-			if (!A.playerHas(this))
+			if (!A.playerHas(this)){
 				A.addInInventory(this)
+			}
 			return A.wear(this, `Mi sta proprio bene.`)
 		},
 		on_takeOff: function(){
