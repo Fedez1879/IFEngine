@@ -220,8 +220,6 @@ class IFEngine{
 		window.close();
 	}
 	
-	
-	
 	// Entra nella stanza
 	async enterRoom(room, ignoreTimedEvents){
 		if(await this._breakRoomAction("afterExit"))
@@ -706,6 +704,14 @@ class IFEngine{
 			if(index >= 0)
 				object.linkedObjects.splice(index,1)
 		}
+	}
+
+	move(subject, source, dest){
+		let index = source.indexOf(subject)
+		if(index == 0)
+			retutn
+		source.splice(index,1)
+		dest.push(subject)
 	}
 
 	// Abilita direzione in una stanza

@@ -10,7 +10,10 @@ class R{
 		objects: [O.occhiali, O.piumino, O.scatola, O.chiave_rossa, O.chiave_blu],
 		e: () => I.porta.open ? R.stanza : `La porta dell'ufficio è chiusa.`,
 		s: () => R.stanza,
-		afterEnter: () => A.startTimedEvent(`earthquake`),
+		afterEnter: () => {
+			A.startTimedEvent(`earthquake`)
+			A.move(O.piumino, R.ufficio.objects, R.stanza.objects)
+		},
 		on_exit: function(){
 			console.log(this)
 			return A.go("e")
@@ -21,6 +24,7 @@ class R{
 		label: `Stanza`,
 		description: `Sei nella stanza accanto al tuo ufficio`,
 		interactors: [I.porta],
+		objects: [],
 		w: () => I.porta.open ? R.ufficio : `La porta dell'ufficio è chiusa.`
 	}	
 }
