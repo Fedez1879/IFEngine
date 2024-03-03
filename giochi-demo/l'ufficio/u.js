@@ -472,7 +472,10 @@ class Adventure extends DemoEngine{
 					}
 
 				},
-
+				onEnter: async () => {
+					this.startTimedEvent(`lastRoom`)
+				},
+				
 			}
 
 		},
@@ -712,8 +715,8 @@ class Adventure extends DemoEngine{
 				await this.CRT.printTyping(`Prima senti un'esplosione...`,{printDelay: 75, cr:false, waitAfter: 1000})
 				await this.CRT.printTyping(` poi la terra inizia a tremare fortissimo!`, {printDelay: 75, waitAfter: 2000})
 				await this.CRT.printTyping(`Cerchi riparo mentre le scale dietro di te crollano...`,{nlAfter: 1, waitAfter: 3000})
-				if(this.adventureData.timedEvents.earthquake.currentStep > 10)
-					this.adventureData.timedEvents.earthquake.currentStep = 10
+				//if(this.adventureData.timedEvents.earthquake.currentStep > 10)
+				//	this.adventureData.timedEvents.earthquake.currentStep = 10
 			},
 			finale: async() => {
 				await this.CRT.printTyping(`Dopo aver aperto il portone quel poco che basta per farti uscire, corri come un forsennato verso il parcheggio.`, {waitAfter: 4000})
@@ -731,7 +734,19 @@ class Adventure extends DemoEngine{
 		},
 		timedEvents: {
 			earthquake: {
-				start: 60,
+				start: 80,
+				steps: {
+					65: async () => this.CRT.printTyping(`Ehi... mi è sembrato di sentire una vibrazione sotto i piedi...`,{nlBefore: 1, waitBefore: 1500}),
+					50: async () => this.CRT.printTyping(`Un'altra... stavolta era proprio una scossa, l'ho avvertita bene!`,{nlBefore: 1, waitBefore: 1500}),
+					30: async () => this.CRT.printTyping(`Accipicchia, questa era forte... è durata anche diversi secondi...`,{nlBefore: 1, waitBefore: 1500}),
+					25: async () => this.CRT.printTyping(`Inizio a sentire degli scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
+					18: async () => this.CRT.printTyping(`Ancora una piccola scossa... e nuovi scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
+					10: async () => this.CRT.printTyping(`...altra piccola scossa...`,{nlBefore: 1, waitBefore: 1500}),
+					1: async() => this.adventureData.timedEvents.earthquake.currentStep = Math.floor(Math.random() * (17-11) ) + 11
+				}
+			},
+			lastRoom: {
+				start: 10,
 				onLimit: async () => {
 					await this.CRT.printTyping(`-RUMBLE-`,{blinking:true, nlBefore: 1, waitBefore: 1500});
 					await this.CRT.printTyping(`Ed eccola la madre di tutte le scosse di terremoto!`, {waitBefore: 1500});
@@ -740,14 +755,8 @@ class Adventure extends DemoEngine{
 					this.die();
 				},
 				steps: {
-					50: async () => this.CRT.printTyping(`Ehi... mi è sembrato di sentire una vibrazione sotto i piedi...`,{nlBefore: 1, waitBefore: 1500}),
-					39: async () => this.CRT.printTyping(`Un'altra... stavolta era proprio una scossa, l'ho avvertita bene!`,{nlBefore: 1, waitBefore: 1500}),
-					27: async () => this.CRT.printTyping(`Accipicchia, questa era forte... è durata anche diversi secondi...`,{nlBefore: 1, waitBefore: 1500}),
-					17: async () => this.CRT.printTyping(`Inizio a sentire degli scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
-					12: async () => this.CRT.printTyping(`Ancora una piccola scossa... e nuovi scricchiolii...`,{nlBefore: 1, waitBefore: 1500}),
 					7: async () => this.CRT.printTyping(`Un'altra scossa, stavolta più forte...`,{nlBefore: 1, waitBefore: 1500}),
 					5: async () => this.CRT.printTyping(`L'ennesima scossa... abbastanza forte! Oscilla tutto qui! Sarà meglio sbrigarsi ad uscire!`,{nlBefore: 1, waitBefore: 1500}),
-					
 				}
 			}
 		}
