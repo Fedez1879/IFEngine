@@ -364,6 +364,8 @@ class Adventure extends DemoEngine{
 						occhiali.visible = false
 						this._removeFromInventory(occhiali,`quasiFuori`)
 					}
+					this.stopTimedEvent(`earthquake`)
+				
 					await this.runSequence(`crollo`);
 				}
 			},
