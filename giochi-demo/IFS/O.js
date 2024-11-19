@@ -83,6 +83,7 @@ class O{
 		label: ['una pila','una pila scarica'],
 		status: 0,
 		pattern: 'pila',
+		visible: false
 	}
 
 	static scatola = {
@@ -92,12 +93,12 @@ class O{
 			return this.linkedObjects.length ? `ci sono degli oggetti dentro` : `è vuota`
 		},
 		initialDescription: `Appoggiata su un tavolo c'è una scatola.`,
+		on_open: `è già aperta`,
 		on_lookAt: function() {
-			console.log(this)
 			return this.description()
 		},
 		container: true,
-		linkedObjects: [O.pila]
+		linkedObjects: [O.pila, O.piumino]
 	}
 
 	static chiave_rossa = {

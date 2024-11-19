@@ -859,7 +859,7 @@ class IFEngine{
 		
 		// è un'azione!
 		// vediamo se è fattibile
-		
+
 		let testVerb = APO.subjects[0];
 		if(testVerb !== undefined){
 			if(testVerb.indexOf(" ") >=0)
@@ -958,8 +958,6 @@ class IFEngine{
 
 		if(visibile || APO.verb == "search"){
 
-			console.log("here")
-		
 			// Eseguji l'azione sugli oggetti/interattori mappati
 			let actionResult = await this._playAction(APO, mSubjects);
 			
@@ -1026,7 +1024,7 @@ class IFEngine{
 		let interactor = this._get(subject,this.AD.currentRoom.interactors, multiple);
 		let roomObject = this._get(subject, this.AD.currentRoom.objects, multiple);
 		let inventoryObject = this._get(subject, this.AD.inventory, multiple);
-
+		
 		let merged = [...interactor, ...roomObject, ...inventoryObject]
 
 		return merged.length ? merged : null
@@ -1181,7 +1179,7 @@ class IFEngine{
 				;
 
 				if(i.container && i.linkedObjects.length){
-					let linkedObjects = i.linkedObjects.map(e => {
+					let linkedObjects = i.linkedObjects.filter(e => e.visible !== false).map(e => {
 						let label = Array.isArray(e.label) ? 
 							e.label[e.status] : 
 							e.label;
@@ -1292,11 +1290,12 @@ class IFEngine{
 			let res = this._match(needle, jsonObj, multiple);
 
 			if(!res) {
+
 				if(jsonObj.linkedObjects && jsonObj.visible !== false){
 					for(let linked of jsonObj.linkedObjects){
-						if(linked && this._match(needle, linked, true))
-							retObj.push[linked]
-							//return linked;
+						if(linked && this._match(needle, linked, true)){
+							retObj.push(linked)
+						}
 					}
 				}
 				continue;
@@ -1304,10 +1303,12 @@ class IFEngine{
 				//jsonObj.key = k;
 				//return jsonObj;
 				retObj.push(jsonObj)
-							
+			
 			}
 		
 		}
+
+		
 		return retObj.length ? retObj : [];
 	}
 
@@ -1325,11 +1326,10 @@ class IFEngine{
 		else
 			pattern = obj.pattern;
 	
-		
-		if(double && pattern.indexOf("|")){
+		if(double && pattern.indexOf("|") >= 0){
 			pattern = pattern.substring(0,pattern.indexOf("|")).replace(/\(/,'')
 		}
-
+		
 		if(pattern.length == 0)
 			return false
 
