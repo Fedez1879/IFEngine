@@ -90,7 +90,7 @@ class O{
 		label: 'una scatola',
 		pattern: 'scatola',
 		description: function() {
-			return this.linkedObjects.length ? `ci sono degli oggetti dentro` : `è vuota`
+			return this.linkedObjects.filter(e => e.visible !== false).length ? this.label+A.describeContainer(this) : `è vuota`
 		},
 		initialDescription: `Appoggiata su un tavolo c'è una scatola.`,
 		on_open: `è già aperta`,
@@ -98,7 +98,7 @@ class O{
 			return this.description()
 		},
 		container: true,
-		linkedObjects: [O.pila, O.piumino]
+		linkedObjects: [O.pila/*, O.piumino*/]
 	}
 
 	static chiave_rossa = {

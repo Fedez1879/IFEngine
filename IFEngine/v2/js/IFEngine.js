@@ -331,27 +331,29 @@ class IFEngine{
 					let whatISee = Array.isArray(obj.label) ? 
 						obj.label[obj.status] : 
 						obj.label;
-						if(obj.container && obj.linkedObjects.length){
-							let linkedObjects = obj.linkedObjects.map(e => {
-								let label = Array.isArray(e.label) ? 
-									e.label[e.status] : 
-									e.label;
-								return `    ${label}`
-							});
-							if(linkedObjects.length == 1)
-								linkedObjects = " "+linkedObjects.join().trim()
-							else
-								linkedObjects = ":\n"+linkedObjects.join("\n")
-								whatISee += ` ${i18n.IFEngine.containing}${linkedObjects}`
-							
-						}
+					if(obj.container && obj.linkedObjects.length){
+						whatISee += this.describeContainer(obj)
+					}
 					await this.CRT.printTyping("  "+whatISee.trim());
 				}
 			}
 		}
 	}
 
-	
+	describeContainer(obj){
+		let linkedObjects = obj.linkedObjects.filter(e => e.visible !== false).map(e => {
+			let label = Array.isArray(e.label) ? 
+				e.label[e.status] : 
+				e.label;
+			return `  ${label}`
+		});
+		if(linkedObjects.length == 1)
+			linkedObjects = " "+linkedObjects.join().trim()
+		else
+			linkedObjects = ":\n"+linkedObjects.join("\n")
+		return ` ${i18n.IFEngine.containing}${linkedObjects}`
+	}
+
 	// Avvia un evento a tempo
 	startTimedEvent(eventLabel){
 		if(this.activeTimedEvents.indexOf(eventLabel) < 0)
@@ -1179,18 +1181,7 @@ class IFEngine{
 				;
 
 				if(i.container && i.linkedObjects.length){
-					let linkedObjects = i.linkedObjects.filter(e => e.visible !== false).map(e => {
-						let label = Array.isArray(e.label) ? 
-							e.label[e.status] : 
-							e.label;
-						return `    ${label}`
-					})
-					if(linkedObjects.length == 1)
-						linkedObjects = " "+linkedObjects.join().trim()
-					else
-						linkedObjects = ":\n"+linkedObjects.join("\n")
-					
-					label += ` ${i18n.IFEngine.containing}${linkedObjects}`
+					label += this.describeContainer(i)
 				}
 				output += "\n  "+label.trim();
 			}
