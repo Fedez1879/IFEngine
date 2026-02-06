@@ -51,9 +51,8 @@ class O{
 	static piumino = {
 		label: `un piumino nero`,
 		pattern: `(piumino|giacc(?:a|etto))(?: ner(?:o|a))?`,
-		description: function() {
-			return `E' un piumino nero`+ (A.playerHas(O.occhiali) == false ? `. Sembra`:``)+` leggero, primaverile.`+ ((O.taschePiumino.visible === undefined) ? `\nHa quattro tasche, due interne e due esterne.`:``)
-		},
+		description: () => `E' un piumino nero` + (A.playerHas(O.occhiali) == false ? `. Sembra`:``)+` leggero, primaverile.`+ ((O.taschePiumino.visible === undefined) ? `\nHa quattro tasche, due interne e due esterne.`:``)
+		,
 		linkedObjects: [O.taschePiumino],
 		visible: true,
 		worn:false,
