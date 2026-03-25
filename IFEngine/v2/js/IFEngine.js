@@ -35,7 +35,7 @@ class IFEngine{
 		this.startingRoom = R[Object.keys(R).shift()]
 
 		this.AD = {
-			currentRoom: this.startingRoom,
+			currentRoom: null,
 			inventory: []
 		}
 
@@ -222,7 +222,7 @@ class IFEngine{
 	
 	// Entra nella stanza
 	async enterRoom(room, ignoreTimedEvents){
-		if(await this._breakRoomAction("afterExit"))
+		if(this.AD.currentRoom && await this._breakRoomAction("on_exit"))
 			return;
 
 		this.AD.currentRoom = room;
@@ -237,7 +237,7 @@ class IFEngine{
 
 		//this.Parser.setOverride(AD.currentRoom.override);
 
-		if(await this._breakRoomAction("afterEnter"))
+		if(await this._breakRoomAction("on_enter"))
 			return;
 
 		await this.printRoomLabel();
