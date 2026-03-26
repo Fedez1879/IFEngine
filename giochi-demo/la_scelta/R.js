@@ -22,7 +22,7 @@ class R{
 				}
 			}
 		},
-		on_exit: function(){ console.log("on_exit");this.first_enter = false }
+		afterExit: function(){ console.log("afterExit");this.first_enter = false }
 	}
 
 	static casa = {

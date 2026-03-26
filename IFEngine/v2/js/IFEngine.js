@@ -222,7 +222,7 @@ class IFEngine{
 	
 	// Entra nella stanza
 	async enterRoom(room, ignoreTimedEvents){
-		if(this.AD.currentRoom && await this._breakRoomAction("on_exit"))
+		if(this.AD.currentRoom && await this._breakRoomAction("afterExit"))
 			return;
 
 		this.AD.currentRoom = room;
@@ -237,7 +237,7 @@ class IFEngine{
 
 		//this.Parser.setOverride(AD.currentRoom.override);
 
-		if(await this._breakRoomAction("on_enter"))
+		if(await this._breakRoomAction("afterEnter"))
 			return;
 
 		await this.printRoomLabel();
